@@ -16,17 +16,12 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "git@bitbucket.org:remi-san/word-selector.git"
-        },
-        {
-            "type": "vcs",
             "url": "git@bitbucket.org:remi-san/mini-game.git"
         }
     ],
     "require": {
         "rhumsaa/uuid" : "~2.8",
-        "remi-san/mini-game" : "dev-master",
-        "remi-san/word-selector" : "dev-master"
+        "remi-san/mini-game" : "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.5",
