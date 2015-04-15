@@ -1,0 +1,41 @@
+{
+    "name": "remi-san/hang",
+    "description" : "A hangman game using library of text mini-games",
+    "keywords": [
+        "Twitter",
+        "API"
+    ],
+    "authors": [
+        {
+            "name": "Rémi San",
+            "email": "remi.san@gmail.com",
+            "homepage": "http://remi-san.github.io/",
+            "role": "Developer"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@bitbucket.org:remi-san/word-selector.git"
+        },
+        {
+            "type": "vcs",
+            "url": "git@bitbucket.org:remi-san/mini-game.git"
+        }
+    ],
+    "require": {
+        "rhumsaa/uuid" : "~2.8",
+        "remi-san/mini-game" : "dev-master",
+        "remi-san/word-selector" : "dev-master"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.5",
+        "Mockery/Mockery": "~0.9"
+    },
+    "autoload": {
+        "psr-4": {
+            "MiniGame\\": "src/",
+            "MiniGame\\Test\\" : "tests/unit/"
+        }
+    }
+}
