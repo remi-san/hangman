@@ -34,8 +34,8 @@
     },
     "autoload": {
         "psr-4": {
-            "MiniGame\\": "src/",
-            "MiniGame\\Test\\" : "tests/unit/"
+            "Hangman\\": "src/",
+            "Hangman\\Test\\" : "tests/unit/"
         }
     }
 }
