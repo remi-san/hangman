@@ -26,7 +26,7 @@ class Hangman implements MiniGame {
     protected $word;
 
     /**
-     * @var \MiniGame\Player[]
+     * @var Player[]
      */
     protected $players;
 
@@ -169,7 +169,7 @@ class Hangman implements MiniGame {
     /**
      * Get the players
      *
-     * @return \MiniGame\Player[]
+     * @return Player[]
      */
     public function getPlayers()
     {
@@ -208,8 +208,8 @@ class Hangman implements MiniGame {
     /**
      * Function to call after a good proposition of letter has been made
      *
-     * @param  \MiniGame\Player $player
-     * @return \Hangman\Result\HangmanGoodProposition
+     * @param  Player $player
+     * @return HangmanGoodProposition
      */
     protected function goodProposition(Player $player) {
         if ($this->isAllLettersFound($player)) {
@@ -239,7 +239,7 @@ class Hangman implements MiniGame {
      * Function to call when game is won by a player
      *
      * @param  Player $player
-     * @return \Hangman\Result\HangmanWon
+     * @return HangmanWon
      */
     protected function win(Player $player) {
         $this->nextPlayer = null;
