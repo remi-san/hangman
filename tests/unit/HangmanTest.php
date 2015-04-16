@@ -251,4 +251,18 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($this->hangman->canPlay($this->playerOne));
         $this->assertFalse($this->hangman->canPlay($this->playerTwo));
     }
+
+    /**
+     * @test
+     */
+    public function testGetPlayers()
+    {
+        $players = array(
+            $this->playerOne,
+            $this->playerTwo
+        );
+
+        $hangman = new Hangman('word', null, $players);
+        $this->assertEquals($players, $hangman->getPlayers());
+    }
 }
