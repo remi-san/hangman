@@ -10,7 +10,10 @@ use MiniGame\Exceptions\IllegalMoveException;
 use MiniGame\Exceptions\NotPlayerTurnException;
 use MiniGame\GameResult;
 use MiniGame\MiniGame;
+use MiniGame\Move;
 use MiniGame\Player;
+use Hangman\Move\Answer;
+use Hangman\Move\Proposition;
 use Rhumsaa\Uuid\Uuid;
 
 class Hangman implements MiniGame {
@@ -105,11 +108,11 @@ class Hangman implements MiniGame {
      * Allows the player to play the game
      *
      * @param  Player $player
-     * @param  string $answer
+     * @param  Move   $move
      * @return GameResult
      * @throws \Exception
      */
-    public function play(Player $player, $answer)
+    public function play(Player $player, Move $move)
     {
         if (!$this->canPlay($player)) {
             throw new NotPlayerTurnException($player, $this, $this->error($player, 'Error!'), 'It is not your turn to play');
@@ -117,8 +120,8 @@ class Hangman implements MiniGame {
 
         $this->nextPlayer();
 
-        if (strlen($answer) == 1) {
-            $letter = strtoupper($answer);
+        if ($move instanceof Proposition) {
+            $letter = strtoupper($move->getText());
             $positions = $this->contains($letter);
             $this->savePlayedLetter($player, $letter, $positions);
 
@@ -127,12 +130,14 @@ class Hangman implements MiniGame {
             } else {
                 return $this->goodProposition($player); // show the letters in good position
             }
-        } else if ($this->isTheAnswer($answer)) {
-            return $this->win($player); // you win
-        } else if (strlen($answer) == strlen($this->word)) {
-            return $this->lose($player); // you lose
-        } else {
-            throw new IllegalMoveException($player, $this, $this->badProposition($player), $answer, sprintf('"%s" is not a valid answer!', $answer));
+        } else if ($move instanceof Answer && strlen($move->getText()) === strlen($this->word)) {
+            if ($this->isTheAnswer($move->getText())) {
+                return $this->win($player); // you win
+            } else {
+                return $this->lose($player); // you lose
+            }
+        }else {
+            throw new IllegalMoveException($player, $this, $this->badProposition($player), $move, sprintf('"%s" is not a valid answer!', $move->getText()));
         }
     }
 

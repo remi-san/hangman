@@ -2,6 +2,8 @@
 namespace Hangman\Test\Mock;
 
 use Hangman\Hangman;
+use Hangman\Move\Answer;
+use Hangman\Move\Proposition;
 use Hangman\Options\HangmanOptions;
 
 trait HangmanMocker {
@@ -36,5 +38,25 @@ trait HangmanMocker {
         $options->shouldReceive('getPlayers')->andReturn($players);
 
         return $options;
+    }
+
+    /**
+     * @param  string $text
+     * @return Answer
+     */
+    public function getAnswer($text) {
+        $move = \Mockery::mock('\\Hangman\\Move\\Answer');
+        $move->shouldReceive('getText')->andReturn($text);
+        return $move;
+    }
+
+    /**
+     * @param  string $text
+     * @return Proposition
+     */
+    public function getProposition($text) {
+        $move = \Mockery::mock('\\Hangman\\Move\\Proposition');
+        $move->shouldReceive('getText')->andReturn($text);
+        return $move;
     }
 } 
