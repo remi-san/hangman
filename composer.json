@@ -20,7 +20,7 @@
         }
     ],
     "require": {
-        "rhumsaa/uuid" : "~2.8",
+        "ramsey/uuid" : "~2.8",
         "remi-san/mini-game" : "dev-master"
     },
     "require-dev": {
