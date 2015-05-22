@@ -88,6 +88,7 @@ class Hangman implements MiniGame {
 
     /**
      * Returns the name of the mini-game
+     *
      * @return string
      */
     public static function getName() {
