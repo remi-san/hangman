@@ -16,41 +16,59 @@ use Hangman\Move\Answer;
 use Hangman\Move\Proposition;
 use Rhumsaa\Uuid\Uuid;
 
+/**
+ * @Entity(repositoryClass="\Hangman\Repository\HangmanRepository")
+ * @Table(name="minigame.hangman")
+ **/
 class Hangman implements MiniGame {
 
     /**
      * @var string
+     * @Id
+     * @Column(type="integer")
+     * @GeneratedValue
      */
     protected $id;
 
     /**
      * @var string
+     * @Column(type="string")
      */
     protected $word;
 
     /**
      * @var Player[]
-     */
+     * @ManyToMany(targetEntity="Hangman\HangmanPlayer")
+     * @JoinTable(name="hangman_has_player",
+     *     joinColumns={@JoinColumn(name="hangman_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@JoinColumn(name="player_id", referencedColumnName="id")}
+     * )
+     **/
     protected $players;
 
     /**
      * @var array
+     * @Column(type="json_array",name="letters_played")
      */
     protected $lettersPlayed;
 
     /**
      * @var array
+     * @Column(type="json_array",name="bad_letters_played")
      */
     protected $badLettersPlayed;
 
     /**
      * @var array
+     * @Column(type="json_array", name="remaining_chances")
      */
     protected $remainingChances;
 
     /**
      * @var Player
-     */
+     * @ManyToOne(targetEntity="Hangman\HangmanPlayer")
+     * @JoinColumn(name="next_player_id", referencedColumnName="id")
+     **/
     protected $nextPlayer;
 
     /**
