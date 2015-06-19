@@ -19,7 +19,7 @@ class HangmanPlayer implements Player {
 
     /**
      * @var string
-     * @Column(type="string")
+     * @Column(type="string", unique="true")
      */
     protected $name;
 

@@ -1,0 +1,45 @@
+Hangman\Hangman:
+  type: entity
+  repositoryClass: Hangman\Repository\HangmanRepository
+  table: hangman
+  schema: minigame
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    word:
+      column: word
+      type: string
+      length: 45
+      nullable: false
+    lettersPlayed:
+      column: letters_played
+      type: json_array
+      nullable: false
+    badLettersPlayed:
+      column: bad_letters_played
+      type: json_array
+      nullable: false
+    remainingChances:
+      column: remaining_chances
+      type: json_array
+      nullable: false
+  manyToOne:
+    nextPlayer:
+      targetEntity: HangmanPlayer
+      joinColumn:
+        name: next_player_id
+        referencedColumnName: id
+  manyToMany:
+    players:
+      targetEntity: HangmanPlayer
+      joinTable:
+        name: hangman_has_player
+        joinColumns:
+          hangman_id:
+            referencedColumnName: id
+        inverseJoinColumns:
+          player_id:
+            referencedColumnName: id

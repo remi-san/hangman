@@ -1,0 +1,18 @@
+Hangman\HangmanPlayer:
+  type: entity
+  repositoryClass: Hangman\Repository\HangmanPlayerRepository
+  table: player
+  schema: minigame
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+  fields:
+    name:
+      column: name
+      type: string
+      length: 45
+      unique: true
+      nullable: false
+    
