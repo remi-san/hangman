@@ -24,18 +24,25 @@ class HangmanOptions extends AbstractGameOptions implements GameOptions {
     private $word;
 
     /**
+     * @var string
+     */
+    private $language;
+
+    /**
      * Constructor
      *
      * @param  string   $word
+     * @param  string   $language
      * @param  int      $length
      * @param  int      $level
      * @param  int      $lives
      * @param  Player[] $players
      * @throws IllegalOptionException
      */
-    public function __construct($word = null, $length = null, $level = null, $lives = 6, array $players = array()) {
+    public function __construct($word = null, $language = 'en', $length = null, $level = null, $lives = 6, array $players = array()) {
         parent::__construct($lives, $players);
         $this->setWord($word);
+        $this->setLanguage($language);
         $this->setLength($length);
         $this->setLevel($level);
     }
@@ -101,5 +108,21 @@ class HangmanOptions extends AbstractGameOptions implements GameOptions {
         }
 
         $this->word = $word;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLanguage()
+    {
+        return $this->language;
+    }
+
+    /**
+     * @param string $language
+     */
+    public function setLanguage($language)
+    {
+        $this->language = $language;
     }
 } 

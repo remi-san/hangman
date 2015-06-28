@@ -23,7 +23,7 @@ class HangmanOptionsTest extends \PHPUnit_Framework_TestCase {
     public function testHangmanOptionsWithWord()
     {
         $word    = 'word';
-        $options = new HangmanOptions($word, null, null, $this->lives, $this->players);
+        $options = new HangmanOptions($word, 'en', null, null, $this->lives, $this->players);
 
         $this->assertEquals($word, $options->getWord());
         $this->assertNull($options->getLength());
@@ -38,7 +38,7 @@ class HangmanOptionsTest extends \PHPUnit_Framework_TestCase {
     public function testHangmanOptionsWithWordAndAddPlayer()
     {
         $word    = 'word';
-        $options = new HangmanOptions($word, null, null, $this->lives, $this->players);
+        $options = new HangmanOptions($word, 'en', null, null, $this->lives, $this->players);
 
         $this->assertEquals($word, $options->getWord());
         $this->assertNull($options->getLength());
@@ -59,7 +59,7 @@ class HangmanOptionsTest extends \PHPUnit_Framework_TestCase {
     public function testHangmanOptionsWithLength()
     {
         $length  = 5;
-        $options = new HangmanOptions(null, $length, null, $this->lives, $this->players);
+        $options = new HangmanOptions(null, 'en', $length, null, $this->lives, $this->players);
 
         $this->assertNull($options->getWord());
         $this->assertEquals($length, $options->getLength());
@@ -75,7 +75,7 @@ class HangmanOptionsTest extends \PHPUnit_Framework_TestCase {
     {
         $length  = 5;
         $level   = 5;
-        $options = new HangmanOptions(null, $length, $level, $this->lives, $this->players);
+        $options = new HangmanOptions(null, 'en', $length, $level, $this->lives, $this->players);
 
         $this->assertNull($options->getWord());
         $this->assertEquals($length, $options->getLength());
@@ -94,7 +94,7 @@ class HangmanOptionsTest extends \PHPUnit_Framework_TestCase {
 
         $this->setExpectedException('\\MiniGame\\Exceptions\\IllegalOptionException');
 
-        new HangmanOptions($word, $length, null, $this->lives, $this->players);
+        new HangmanOptions($word, 'en', $length, null, $this->lives, $this->players);
     }
 
     /**
@@ -107,7 +107,7 @@ class HangmanOptionsTest extends \PHPUnit_Framework_TestCase {
 
         $this->setExpectedException('\\MiniGame\\Exceptions\\IllegalOptionException');
 
-        new HangmanOptions($word, null, $level, $this->lives, $this->players);
+        new HangmanOptions($word, 'en', null, $level, $this->lives, $this->players);
     }
 
     /**
@@ -121,7 +121,7 @@ class HangmanOptionsTest extends \PHPUnit_Framework_TestCase {
 
         $this->setExpectedException('\\MiniGame\\Exceptions\\IllegalOptionException');
 
-        new HangmanOptions($word, $length, $level, $this->lives, $this->players);
+        new HangmanOptions($word, 'en', $length, $level, $this->lives, $this->players);
     }
 
     /**
@@ -135,7 +135,7 @@ class HangmanOptionsTest extends \PHPUnit_Framework_TestCase {
 
         $this->setExpectedException('\\MiniGame\\Exceptions\\IllegalOptionException');
 
-        $options = new HangmanOptions(null, $length, $level, $this->lives, $this->players);
+        $options = new HangmanOptions(null, 'en', $length, $level, $this->lives, $this->players);
         $options->setWord($word);
     }
 } 
