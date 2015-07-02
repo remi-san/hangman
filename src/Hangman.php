@@ -168,7 +168,7 @@ class Hangman implements MiniGame {
      */
     public function canPlay(Player $player)
     {
-        return $this->nextPlayer !== null && $this->nextPlayer->getId() === $player->getId();
+        return $this->nextPlayer && $this->nextPlayer->getId() === $player->getId();
     }
 
     /**
@@ -209,10 +209,6 @@ class Hangman implements MiniGame {
         $nextPlayer = next($this->players);
         if (!$nextPlayer) {
             $nextPlayer = reset($this->players);
-        }
-
-        if (!$nextPlayer) {
-            $nextPlayer = null;
         }
 
         $this->nextPlayer = $nextPlayer;

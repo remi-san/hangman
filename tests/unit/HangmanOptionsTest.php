@@ -23,13 +23,15 @@ class HangmanOptionsTest extends \PHPUnit_Framework_TestCase {
     public function testHangmanOptionsWithWord()
     {
         $word    = 'word';
-        $options = new HangmanOptions($word, 'en', null, null, $this->lives, $this->players);
+        $lang = 'en';
+        $options = new HangmanOptions($word, $lang, null, null, $this->lives, $this->players);
 
         $this->assertEquals($word, $options->getWord());
         $this->assertNull($options->getLength());
         $this->assertNull($options->getLevel());
         $this->assertEquals($this->lives, $options->getLives());
         $this->assertEquals($this->players, $options->getPlayers());
+        $this->assertEquals($lang, $options->getLanguage());
     }
 
     /**
