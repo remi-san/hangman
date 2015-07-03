@@ -23,12 +23,13 @@ trait HangmanMocker {
 
     /**
      * @param  string $word
+     * @param  string $lang
      * @param  int    $length
      * @param  int    $level
      * @param  array  $players
      * @return \Hangman\Options\HangmanOptions
      */
-    public function getHangmanOptions($word = null, $length = null, $level = null, array $players = array())
+    public function getHangmanOptions($word = null, $lang = 'en', $length = null, $level = null, array $players = array())
     {
         $options = \Mockery::mock('\\Hangman\\Options\\HangmanOptions');
 
@@ -36,6 +37,7 @@ trait HangmanMocker {
         $options->shouldReceive('getLength')->andReturn($length);
         $options->shouldReceive('getLevel')->andReturn($level);
         $options->shouldReceive('getPlayers')->andReturn($players);
+        $options->shouldReceive('getLanguage')->andReturn($lang);
 
         return $options;
     }
