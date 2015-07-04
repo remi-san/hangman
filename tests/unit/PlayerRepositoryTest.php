@@ -8,7 +8,7 @@ class PlayerRepositoryTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function testWordService() {
+    public function testSaveDelete() {
 
         $player = \Mockery::mock('\\Hangman\\HangmanPlayer');
 
