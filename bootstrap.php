@@ -17,4 +17,17 @@ $hangmanRepository = $entityManager->getRepository('\\Hangman\\Hangman');
 
 $player = new \Hangman\HangmanPlayer(null, "remi");
 $playerRepository->save($player);
+
+$hangman = new \Hangman\Hangman(null, 'word', array($player));
+$hangmanRepository->save($hangman);
+
+$hangman = $hangmanRepository->find($hangman->getId());
+
+$entityManager->flush();
+
+$hangman = $hangmanRepository->findPlayerMinigame($player);
+
+$hangmanRepository->delete($hangman);
+$playerRepository->delete($player);
+
 $entityManager->flush();

@@ -36,7 +36,7 @@ Hangman\Hangman:
     players:
       targetEntity: HangmanPlayer
       joinTable:
-        name: hangman_has_player
+        name: minigame.hangman_has_player
         joinColumns:
           hangman_id:
             referencedColumnName: id

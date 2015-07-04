@@ -74,12 +74,12 @@ class Hangman implements MiniGame {
     /**
      * Constructor
      *
-     * @param string   $word
      * @param string   $id
+     * @param string   $word
      * @param Player[] $players
      * @param int      $chances
      */
-    public function __construct($word, $id = null, array $players = array(), $chances = 6) {
+    public function __construct($id = null, $word, array $players = array(), $chances = 6) {
         if ($id === null) {
             $id = Uuid::uuid4()->toString();
         }

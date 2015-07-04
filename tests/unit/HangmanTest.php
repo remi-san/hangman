@@ -44,7 +44,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
     public function setUp() {
         $this->playerOne = $this->getPlayer(self::P1_ID, self::P1_NAME);
         $this->playerTwo = $this->getPlayer(self::P2_ID, self::P2_NAME);
-        $this->hangman = new Hangman(self::WORD, self::ID, array($this->playerOne, $this->playerTwo), self::CHANCES);
+        $this->hangman = new Hangman(self::ID, self::WORD, array($this->playerOne, $this->playerTwo), self::CHANCES);
     }
 
     /**
@@ -60,7 +60,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function testUuidIsGenerated() {
-        $hangman = new Hangman(self::WORD);
+        $hangman = new Hangman(null, self::WORD);
         $this->assertTrue(Uuid::isValid($hangman->getId()));
     }
 
@@ -160,7 +160,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
         $word = 'AAAA';
 
         /* @var $feedback \Hangman\Result\HangmanWon */
-        $hangman = new Hangman($word, self::ID, array($this->playerOne, $this->playerTwo), self::CHANCES);
+        $hangman = new Hangman(self::ID, $word, array($this->playerOne, $this->playerTwo), self::CHANCES);
         $feedback = $hangman->play($this->playerOne, $this->getProposition('A'));
 
         $this->assertInstanceOf('\\Hangman\\Result\\HangmanWon', $feedback);
@@ -180,7 +180,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function testPlayerOneLoses() {
-        $hangman = new Hangman(self::WORD, self::ID, array($this->playerOne, $this->playerTwo), 1);
+        $hangman = new Hangman(self::ID, self::WORD, array($this->playerOne, $this->playerTwo), 1);
 
         /* @var $feedback \Hangman\Result\HangmanLost */
         $feedback = $hangman->play($this->playerOne, $this->getProposition('Z'));
@@ -262,7 +262,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
             $this->playerTwo
         );
 
-        $hangman = new Hangman('word', null, $players);
+        $hangman = new Hangman(self::ID, 'word', $players);
         $this->assertEquals($players, $hangman->getPlayers());
     }
 }

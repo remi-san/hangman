@@ -28,7 +28,7 @@ class HangmanPlayerRepository extends EntityRepository implements PlayerReposito
      */
     public function delete(Player $player)
     {
-        $this->_em->detach($player);
+        $this->_em->remove($player);
     }
 
 }

@@ -14,7 +14,7 @@ class PlayerRepositoryTest extends \PHPUnit_Framework_TestCase {
 
         $entityManager = \Mockery::mock('\\Doctrine\\ORM\\EntityManager');
         $entityManager->shouldReceive('persist')->with($player)->once();
-        $entityManager->shouldReceive('detach')->with($player)->once();
+        $entityManager->shouldReceive('remove')->with($player)->once();
 
         $classMetadata = \Mockery::mock('\\Doctrine\\ORM\\Mapping\ClassMetadata');
 
