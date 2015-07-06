@@ -5,6 +5,11 @@ use Hangman\Repository\HangmanPlayerRepository;
 
 class PlayerRepositoryTest extends \PHPUnit_Framework_TestCase {
 
+    public function tearDown()
+    {
+        \Mockery::close();
+    }
+
     /**
      * @test
      */

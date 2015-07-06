@@ -6,6 +6,11 @@ use Hangman\Repository\HangmanRepository;
 
 class HangmanRepositoryTest extends \PHPUnit_Framework_TestCase {
 
+    public function tearDown()
+    {
+        \Mockery::close();
+    }
+
     /**
      * @test
      */

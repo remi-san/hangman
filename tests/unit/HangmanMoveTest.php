@@ -6,6 +6,11 @@ use Hangman\Move\Proposition;
 
 class HangmanMoveTest extends \PHPUnit_Framework_TestCase {
 
+    public function tearDown()
+    {
+        \Mockery::close();
+    }
+
     /**
      * @test
      */

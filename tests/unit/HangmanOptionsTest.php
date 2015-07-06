@@ -17,6 +17,11 @@ class HangmanOptionsTest extends \PHPUnit_Framework_TestCase {
         $this->lives = 5;
     }
 
+    public function tearDown()
+    {
+        \Mockery::close();
+    }
+
     /**
      * @test
      */

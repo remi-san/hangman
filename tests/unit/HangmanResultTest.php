@@ -21,6 +21,11 @@ class HangmanResultTest extends \PHPUnit_Framework_TestCase {
         $this->lettersPlayed = array('A', 'E', 'Z');
     }
 
+    public function tearDown()
+    {
+        \Mockery::close();
+    }
+
     /**
      * @test
      */

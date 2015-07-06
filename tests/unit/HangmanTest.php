@@ -47,6 +47,11 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
         $this->hangman = new Hangman(self::ID, self::WORD, array($this->playerOne, $this->playerTwo), self::CHANCES);
     }
 
+    public function tearDown()
+    {
+        \Mockery::close();
+    }
+
     /**
      * @test
      */

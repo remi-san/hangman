@@ -2,6 +2,7 @@
 namespace Hangman;
 
 use MiniGame\Player;
+use Rhumsaa\Uuid\Uuid;
 
 /**
  * @Entity(repositoryClass="\Hangman\Repository\HangmanPlayerRepository")
@@ -31,6 +32,10 @@ class HangmanPlayer implements Player {
      */
     function __construct($id, $name)
     {
+        if ($id === null) {
+            $id = Uuid::uuid4()->toString();
+        }
+
         $this->id = $id;
         $this->name = $name;
     }
