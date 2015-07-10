@@ -5,14 +5,18 @@ Hangman\Hangman:
   schema: minigame
   id:
     id:
-      type: integer
+      type: guid
       generator:
-        strategy: AUTO
+        strategy: NONE
   fields:
     word:
       column: word
       type: string
       length: 45
+      nullable: false
+    gameOrder:
+      column: game_order
+      type: json_array
       nullable: false
     lettersPlayed:
       column: letters_played
@@ -27,10 +31,10 @@ Hangman\Hangman:
       type: json_array
       nullable: false
   manyToOne:
-    nextPlayer:
+    currentPlayer:
       targetEntity: HangmanPlayer
       joinColumn:
-        name: next_player_id
+        name: current_player_id
         referencedColumnName: id
   manyToMany:
     players:

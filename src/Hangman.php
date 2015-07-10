@@ -25,8 +25,8 @@ class Hangman implements MiniGame {
     /**
      * @var string
      * @Id
-     * @Column(type="integer")
-     * @GeneratedValue
+     * @Column(type="guid")
+     * @GeneratedValue(strategy="NONE")
      */
     protected $id;
 
@@ -45,6 +45,12 @@ class Hangman implements MiniGame {
      * )
      **/
     protected $players;
+
+    /**
+     * @var array
+     * @Column(type="json_array",name="game_order")
+     */
+    protected $gameOrder;
 
     /**
      * @var array
@@ -67,9 +73,9 @@ class Hangman implements MiniGame {
     /**
      * @var Player
      * @ManyToOne(targetEntity="Hangman\HangmanPlayer")
-     * @JoinColumn(name="next_player_id", referencedColumnName="id")
+     * @JoinColumn(name="current_player_id", referencedColumnName="id")
      **/
-    protected $nextPlayer;
+    protected $currentPlayer;
 
     /**
      * Constructor
@@ -88,9 +94,12 @@ class Hangman implements MiniGame {
         $this->word = strtoupper($word);
         $this->players = $players;
 
+        $this->gameOrder = array();
+
         $this->lettersPlayed = array();
         $this->badLettersPlayed = array();
 
+        $order = 0;
         foreach ($players as $player) {
             $playerId = $player->getId();
             $this->lettersPlayed[$playerId] = array();
@@ -99,9 +108,10 @@ class Hangman implements MiniGame {
                 $this->lettersPlayed[$playerId][$i] = '_';
             }
             $this->remainingChances[$playerId] = $chances;
+            $this->gameOrder[$order++] = $playerId;
         }
 
-        $this->nextPlayer = reset($players);
+        $this->currentPlayer = reset($players);
     }
 
     /**
@@ -168,7 +178,7 @@ class Hangman implements MiniGame {
      */
     public function canPlay(Player $player)
     {
-        return $this->nextPlayer && $this->nextPlayer->getId() === $player->getId();
+        return $this->currentPlayer && $this->currentPlayer->getId() === $player->getId();
     }
 
     /**
@@ -186,8 +196,8 @@ class Hangman implements MiniGame {
      *
      * @return Player
      */
-    public function getNextPlayer() {
-        return $this->nextPlayer;
+    public function getCurrentPlayer() {
+        return $this->currentPlayer;
     }
 
     /**
@@ -206,12 +216,32 @@ class Hangman implements MiniGame {
      * @return void
      */
     protected function nextPlayer() {
-        $nextPlayer = next($this->players);
-        if (!$nextPlayer) {
-            $nextPlayer = reset($this->players);
+        $currentPlayerId = $this->currentPlayer->getId();
+        $nextPlayerId = null;
+
+        $stop = false;
+        foreach($this->gameOrder as $pId) {
+            if ($stop) {
+                $nextPlayerId = $pId;
+                break;
+            } else if ($currentPlayerId == $pId) {
+                $stop = true;
+            }
+
+            if ($nextPlayerId === null) {
+                $nextPlayerId = $pId;
+            }
         }
 
-        $this->nextPlayer = $nextPlayer;
+        $nextPlayer = null;
+        foreach($this->players as $player) {
+            if ($player->getId() == $nextPlayerId) {
+                $nextPlayer = $player;
+                break;
+            }
+        }
+
+        $this->currentPlayer = $nextPlayer;
     }
 
     /**
@@ -262,7 +292,7 @@ class Hangman implements MiniGame {
      * @return HangmanWon
      */
     protected function win(Player $player) {
-        $this->nextPlayer = null;
+        $this->currentPlayer = null;
         return new HangmanWon($player, $this->getPlayedLetters($player), $this->getRemainingChances($player), $this->word);
     }
 
@@ -355,4 +385,4 @@ class Hangman implements MiniGame {
         $badLetters = $this->badLettersPlayed[$playerId];
         return array_unique(array_merge($badLetters, array_filter($letters, function($l){ return $l != '_'; })));
     }
-} 
+}

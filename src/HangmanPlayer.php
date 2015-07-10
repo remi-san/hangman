@@ -13,8 +13,8 @@ class HangmanPlayer implements Player {
     /**
      * @var int
      * @Id
-     * @Column(type="integer")
-     * @GeneratedValue
+     * @Column(type="string")
+     * @GeneratedValue(strategy="NONE")
      */
     protected $id;
 

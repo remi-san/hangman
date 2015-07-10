@@ -5,9 +5,9 @@ Hangman\HangmanPlayer:
   schema: minigame
   id:
     id:
-      type: integer
+      type: guid
       generator:
-        strategy: AUTO
+        strategy: NONE
   fields:
     name:
       column: name
