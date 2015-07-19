@@ -73,8 +73,18 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
      * @test
      */
     public function testCanPlay() {
-        $this->assertTrue($this->hangman->canPlay($this->playerOne));
-        $this->assertFalse($this->hangman->canPlay($this->playerTwo));
+        $this->assertTrue($this->hangman->canPlayerPlay($this->playerOne));
+        $this->assertFalse($this->hangman->canPlayerPlay($this->playerTwo));
+    }
+
+    /**
+     * @test
+     */
+    public function testPlayerOnePlaysWithUnknownMove() {
+        $this->setExpectedException('\\MiniGame\\Exceptions\\IllegalMoveException');
+
+        /* @var $feedback HangmanGoodProposition */
+        $this->hangman->play($this->playerOne, $this->getMove('unknown'));
     }
 
     /**
@@ -93,8 +103,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(self::CHANCES, $this->hangman->getRemainingChances($this->playerOne));
         $this->assertEquals(self::CHANCES, $this->hangman->getRemainingChances($this->playerTwo));
 
-        $this->assertFalse($this->hangman->canPlay($this->playerOne));
-        $this->assertTrue($this->hangman->canPlay($this->playerTwo));
+        $this->assertFalse($this->hangman->canPlayerPlay($this->playerOne));
+        $this->assertTrue($this->hangman->canPlayerPlay($this->playerTwo));
     }
 
     /**
@@ -113,8 +123,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(self::CHANCES-1, $this->hangman->getRemainingChances($this->playerOne));
         $this->assertEquals(self::CHANCES, $this->hangman->getRemainingChances($this->playerTwo));
 
-        $this->assertFalse($this->hangman->canPlay($this->playerOne));
-        $this->assertTrue($this->hangman->canPlay($this->playerTwo));
+        $this->assertFalse($this->hangman->canPlayerPlay($this->playerOne));
+        $this->assertTrue($this->hangman->canPlayerPlay($this->playerTwo));
     }
 
     /**
@@ -131,8 +141,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
             $this->assertEquals(self::CHANCES-1, $this->hangman->getRemainingChances($this->playerOne));
             $this->assertEquals(self::CHANCES, $this->hangman->getRemainingChances($this->playerTwo));
 
-            $this->assertFalse($this->hangman->canPlay($this->playerOne));
-            $this->assertTrue($this->hangman->canPlay($this->playerTwo));
+            $this->assertFalse($this->hangman->canPlayerPlay($this->playerOne));
+            $this->assertTrue($this->hangman->canPlayerPlay($this->playerTwo));
 
             throw $e;
         }
@@ -154,8 +164,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(self::CHANCES, $this->hangman->getRemainingChances($this->playerOne));
         $this->assertEquals(self::CHANCES, $this->hangman->getRemainingChances($this->playerTwo));
 
-        $this->assertFalse($this->hangman->canPlay($this->playerOne));
-        $this->assertFalse($this->hangman->canPlay($this->playerTwo));
+        $this->assertFalse($this->hangman->canPlayerPlay($this->playerOne));
+        $this->assertFalse($this->hangman->canPlayerPlay($this->playerTwo));
     }
 
     /**
@@ -177,8 +187,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(self::CHANCES, $hangman->getRemainingChances($this->playerOne));
         $this->assertEquals(self::CHANCES, $hangman->getRemainingChances($this->playerTwo));
 
-        $this->assertFalse($hangman->canPlay($this->playerOne));
-        $this->assertFalse($hangman->canPlay($this->playerTwo));
+        $this->assertFalse($hangman->canPlayerPlay($this->playerOne));
+        $this->assertFalse($hangman->canPlayerPlay($this->playerTwo));
     }
 
     /**
@@ -199,8 +209,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(0, $hangman->getRemainingChances($this->playerOne));
         $this->assertEquals(1, $hangman->getRemainingChances($this->playerTwo));
 
-        $this->assertFalse($hangman->canPlay($this->playerOne));
-        $this->assertTrue($hangman->canPlay($this->playerTwo));
+        $this->assertFalse($hangman->canPlayerPlay($this->playerOne));
+        $this->assertFalse($hangman->canPlayerPlay($this->playerTwo));
     }
 
     /**
@@ -219,8 +229,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(self::CHANCES, $this->hangman->getRemainingChances($this->playerOne));
         $this->assertEquals(self::CHANCES, $this->hangman->getRemainingChances($this->playerTwo));
 
-        $this->assertFalse($this->hangman->canPlay($this->playerOne));
-        $this->assertTrue($this->hangman->canPlay($this->playerTwo));
+        $this->assertFalse($this->hangman->canPlayerPlay($this->playerOne));
+        $this->assertFalse($this->hangman->canPlayerPlay($this->playerTwo));
     }
 
     /**
@@ -237,7 +247,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
             $this->assertEquals(self::CHANCES, $this->hangman->getRemainingChances($this->playerOne));
             $this->assertEquals(self::CHANCES, $this->hangman->getRemainingChances($this->playerTwo));
 
-            $this->assertTrue($this->hangman->canPlay($this->playerOne));
+            $this->assertTrue($this->hangman->canPlayerPlay($this->playerOne));
             throw $e;
         }
     }
@@ -248,13 +258,13 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
     public function testTwoPlayersPlayOnTheirTurn() {
         $this->hangman->play($this->playerOne, $this->getProposition('A'));
 
-        $this->assertFalse($this->hangman->canPlay($this->playerOne));
-        $this->assertTrue($this->hangman->canPlay($this->playerTwo));
+        $this->assertFalse($this->hangman->canPlayerPlay($this->playerOne));
+        $this->assertTrue($this->hangman->canPlayerPlay($this->playerTwo));
 
         $this->hangman->play($this->playerTwo, $this->getProposition('A'));
 
-        $this->assertTrue($this->hangman->canPlay($this->playerOne));
-        $this->assertFalse($this->hangman->canPlay($this->playerTwo));
+        $this->assertTrue($this->hangman->canPlayerPlay($this->playerOne));
+        $this->assertFalse($this->hangman->canPlayerPlay($this->playerTwo));
     }
 
     /**

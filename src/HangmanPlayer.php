@@ -4,23 +4,15 @@ namespace Hangman;
 use MiniGame\Player;
 use Rhumsaa\Uuid\Uuid;
 
-/**
- * @Entity(repositoryClass="\Hangman\Repository\HangmanPlayerRepository")
- * @Table(name="minigame.player")
- **/
 class HangmanPlayer implements Player {
 
     /**
      * @var int
-     * @Id
-     * @Column(type="string")
-     * @GeneratedValue(strategy="NONE")
      */
     protected $id;
 
     /**
      * @var string
-     * @Column(type="string", unique="true")
      */
     protected $name;
 

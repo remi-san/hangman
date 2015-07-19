@@ -1,6 +1,7 @@
 <?php
 namespace Hangman;
 
+use Hangman\Exception\HangmanException;
 use Hangman\Result\HangmanBadProposition;
 use Hangman\Result\HangmanError;
 use Hangman\Result\HangmanGoodProposition;
@@ -16,64 +17,45 @@ use Hangman\Move\Answer;
 use Hangman\Move\Proposition;
 use Rhumsaa\Uuid\Uuid;
 
-/**
- * @Entity(repositoryClass="\Hangman\Repository\HangmanRepository")
- * @Table(name="minigame.hangman")
- **/
 class Hangman implements MiniGame {
 
     /**
      * @var string
-     * @Id
-     * @Column(type="guid")
-     * @GeneratedValue(strategy="NONE")
      */
     protected $id;
 
     /**
      * @var string
-     * @Column(type="string")
      */
     protected $word;
 
     /**
      * @var Player[]
-     * @ManyToMany(targetEntity="Hangman\HangmanPlayer")
-     * @JoinTable(name="hangman_has_player",
-     *     joinColumns={@JoinColumn(name="hangman_id", referencedColumnName="id")},
-     *     inverseJoinColumns={@JoinColumn(name="player_id", referencedColumnName="id")}
-     * )
      **/
     protected $players;
 
     /**
      * @var array
-     * @Column(type="json_array",name="game_order")
      */
     protected $gameOrder;
 
     /**
      * @var array
-     * @Column(type="json_array",name="letters_played")
      */
     protected $lettersPlayed;
 
     /**
      * @var array
-     * @Column(type="json_array",name="bad_letters_played")
      */
     protected $badLettersPlayed;
 
     /**
      * @var array
-     * @Column(type="json_array", name="remaining_chances")
      */
     protected $remainingChances;
 
     /**
      * @var Player
-     * @ManyToOne(targetEntity="Hangman\HangmanPlayer")
-     * @JoinColumn(name="current_player_id", referencedColumnName="id")
      **/
     protected $currentPlayer;
 
@@ -143,30 +125,75 @@ class Hangman implements MiniGame {
      */
     public function play(Player $player, Move $move)
     {
-        if (!$this->canPlay($player)) {
+        if (!$this->canPlayerPlay($player)) {
             throw new NotPlayerTurnException($player, $this, $this->error($player, 'Error!'), 'It is not your turn to play');
         }
 
-        $this->nextPlayer();
-
-        if ($move instanceof Proposition) {
-            $letter = strtoupper($move->getText());
-            $positions = $this->contains($letter);
-            $this->savePlayedLetter($player, $letter, $positions);
-
-            if (!$positions) {
-                return $this->badProposition($player); // remove a life
-            } else {
-                return $this->goodProposition($player); // show the letters in good position
+        try {
+            if ($move instanceof Proposition) {
+                return $this->proposeLetter($player, $move->getText());
+            } else if ($move instanceof Answer) {
+                return $this->proposeAnswer($player, $move->getText());
+            }else {
+                throw new HangmanException('Unsupported Move!');
             }
-        } else if ($move instanceof Answer && strlen($move->getText()) === strlen($this->word)) {
-            if ($this->isTheAnswer($move->getText())) {
-                return $this->win($player); // you win
-            } else {
-                return $this->lose($player); // you lose
-            }
-        }else {
-            throw new IllegalMoveException($player, $this, $this->badProposition($player), $move, sprintf('"%s" is not a valid answer!', $move->getText()));
+        } catch (HangmanException $e) {
+            throw new IllegalMoveException($player, $this, $this->badProposition($player), $move, $e->getMessage());
+        }
+    }
+
+    /**
+     * Propose a letter
+     *
+     * @param  Player $player
+     * @param  string $letter
+     * @return HangmanBadProposition|HangmanGoodProposition
+     */
+    protected function proposeLetter(Player $player, $letter)
+    {
+        $capLetter = strtoupper($letter);
+        $positions = $this->contains($capLetter);
+        $this->savePlayedLetter($player, $capLetter, $positions);
+
+        $result =  (!$positions)
+                   ? $this->badProposition($player) // remove a life
+                   : $this->goodProposition($player); // yay!
+
+        $this->endCurrentPlayerTurn();
+
+        return $result;
+    }
+
+    /**
+     * Propose an answer
+     *
+     * @param  Player $player
+     * @param  string $answer
+     * @return HangmanLost|HangmanWon
+     */
+    protected function proposeAnswer(Player $player, $answer)
+    {
+        $this->checkAnswerIsValid($answer);
+
+        if ($this->isTheAnswer($answer)) {
+            return $this->win($player); // you win
+        } else {
+            return $this->lose($player); // you lose
+        }
+    }
+
+    /**
+     * Checks if the answer is valid
+     * If it's not, ends player turn and throws an HangmanException
+     *
+     * @param  string $answer
+     * @throws HangmanException
+     */
+    protected function checkAnswerIsValid($answer)
+    {
+        if (strlen($answer) !== strlen($this->word)) {
+            $this->endCurrentPlayerTurn();
+            throw new HangmanException(sprintf('"%s" is not a valid answer!', $answer));
         }
     }
 
@@ -176,7 +203,7 @@ class Hangman implements MiniGame {
      * @param  Player $player
      * @return bool
      */
-    public function canPlay(Player $player)
+    public function canPlayerPlay(Player $player)
     {
         return $this->currentPlayer && $this->currentPlayer->getId() === $player->getId();
     }
@@ -215,7 +242,12 @@ class Hangman implements MiniGame {
      *
      * @return void
      */
-    protected function nextPlayer() {
+    protected function endCurrentPlayerTurn()
+    {
+        if ($this->currentPlayer === null) {
+            return;
+        }
+
         $currentPlayerId = $this->currentPlayer->getId();
         $nextPlayerId = null;
 
@@ -303,6 +335,7 @@ class Hangman implements MiniGame {
      * @return HangmanLost
      */
     protected function lose(Player $player) {
+        $this->currentPlayer = null;
         return new HangmanLost($player, $this->getPlayedLetters($player), $this->getRemainingChances($player), $this->word);
     }
 
