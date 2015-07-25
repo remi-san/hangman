@@ -4,8 +4,8 @@ namespace Hangman\Result;
 use MiniGame\Player;
 use MiniGame\Result\Proposition;
 
-abstract class HangmanProposition extends HangmanGameResult implements Proposition {
-
+abstract class HangmanProposition extends HangmanGameResult implements Proposition
+{
     /**
      * @var string
      */
@@ -30,4 +30,4 @@ abstract class HangmanProposition extends HangmanGameResult implements Propositi
     {
         return $this->feedback;
     }
-} 
+}

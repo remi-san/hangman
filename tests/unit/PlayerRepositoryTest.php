@@ -3,8 +3,8 @@ namespace Hangman\Test;
 
 use Hangman\Repository\HangmanPlayerRepository;
 
-class PlayerRepositoryTest extends \PHPUnit_Framework_TestCase {
-
+class PlayerRepositoryTest extends \PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         \Mockery::close();
@@ -13,7 +13,8 @@ class PlayerRepositoryTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function testSaveDelete() {
+    public function testSaveDelete()
+    {
 
         $player = \Mockery::mock('\\Hangman\\HangmanPlayer');
 
@@ -27,4 +28,4 @@ class PlayerRepositoryTest extends \PHPUnit_Framework_TestCase {
         $mr->save($player);
         $mr->delete($player);
     }
-} 
+}

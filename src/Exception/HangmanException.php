@@ -1,4 +1,6 @@
 <?php
 namespace Hangman\Exception;
 
-class HangmanException extends \Exception {}
+class HangmanException extends \Exception
+{
+}

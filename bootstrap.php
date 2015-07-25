@@ -9,7 +9,10 @@ $dbParams = array(
     "dbname"   => "games",
 );
 
-$dbConfig = \Doctrine\ORM\Tools\Setup::createYAMLMetadataConfiguration(array("/home/macosx/web/twitter-hangman/vendor/remi-san/hangman/config/orm"), true);
+$dbConfig = \Doctrine\ORM\Tools\Setup::createYAMLMetadataConfiguration(
+    array("/home/macosx/web/twitter-hangman/vendor/remi-san/hangman/config/orm"),
+    true
+);
 $entityManager = \Doctrine\ORM\EntityManager::create($dbParams, $dbConfig);
 
 $playerRepository  = $entityManager->getRepository('\\Hangman\\HangmanPlayer');

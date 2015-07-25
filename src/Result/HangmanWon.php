@@ -3,8 +3,8 @@ namespace Hangman\Result;
 
 use MiniGame\Result\GameWon;
 
-class HangmanWon extends HangmanEndGame implements GameWon {
-
+class HangmanWon extends HangmanEndGame implements GameWon
+{
     /**
      * @return string
      */

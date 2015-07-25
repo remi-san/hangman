@@ -54,5 +54,4 @@ class HangmanRepository extends EntityRepository implements MiniGameRepository
     {
         $this->_em->remove($game);
     }
-
 }

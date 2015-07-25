@@ -6,8 +6,8 @@ use MiniGame\GameOptions;
 use MiniGame\Options\AbstractGameOptions;
 use MiniGame\Player;
 
-class HangmanOptions extends AbstractGameOptions implements GameOptions {
-
+class HangmanOptions extends AbstractGameOptions implements GameOptions
+{
     /**
      * @var int
      */
@@ -39,7 +39,14 @@ class HangmanOptions extends AbstractGameOptions implements GameOptions {
      * @param  Player[] $players
      * @throws IllegalOptionException
      */
-    public function __construct($word = null, $language = 'en', $length = null, $level = null, $lives = 6, array $players = array()) {
+    public function __construct(
+        $word = null,
+        $language = 'en',
+        $length = null,
+        $level = null,
+        $lives = 6,
+        array $players = array()
+    ) {
         parent::__construct($lives, $players);
         $this->setWord($word);
         $this->setLanguage($language);
@@ -62,7 +69,11 @@ class HangmanOptions extends AbstractGameOptions implements GameOptions {
     public function setLength($length)
     {
         if ($length !== null && $this->word) {
-            throw new IllegalOptionException("You can't set the length if the word is already chosen!", 'length', $length);
+            throw new IllegalOptionException(
+                "You can't set the length if the word is already chosen!",
+                'length',
+                $length
+            );
         }
 
         $this->length = $length;
@@ -104,7 +115,11 @@ class HangmanOptions extends AbstractGameOptions implements GameOptions {
     public function setWord($word)
     {
         if ($word !== null && ($this->length || $this->level)) {
-            throw new IllegalOptionException("You can't set the word if the level and/or the length are already chosen!", 'word', $word);
+            throw new IllegalOptionException(
+                "You can't set the word if the level and/or the length are already chosen!",
+                'word',
+                $word
+            );
         }
 
         $this->word = $word;
@@ -125,4 +140,4 @@ class HangmanOptions extends AbstractGameOptions implements GameOptions {
     {
         $this->language = $language;
     }
-} 
+}

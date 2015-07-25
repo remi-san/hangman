@@ -5,14 +5,14 @@ use Hangman\Hangman;
 use Hangman\Result\HangmanBadProposition;
 use Hangman\Result\HangmanGoodProposition;
 use Hangman\Result\HangmanLost;
-use Hangman\Result\HangmanWon;
 use Hangman\Test\Mock\HangmanMocker;
 use MiniGame\Exceptions\IllegalMoveException;
 use MiniGame\Exceptions\NotPlayerTurnException;
 use MiniGame\Test\Mock\GameObjectMocker;
 use Rhumsaa\Uuid\Uuid;
 
-class HangmanTest extends \PHPUnit_Framework_TestCase {
+class HangmanTest extends \PHPUnit_Framework_TestCase
+{
     use GameObjectMocker;
     use HangmanMocker;
 
@@ -41,7 +41,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
      */
     protected $playerTwo;
 
-    public function setUp() {
+    public function setUp()
+    {
         $this->playerOne = $this->getPlayer(self::P1_ID, self::P1_NAME);
         $this->playerTwo = $this->getPlayer(self::P2_ID, self::P2_NAME);
         $this->hangman = new Hangman(self::ID, self::WORD, array($this->playerOne, $this->playerTwo), self::CHANCES);
@@ -55,7 +56,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function testGetters() {
+    public function testGetters()
+    {
         $this->assertEquals('HANGMAN', $this->hangman->getName());
         $this->assertEquals(self::ID, $this->hangman->getId());
         $this->assertEquals($this->playerOne, $this->hangman->getCurrentPlayer());
@@ -64,7 +66,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function testUuidIsGenerated() {
+    public function testUuidIsGenerated()
+    {
         $hangman = new Hangman(null, self::WORD);
         $this->assertTrue(Uuid::isValid($hangman->getId()));
     }
@@ -72,7 +75,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function testCanPlay() {
+    public function testCanPlay()
+    {
         $this->assertTrue($this->hangman->canPlayerPlay($this->playerOne));
         $this->assertFalse($this->hangman->canPlayerPlay($this->playerTwo));
     }
@@ -80,7 +84,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function testPlayerOnePlaysWithUnknownMove() {
+    public function testPlayerOnePlaysWithUnknownMove()
+    {
         $this->setExpectedException('\\MiniGame\\Exceptions\\IllegalMoveException');
 
         /* @var $feedback HangmanGoodProposition */
@@ -90,7 +95,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function testPlayerOnePlaysOneGoodLetter() {
+    public function testPlayerOnePlaysOneGoodLetter()
+    {
         /* @var $feedback HangmanGoodProposition */
         $feedback = $this->hangman->play($this->playerOne, $this->getProposition('H'));
 
@@ -110,7 +116,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function testPlayerOnePlaysOneBadLetter() {
+    public function testPlayerOnePlaysOneBadLetter()
+    {
         /* @var $feedback HangmanBadProposition */
         $feedback = $this->hangman->play($this->playerOne, $this->getProposition('Z'));
 
@@ -130,7 +137,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function testPlayerOnePlaysIllegalAnswer() {
+    public function testPlayerOnePlaysIllegalAnswer()
+    {
         $this->setExpectedException('\\MiniGame\\Exceptions\\IllegalMoveException');
         $move = $this->getAnswer('ABCD');
         try {
@@ -151,7 +159,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function testPlayerOneFindsSolution() {
+    public function testPlayerOneFindsSolution()
+    {
         /* @var $feedback \Hangman\Result\HangmanWon */
         $feedback = $this->hangman->play($this->playerOne, $this->getAnswer(self::WORD));
 
@@ -171,7 +180,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function testPlayerOneFindsLastLetter() {
+    public function testPlayerOneFindsLastLetter()
+    {
         $word = 'AAAA';
 
         /* @var $feedback \Hangman\Result\HangmanWon */
@@ -194,7 +204,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function testPlayerOneLoses() {
+    public function testPlayerOneLoses()
+    {
         $hangman = new Hangman(self::ID, self::WORD, array($this->playerOne, $this->playerTwo), 1);
 
         /* @var $feedback \Hangman\Result\HangmanLost */
@@ -216,7 +227,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function testPlayerOneBadSolution() {
+    public function testPlayerOneBadSolution()
+    {
         /* @var $feedback HangmanLost */
         $feedback = $this->hangman->play($this->playerOne, $this->getAnswer('HHHHHHHHHHH'));
 
@@ -236,7 +248,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function testPlayerTwoPlaysWhenNotHisTurn() {
+    public function testPlayerTwoPlaysWhenNotHisTurn()
+    {
         $this->setExpectedException('\\MiniGame\\Exceptions\\NotPlayerTurnException');
         try {
             $this->hangman->play($this->playerTwo, $this->getProposition('A'));
@@ -255,7 +268,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function testTwoPlayersPlayOnTheirTurn() {
+    public function testTwoPlayersPlayOnTheirTurn()
+    {
         $this->hangman->play($this->playerOne, $this->getProposition('A'));
 
         $this->assertFalse($this->hangman->canPlayerPlay($this->playerOne));

@@ -4,8 +4,8 @@ namespace Hangman\Result;
 use MiniGame\Player;
 use MiniGame\Result\EndGame;
 
-abstract class HangmanEndGame extends HangmanGameResult implements EndGame {
-
+abstract class HangmanEndGame extends HangmanGameResult implements EndGame
+{
     /**
      * @var string
      */
@@ -32,4 +32,4 @@ abstract class HangmanEndGame extends HangmanGameResult implements EndGame {
     {
         return $this->solution;
     }
-} 
+}

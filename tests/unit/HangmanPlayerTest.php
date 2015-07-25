@@ -4,8 +4,8 @@ namespace Hangman\Test;
 use Hangman\HangmanPlayer;
 use Rhumsaa\Uuid\Uuid;
 
-class HangmanPlayerTest extends \PHPUnit_Framework_TestCase {
-
+class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         \Mockery::close();
@@ -16,7 +16,6 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase {
      */
     public function testId()
     {
-        $id = 42;
         $name = 'Douglas';
 
         $player = new HangmanPlayer(null, $name);

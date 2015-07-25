@@ -3,8 +3,8 @@ namespace Hangman\Move;
 
 use MiniGame\Move;
 
-class Answer implements Move {
-
+class Answer implements Move
+{
     /**
      * @var string
      */
@@ -13,7 +13,8 @@ class Answer implements Move {
     /**
      * @param string $text
      */
-    public function __construct($text) {
+    public function __construct($text)
+    {
         $this->text = $text;
     }
 
@@ -24,4 +25,4 @@ class Answer implements Move {
     {
         return $this->text;
     }
-} 
+}

@@ -1,13 +1,11 @@
 <?php
 namespace Hangman\Test\Mock;
 
-use Hangman\Hangman;
 use Hangman\Move\Answer;
 use Hangman\Move\Proposition;
-use Hangman\Options\HangmanOptions;
 
-trait HangmanMocker {
-
+trait HangmanMocker
+{
     /**
      * Returns a hangman mini-game
      * @param  int $id
@@ -29,8 +27,13 @@ trait HangmanMocker {
      * @param  array  $players
      * @return \Hangman\Options\HangmanOptions
      */
-    public function getHangmanOptions($word = null, $lang = 'en', $length = null, $level = null, array $players = array())
-    {
+    public function getHangmanOptions(
+        $word = null,
+        $lang = 'en',
+        $length = null,
+        $level = null,
+        array $players = array()
+    ) {
         $options = \Mockery::mock('\\Hangman\\Options\\HangmanOptions');
 
         $options->shouldReceive('getWord')->andReturn($word);
@@ -46,7 +49,8 @@ trait HangmanMocker {
      * @param  string $text
      * @return Answer
      */
-    public function getAnswer($text) {
+    public function getAnswer($text)
+    {
         $move = \Mockery::mock('\\Hangman\\Move\\Answer');
         $move->shouldReceive('getText')->andReturn($text);
         return $move;
@@ -56,9 +60,10 @@ trait HangmanMocker {
      * @param  string $text
      * @return Proposition
      */
-    public function getProposition($text) {
+    public function getProposition($text)
+    {
         $move = \Mockery::mock('\\Hangman\\Move\\Proposition');
         $move->shouldReceive('getText')->andReturn($text);
         return $move;
     }
-} 
+}

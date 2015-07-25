@@ -4,7 +4,8 @@ namespace Hangman\Test;
 use Hangman\Options\HangmanOptions;
 use MiniGame\Test\Mock\GameObjectMocker;
 
-class HangmanOptionsTest extends \PHPUnit_Framework_TestCase {
+class HangmanOptionsTest extends \PHPUnit_Framework_TestCase
+{
     use GameObjectMocker;
 
     private $players;
@@ -145,4 +146,4 @@ class HangmanOptionsTest extends \PHPUnit_Framework_TestCase {
         $options = new HangmanOptions(null, 'en', $length, $level, $this->lives, $this->players);
         $options->setWord($word);
     }
-} 
+}

@@ -4,8 +4,8 @@ namespace Hangman\Test;
 use Doctrine\ORM\Query;
 use Hangman\Repository\HangmanRepository;
 
-class HangmanRepositoryTest extends \PHPUnit_Framework_TestCase {
-
+class HangmanRepositoryTest extends \PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         \Mockery::close();
@@ -14,7 +14,8 @@ class HangmanRepositoryTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function testSaveDelete() {
+    public function testSaveDelete()
+    {
 
         $hangman = \Mockery::mock('\\Hangman\\Hangman');
 
@@ -32,7 +33,8 @@ class HangmanRepositoryTest extends \PHPUnit_Framework_TestCase {
     /**
      * @test
      */
-    public function testCustom() {
+    public function testCustom()
+    {
 
         $hangman = \Mockery::mock('\\Hangman\\Hangman');
         $player = \Mockery::mock('\\MiniGame\\Player');
@@ -60,4 +62,4 @@ class HangmanRepositoryTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertEquals($hangman, $hangmanResult);
     }
-} 
+}

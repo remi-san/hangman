@@ -8,7 +8,8 @@ use Hangman\Result\HangmanLost;
 use Hangman\Result\HangmanWon;
 use MiniGame\Test\Mock\GameObjectMocker;
 
-class HangmanResultTest extends \PHPUnit_Framework_TestCase {
+class HangmanResultTest extends \PHPUnit_Framework_TestCase
+{
     use GameObjectMocker;
 
     private $player;
@@ -33,7 +34,12 @@ class HangmanResultTest extends \PHPUnit_Framework_TestCase {
     {
         $feedback = 'feedback';
         $remainingChances = 5;
-        $message = sprintf('Too bad... %s (letters played: %s) - Remaining chances: %d', $feedback, implode(', ', $this->lettersPlayed), $remainingChances);
+        $message = sprintf(
+            'Too bad... %s (letters played: %s) - Remaining chances: %d',
+            $feedback,
+            implode(', ', $this->lettersPlayed),
+            $remainingChances
+        );
 
         $badProposition = new HangmanBadProposition($this->player, $feedback, $this->lettersPlayed, $remainingChances);
 
@@ -51,7 +57,12 @@ class HangmanResultTest extends \PHPUnit_Framework_TestCase {
     {
         $feedback = 'feedback';
         $remainingChances = 6;
-        $message = sprintf('Well played! %s (letters played: %s) - Remaining chances: %d', $feedback, implode(', ', $this->lettersPlayed), $remainingChances);
+        $message = sprintf(
+            'Well played! %s (letters played: %s) - Remaining chances: %d',
+            $feedback,
+            implode(', ', $this->lettersPlayed),
+            $remainingChances
+        );
 
         $badProposition = new HangmanGoodProposition($this->player, $feedback, $this->lettersPlayed, $remainingChances);
 
@@ -113,4 +124,4 @@ class HangmanResultTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals($remainingChances, $badProposition->getRemainingChances());
         $this->assertEquals($message, $badProposition->getAsMessage());
     }
-} 
+}

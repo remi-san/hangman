@@ -4,8 +4,8 @@ namespace Hangman\Result;
 use MiniGame\Player;
 use MiniGame\Result\Error;
 
-class HangmanError extends HangmanGameResult implements Error {
-
+class HangmanError extends HangmanGameResult implements Error
+{
     /**
      * @var string
      */
@@ -19,7 +19,8 @@ class HangmanError extends HangmanGameResult implements Error {
      * @param array  $lettersPlayed
      * @param int    $remainingChances
      */
-    public function __construct($message, Player $player, array $lettersPlayed = array(), $remainingChances = null) {
+    public function __construct($message, Player $player, array $lettersPlayed = array(), $remainingChances = null)
+    {
         $this->message = $message;
         parent::__construct($player, $lettersPlayed, $remainingChances);
     }

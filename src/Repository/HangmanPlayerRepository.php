@@ -30,5 +30,4 @@ class HangmanPlayerRepository extends EntityRepository implements PlayerReposito
     {
         $this->_em->remove($player);
     }
-
 }

@@ -4,8 +4,8 @@ namespace Hangman;
 use MiniGame\Player;
 use Rhumsaa\Uuid\Uuid;
 
-class HangmanPlayer implements Player {
-
+class HangmanPlayer implements Player
+{
     /**
      * @var int
      */
@@ -22,7 +22,7 @@ class HangmanPlayer implements Player {
      * @param int    $id
      * @param string $name
      */
-    function __construct($id, $name)
+    public function __construct($id, $name)
     {
         if ($id === null) {
             $id = Uuid::uuid4()->toString();
@@ -51,4 +51,4 @@ class HangmanPlayer implements Player {
     {
         return $this->name;
     }
-} 
+}

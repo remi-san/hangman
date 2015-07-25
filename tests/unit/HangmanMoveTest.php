@@ -4,8 +4,8 @@ namespace Hangman\Test;
 use Hangman\Move\Answer;
 use Hangman\Move\Proposition;
 
-class HangmanMoveTest extends \PHPUnit_Framework_TestCase {
-
+class HangmanMoveTest extends \PHPUnit_Framework_TestCase
+{
     public function tearDown()
     {
         \Mockery::close();
@@ -32,4 +32,4 @@ class HangmanMoveTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertEquals($text, $move->getText());
     }
-} 
+}
