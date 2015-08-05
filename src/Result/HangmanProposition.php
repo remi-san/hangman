@@ -1,10 +1,11 @@
 <?php
 namespace Hangman\Result;
 
-use MiniGame\Player;
-use MiniGame\Result\Proposition;
+use MiniGame\Entity\MiniGameId;
+use MiniGame\Entity\PlayerId;
+use MiniGame\Result\MoveResult;
 
-abstract class HangmanProposition extends HangmanGameResult implements Proposition
+abstract class HangmanProposition extends HangmanGameResult implements MoveResult
 {
     /**
      * @var string
@@ -12,15 +13,23 @@ abstract class HangmanProposition extends HangmanGameResult implements Propositi
     protected $feedback;
 
     /**
-     * @param Player $player
-     * @param string $feedback
-     * @param array  $lettersPlayed
-     * @param int    $remainingChances
+     * Constructor
+     *
+     * @param MiniGameId $gameId
+     * @param PlayerId   $player
+     * @param string     $feedback
+     * @param array      $lettersPlayed
+     * @param int        $remainingChances
      */
-    public function __construct(Player $player, $feedback, array $lettersPlayed, $remainingChances)
-    {
+    public function __construct(
+        MiniGameId $gameId,
+        PlayerId $player,
+        $feedback,
+        array $lettersPlayed,
+        $remainingChances
+    ) {
         $this->feedback = $feedback;
-        parent::__construct($player, $lettersPlayed, $remainingChances);
+        parent::__construct($gameId, $player, $lettersPlayed, $remainingChances);
     }
 
     /**

@@ -1,10 +1,10 @@
 <?php
 namespace Hangman\Options;
 
+use MiniGame\Entity\Player;
 use MiniGame\Exceptions\IllegalOptionException;
 use MiniGame\GameOptions;
 use MiniGame\Options\AbstractGameOptions;
-use MiniGame\Player;
 
 class HangmanOptions extends AbstractGameOptions implements GameOptions
 {

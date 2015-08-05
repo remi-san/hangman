@@ -1,11 +1,18 @@
 <?php
 namespace Hangman\Test;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
+use Hangman\Hangman;
 use Hangman\Repository\HangmanRepository;
+use MiniGame\Entity\Player;
+use MiniGame\Test\Mock\GameObjectMocker;
 
 class HangmanRepositoryTest extends \PHPUnit_Framework_TestCase
 {
+    use GameObjectMocker;
+
     public function tearDown()
     {
         \Mockery::close();
@@ -16,13 +23,15 @@ class HangmanRepositoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testSaveDelete()
     {
-
+        /* @var $hangman Hangman */
         $hangman = \Mockery::mock('\\Hangman\\Hangman');
 
+        /* @var $entityManager EntityManager */
         $entityManager = \Mockery::mock('\\Doctrine\\ORM\\EntityManager');
         $entityManager->shouldReceive('persist')->with($hangman)->once();
         $entityManager->shouldReceive('remove')->with($hangman)->once();
 
+        /* @var $classMetadata ClassMetadata */
         $classMetadata = \Mockery::mock('\\Doctrine\\ORM\\Mapping\ClassMetadata');
 
         $mr = new HangmanRepository($entityManager, $classMetadata);
@@ -35,15 +44,15 @@ class HangmanRepositoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testCustom()
     {
-
+        /* @var $hangman Hangman */
         $hangman = \Mockery::mock('\\Hangman\\Hangman');
-        $player = \Mockery::mock('\\MiniGame\\Player');
-        $player->shouldReceive('getId')->andReturn(42);
+        $playerId = $this->getPlayerId('42');
 
         $configuration = \Mockery::mock('\\Doctrine\\ORM\\Configuration');
         $configuration->shouldReceive('getDefaultQueryHints')->andReturn(array());
         $configuration->shouldReceive('isSecondLevelCacheEnabled')->andReturn(false);
 
+        /* @var $entityManager EntityManager */
         $entityManager = \Mockery::mock('\\Doctrine\\ORM\\EntityManager');
         $entityManager->shouldReceive('getConfiguration')->andReturn($configuration);
 
@@ -57,8 +66,9 @@ class HangmanRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $classMetadata = \Mockery::mock('\\Doctrine\\ORM\\Mapping\ClassMetadata');
 
+        /* @var $classMetadata ClassMetadata */
         $mr = new HangmanRepository($entityManager, $classMetadata);
-        $hangmanResult = $mr->findPlayerMinigame($player);
+        $hangmanResult = $mr->findPlayerMinigame($playerId);
 
         $this->assertEquals($hangman, $hangmanResult);
     }

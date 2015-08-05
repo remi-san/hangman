@@ -1,8 +1,9 @@
 <?php
 namespace Hangman\Result;
 
+use MiniGame\Entity\MiniGameId;
+use MiniGame\Entity\PlayerId;
 use MiniGame\GameResult;
-use MiniGame\Player;
 use MiniGame\Result\AbstractGameResult;
 
 abstract class HangmanGameResult extends AbstractGameResult implements GameResult
@@ -18,15 +19,21 @@ abstract class HangmanGameResult extends AbstractGameResult implements GameResul
     protected $remainingChances;
 
     /**
-     * @param Player $player
-     * @param array  $lettersPlayed
-     * @param int    $remainingChances
+     * Constructor
+     * @param MiniGameId $gameId
+     * @param PlayerId   $playerId
+     * @param array      $lettersPlayed
+     * @param int        $remainingChances
      */
-    public function __construct(Player $player, array $lettersPlayed = array(), $remainingChances = null)
-    {
+    public function __construct(
+        MiniGameId $gameId,
+        PlayerId $playerId,
+        array $lettersPlayed = array(),
+        $remainingChances = null
+    ) {
         $this->lettersPlayed = $lettersPlayed;
         $this->remainingChances = $remainingChances;
-        parent::__construct($player);
+        parent::__construct($gameId, $playerId);
     }
 
     /**

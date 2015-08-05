@@ -1,9 +1,9 @@
 <?php
 namespace Hangman\Result;
 
-use MiniGame\Result\BadProposition;
+use MiniGame\Result\MoveResult;
 
-class HangmanBadProposition extends HangmanProposition implements BadProposition
+class HangmanBadProposition extends HangmanProposition implements MoveResult
 {
     /**
      * @return string

@@ -43,27 +43,6 @@ class HangmanOptionsTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function testHangmanOptionsWithWordAndAddPlayer()
-    {
-        $word    = 'word';
-        $options = new HangmanOptions($word, 'en', null, null, $this->lives, $this->players);
-
-        $this->assertEquals($word, $options->getWord());
-        $this->assertNull($options->getLength());
-        $this->assertNull($options->getLevel());
-        $this->assertEquals($this->lives, $options->getLives());
-        $this->assertEquals($this->players, $options->getPlayers());
-
-        $player2 = $this->getPlayer(43, 'Adams');
-        $newPlayers = $this->players + array(43=>$player2);
-
-        $options->addPlayer($player2);
-        $this->assertEquals($newPlayers, $options->getPlayers());
-    }
-
-    /**
-     * @test
-     */
     public function testHangmanOptionsWithLength()
     {
         $length  = 5;

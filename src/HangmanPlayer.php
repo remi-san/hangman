@@ -1,13 +1,15 @@
 <?php
 namespace Hangman;
 
-use MiniGame\Player;
+use MiniGame\Entity\MiniGame;
+use MiniGame\Entity\Player;
+use MiniGame\Entity\PlayerId;
 use Rhumsaa\Uuid\Uuid;
 
 class HangmanPlayer implements Player
 {
     /**
-     * @var int
+     * @var PlayerId
      */
     protected $id;
 
@@ -17,25 +19,27 @@ class HangmanPlayer implements Player
     protected $name;
 
     /**
+     * @var MiniGame
+     */
+    protected $game;
+
+    /**
      * Constructor
      *
-     * @param int    $id
-     * @param string $name
+     * @param PlayerId $id
+     * @param string   $name
+     * @param MiniGame $game
      */
-    public function __construct($id, $name)
+    public function __construct($id = null, $name = null, MiniGame $game = null)
     {
-        if ($id === null) {
-            $id = Uuid::uuid4()->toString();
-        }
-
-        $this->id = $id;
+        $this->id = ($id !== null) ? $id : new PlayerId(Uuid::uuid4()->toString());
         $this->name = $name;
     }
 
     /**
      * Returns the id of the player
      *
-     * @return int
+     * @return PlayerId
      */
     public function getId()
     {
@@ -50,5 +54,26 @@ class HangmanPlayer implements Player
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Gets the game
+     *
+     * @return MiniGame
+     */
+    public function getGame()
+    {
+        return $this->game;
+    }
+
+    /**
+     * Sets the game
+     *
+     * @param  MiniGame $game
+     * @return void
+     */
+    public function setGame(MiniGame $game)
+    {
+        $this->game = $game;
     }
 }

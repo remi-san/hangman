@@ -1,7 +1,8 @@
 <?php
 namespace Hangman\Result;
 
-use MiniGame\Player;
+use MiniGame\Entity\MiniGameId;
+use MiniGame\Entity\PlayerId;
 use MiniGame\Result\EndGame;
 
 abstract class HangmanEndGame extends HangmanGameResult implements EndGame
@@ -14,15 +15,21 @@ abstract class HangmanEndGame extends HangmanGameResult implements EndGame
     /**
      * Constructor
      *
-     * @param Player $player
-     * @param array  $lettersPlayed
-     * @param int    $remainingChances
-     * @param string $solution
+     * @param MiniGameId $gameId
+     * @param PlayerId   $player
+     * @param array      $lettersPlayed
+     * @param int        $remainingChances
+     * @param string     $solution
      */
-    public function __construct(Player $player, array $lettersPlayed, $remainingChances, $solution)
-    {
+    public function __construct(
+        MiniGameId $gameId,
+        PlayerId $player,
+        array $lettersPlayed,
+        $remainingChances,
+        $solution
+    ) {
         $this->solution = $solution;
-        parent::__construct($player, $lettersPlayed, $remainingChances);
+        parent::__construct($gameId, $player, $lettersPlayed, $remainingChances);
     }
 
     /**

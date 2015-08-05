@@ -2,7 +2,7 @@
 namespace Hangman\Repository;
 
 use Doctrine\ORM\EntityRepository;
-use MiniGame\Player;
+use MiniGame\Entity\Player;
 use MiniGame\Repository\PlayerRepository;
 
 class HangmanPlayerRepository extends EntityRepository implements PlayerRepository
@@ -29,5 +29,6 @@ class HangmanPlayerRepository extends EntityRepository implements PlayerReposito
     public function delete(Player $player)
     {
         $this->_em->remove($player);
+        $this->_em->flush();
     }
 }

@@ -1,7 +1,8 @@
 <?php
 namespace Hangman\Result;
 
-use MiniGame\Player;
+use MiniGame\Entity\MiniGameId;
+use MiniGame\Entity\PlayerId;
 use MiniGame\Result\Error;
 
 class HangmanError extends HangmanGameResult implements Error
@@ -14,15 +15,21 @@ class HangmanError extends HangmanGameResult implements Error
     /**
      * Constructor
      *
-     * @param string $message
-     * @param Player $player
-     * @param array  $lettersPlayed
-     * @param int    $remainingChances
+     * @param MiniGameId $gameId
+     * @param PlayerId   $player
+     * @param string     $message
+     * @param array      $lettersPlayed
+     * @param int        $remainingChances
      */
-    public function __construct($message, Player $player, array $lettersPlayed = array(), $remainingChances = null)
-    {
+    public function __construct(
+        MiniGameId $gameId,
+        PlayerId $player,
+        $message,
+        array $lettersPlayed = array(),
+        $remainingChances = null
+    ) {
         $this->message = $message;
-        parent::__construct($player, $lettersPlayed, $remainingChances);
+        parent::__construct($gameId, $player, $lettersPlayed, $remainingChances);
     }
 
     /**

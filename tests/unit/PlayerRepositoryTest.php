@@ -2,6 +2,7 @@
 namespace Hangman\Test;
 
 use Hangman\Repository\HangmanPlayerRepository;
+use MiniGame\Entity\Player;
 
 class PlayerRepositoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -15,12 +16,13 @@ class PlayerRepositoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testSaveDelete()
     {
-
+        /* @var $player Player */
         $player = \Mockery::mock('\\Hangman\\HangmanPlayer');
 
         $entityManager = \Mockery::mock('\\Doctrine\\ORM\\EntityManager');
         $entityManager->shouldReceive('persist')->with($player)->once();
         $entityManager->shouldReceive('remove')->with($player)->once();
+        $entityManager->shouldReceive('flush')->once();
 
         $classMetadata = \Mockery::mock('\\Doctrine\\ORM\\Mapping\ClassMetadata');
 
