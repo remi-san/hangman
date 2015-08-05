@@ -30,10 +30,11 @@ class HangmanPlayer implements Player
      * @param string   $name
      * @param MiniGame $game
      */
-    public function __construct($id = null, $name = null, MiniGame $game = null)
+    public function __construct(PlayerId $id = null, $name = null, MiniGame $game = null)
     {
         $this->id = ($id !== null) ? $id : new PlayerId(Uuid::uuid4()->toString());
         $this->name = $name;
+        $this->game = $game;
     }
 
     /**
