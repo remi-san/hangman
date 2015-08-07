@@ -17,7 +17,7 @@ class PlayerRepositoryTest extends \PHPUnit_Framework_TestCase
     public function testSaveDelete()
     {
         /* @var $player Player */
-        $player = \Mockery::mock('\\Hangman\\HangmanPlayer');
+        $player = \Mockery::mock('\\Hangman\\Entity\\HangmanPlayer');
 
         $entityManager = \Mockery::mock('\\Doctrine\\ORM\\EntityManager');
         $entityManager->shouldReceive('persist')->with($player)->once();

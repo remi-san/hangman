@@ -15,13 +15,13 @@ $dbConfig = \Doctrine\ORM\Tools\Setup::createYAMLMetadataConfiguration(
 );
 $entityManager = \Doctrine\ORM\EntityManager::create($dbParams, $dbConfig);
 
-$playerRepository  = $entityManager->getRepository('\\Hangman\\HangmanPlayer');
-$hangmanRepository = $entityManager->getRepository('\\Hangman\\Hangman');
+$playerRepository  = $entityManager->getRepository('\\Hangman\\Entity\\HangmanPlayer');
+$hangmanRepository = $entityManager->getRepository('\\Hangman\\Entity\\Hangman');
 
-$player = new \Hangman\HangmanPlayer(null, "remi");
+$player = new \Hangman\Entity\HangmanPlayer(null, "remi");
 $playerRepository->save($player);
 
-$hangman = new \Hangman\Hangman(null, 'word', array($player));
+$hangman = new \Hangman\Entity\Hangman(null, 'word', array($player));
 $hangmanRepository->save($hangman);
 
 $hangman = $hangmanRepository->find($hangman->getId());

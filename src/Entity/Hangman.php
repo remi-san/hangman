@@ -1,5 +1,5 @@
 <?php
-namespace Hangman;
+namespace Hangman\Entity;
 
 use Hangman\Exception\HangmanException;
 use Hangman\Move\Answer;

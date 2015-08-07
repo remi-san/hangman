@@ -9,11 +9,11 @@ trait HangmanMocker
     /**
      * Returns a hangman mini-game
      * @param  int $id
-     * @return \Hangman\Hangman
+     * @return \Hangman\Entity\Hangman
      */
     public function getHangmanMiniGame($id)
     {
-        $h = \Mockery::mock('\\Hangman\\Hangman');
+        $h = \Mockery::mock('\\Hangman\\Entity\\Hangman');
         $h->shouldReceive('getId')->andReturn($id);
 
         return $h;

@@ -1,5 +1,5 @@
 <?php
-namespace Hangman;
+namespace Hangman\Entity;
 
 use MiniGame\Entity\MiniGame;
 use MiniGame\Entity\Player;

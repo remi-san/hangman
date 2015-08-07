@@ -1,10 +1,8 @@
 <?php
 namespace Hangman\Test;
 
-use Hangman\HangmanPlayer;
+use Hangman\Entity\HangmanPlayer;
 use MiniGame\Test\Mock\GameObjectMocker;
-use MiniGameApp\Test\Mock\MiniGameAppMocker;
-use MiniGameApp\Test\Mock\PlayerMock;
 use Rhumsaa\Uuid\Uuid;
 
 class HangmanPlayerTest extends \PHPUnit_Framework_TestCase

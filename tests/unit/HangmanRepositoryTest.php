@@ -4,9 +4,8 @@ namespace Hangman\Test;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
-use Hangman\Hangman;
+use Hangman\Entity\Hangman;
 use Hangman\Repository\HangmanRepository;
-use MiniGame\Entity\Player;
 use MiniGame\Test\Mock\GameObjectMocker;
 
 class HangmanRepositoryTest extends \PHPUnit_Framework_TestCase
@@ -24,7 +23,7 @@ class HangmanRepositoryTest extends \PHPUnit_Framework_TestCase
     public function testSaveDelete()
     {
         /* @var $hangman Hangman */
-        $hangman = \Mockery::mock('\\Hangman\\Hangman');
+        $hangman = \Mockery::mock('\\Hangman\\Entity\\Hangman');
 
         /* @var $entityManager EntityManager */
         $entityManager = \Mockery::mock('\\Doctrine\\ORM\\EntityManager');
@@ -45,7 +44,7 @@ class HangmanRepositoryTest extends \PHPUnit_Framework_TestCase
     public function testCustom()
     {
         /* @var $hangman Hangman */
-        $hangman = \Mockery::mock('\\Hangman\\Hangman');
+        $hangman = \Mockery::mock('\\Hangman\\Entity\\Hangman');
         $playerId = $this->getPlayerId('42');
 
         $configuration = \Mockery::mock('\\Doctrine\\ORM\\Configuration');

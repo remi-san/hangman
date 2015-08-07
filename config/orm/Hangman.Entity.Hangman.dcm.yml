@@ -1,4 +1,4 @@
-Hangman\Hangman:
+Hangman\Entity\Hangman:
   type: entity
   repositoryClass: Hangman\Repository\HangmanRepository
   table: hangman

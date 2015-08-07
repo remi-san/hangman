@@ -1,4 +1,4 @@
-Hangman\HangmanPlayer:
+Hangman\Entity\HangmanPlayer:
   type: entity
   repositoryClass: Hangman\Repository\HangmanPlayerRepository
   table: player

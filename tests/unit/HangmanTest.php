@@ -1,7 +1,7 @@
 <?php
 namespace Hangman\Test;
 
-use Hangman\Hangman;
+use Hangman\Entity\Hangman;
 use Hangman\Result\HangmanBadProposition;
 use Hangman\Result\HangmanGoodProposition;
 use Hangman\Result\HangmanLost;
