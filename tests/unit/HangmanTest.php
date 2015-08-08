@@ -89,6 +89,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
     public function testGetters()
     {
         $this->assertEquals('HANGMAN', $this->hangman->getName());
+        $this->assertEquals($this->hangmanId, $this->hangman->getAggregateRootId());
         $this->assertEquals($this->hangmanId, $this->hangman->getId());
         $this->assertEquals($this->playerOne, $this->hangman->getCurrentPlayer());
     }
