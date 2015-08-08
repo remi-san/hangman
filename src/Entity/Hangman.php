@@ -21,7 +21,6 @@ use Rhumsaa\Uuid\Uuid;
 
 class Hangman implements MiniGame
 {
-
     /**
      * @var MiniGameId
      */
@@ -43,22 +42,7 @@ class Hangman implements MiniGame
     protected $gameOrder;
 
     /**
-     * @var array
-     */
-    protected $lettersPlayed;
-
-    /**
-     * @var array
-     */
-    protected $badLettersPlayed;
-
-    /**
-     * @var array
-     */
-    protected $remainingChances;
-
-    /**
-     * @var Player
+     * @var HangmanPlayer
      **/
     protected $currentPlayer;
 
@@ -68,9 +52,8 @@ class Hangman implements MiniGame
      * @param MiniGameId $id
      * @param string     $word
      * @param Player[]   $players
-     * @param int        $chances
      */
-    public function __construct(MiniGameId $id = null, $word = 'HANGMAN', array $players = array(), $chances = 6)
+    public function __construct(MiniGameId $id = null, $word = 'HANGMAN', array $players = array())
     {
         if ($id === null) {
             $id = new MiniGameId(Uuid::uuid4()->toString());
@@ -78,36 +61,13 @@ class Hangman implements MiniGame
 
         $this->id = $id;
         $this->word = strtoupper($word);
-        $this->players = $players;
+        $this->players = array();
 
         $this->gameOrder = array();
 
-        $this->lettersPlayed = array();
-        $this->badLettersPlayed = array();
-
-        $order = 0;
         foreach ($players as $player) {
-            $playerId = $player->getId();
-            $this->lettersPlayed[(string)$playerId] = array();
-            $this->badLettersPlayed[(string)$playerId] = array();
-            for ($i = 0; $i < strlen($this->word); $i++) {
-                $this->lettersPlayed[(string)$playerId][$i] = '_';
-            }
-            $this->remainingChances[(string)$playerId] = $chances;
-            $this->gameOrder[$order++] = (string)$playerId;
+            $this->addPlayer($player);
         }
-
-        $this->currentPlayer = reset($players);
-    }
-
-    /**
-     * Returns the name of the mini-game
-     *
-     * @return string
-     */
-    public static function getName()
-    {
-        return 'HANGMAN';
     }
 
     /**
@@ -121,118 +81,55 @@ class Hangman implements MiniGame
     }
 
     /**
-     * Allows the player to play the game
+     * Returns the name of the mini-game
      *
-     * @param  PlayerId $playerId
-     * @param  Move     $move
-     * @return GameResult
-     * @throws \Exception
+     * @return string
      */
-    public function play(PlayerId $playerId, Move $move)
+    public static function getName()
     {
-        if (!$this->canPlayerPlay($playerId)) {
-            throw new NotPlayerTurnException(
-                $playerId,
-                $this->getId(),
-                $this->error($playerId, 'Error!'),
-                'It is not your turn to play'
-            );
-        }
-
-        try {
-            if ($move instanceof Proposition) {
-                return $this->proposeLetter($playerId, $move->getText());
-            } elseif ($move instanceof Answer) {
-                return $this->proposeAnswer($playerId, $move->getText());
-            } else {
-                throw new HangmanException('Unsupported Move!');
-            }
-        } catch (HangmanException $e) {
-            throw new IllegalMoveException(
-                $playerId,
-                $this->getId(),
-                $this->badProposition($playerId),
-                $move,
-                $e->getMessage()
-            );
-        }
+        return 'HANGMAN';
     }
 
     /**
-     * Propose a letter
+     * Adds a player
      *
-     * @param  PlayerId $playerId
-     * @param  string   $letter
-     * @return HangmanBadProposition|HangmanGoodProposition
+     * @param Player $player
      */
-    protected function proposeLetter(PlayerId $playerId, $letter)
+    public function addPlayer(Player $player)
     {
-        $capLetter = strtoupper($letter);
-        $positions = $this->contains($capLetter);
-        $this->savePlayedLetter($playerId, $capLetter, $positions);
-
-        $result =  (!$positions)
-                   ? $this->badProposition($playerId) // remove a life
-                   : $this->goodProposition($playerId); // yay!
-
-        $this->endCurrentPlayerTurn();
-
-        return $result;
-    }
-
-    /**
-     * Propose an answer
-     *
-     * @param  PlayerId $playerId
-     * @param  string   $answer
-     * @return HangmanLost|HangmanWon
-     */
-    protected function proposeAnswer(PlayerId $playerId, $answer)
-    {
-        $this->checkAnswerIsValid($answer);
-
-        if ($this->isTheAnswer($answer)) {
-            return $this->win($playerId); // you win
-        } else {
-            return $this->lose($playerId); // you lose
+        $player->setGame($this);
+        $this->gameOrder[] = (string)$player->getId();
+        if ($this->currentPlayer === null) {
+            $this->currentPlayer = $player;
         }
-    }
-
-    /**
-     * Checks if the answer is valid
-     * If it's not, ends player turn and throws an HangmanException
-     *
-     * @param  string $answer
-     * @throws HangmanException
-     */
-    protected function checkAnswerIsValid($answer)
-    {
-        if (strlen($answer) !== strlen($this->word)) {
-            $this->endCurrentPlayerTurn();
-            throw new HangmanException(sprintf('"%s" is not a valid answer!', $answer));
-        }
+        $this->players[] = $player;
     }
 
     /**
      * Is it the player's turn?
      *
-     * @param  PlayerId $player
+     * @param  PlayerId $playerId
      * @return bool
      */
-    public function canPlayerPlay(PlayerId $player)
+    public function canPlayerPlay(PlayerId $playerId)
     {
-        return $this->currentPlayer && $this->currentPlayer->getId() === $player;
+        return $this->currentPlayer && $this->currentPlayer->getId() === $playerId;
     }
 
     /**
-     * Gets the remaining chances for the player
+     * Get the player identified by PlayerId
      *
-     * @param  PlayerId $player
-     * @return int
+     * @param  PlayerId $playerId
+     * @return HangmanPlayer
      */
-    public function getRemainingChances(PlayerId $player)
+    public function getPlayer(PlayerId $playerId)
     {
-        return $this->remainingChances[(string)$player];
+        foreach ($this->players as $player) {
+            if ((string)$player->getId() == (string)$playerId) {
+                return $player;
+            }
+        }
+        return null;
     }
 
     /**
@@ -256,11 +153,177 @@ class Hangman implements MiniGame
     }
 
     /**
+     * Allows the player to play the game
+     *
+     * @param  PlayerId $playerId
+     * @param  Move     $move
+     * @return GameResult
+     * @throws \Exception
+     */
+    public function play(PlayerId $playerId, Move $move)
+    {
+        if (!$this->canPlayerPlay($playerId)) {
+            throw new NotPlayerTurnException(
+                $playerId,
+                $this->getId(),
+                $this->playerError($playerId, 'Error!'),
+                'It is not your turn to play'
+            );
+        }
+
+        try {
+            if ($move instanceof Proposition) {
+                return $this->currentPlayerProposeLetter($move->getText());
+            } elseif ($move instanceof Answer) {
+                return $this->currentPlayerProposeAnswer($move->getText());
+            } else {
+                throw new HangmanException('Unsupported Move!');
+            }
+        } catch (HangmanException $e) {
+            $return = $this->currentPlayerBadProposition();
+            $this->endCurrentPlayerTurn();
+            throw new IllegalMoveException(
+                $playerId,
+                $this->getId(),
+                $return,
+                $move,
+                $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Propose a letter
+     *
+     * @param  string   $letter
+     * @return HangmanBadProposition|HangmanGoodProposition
+     */
+    private function currentPlayerProposeLetter($letter)
+    {
+        $capLetter = strtoupper($letter);
+        $letterPresent = $this->wordContains($capLetter);
+        $this->savePlayedLetterForCurrentPlayer($capLetter);
+
+        $result =  (!$letterPresent)
+                   ? $this->currentPlayerBadProposition() // remove a life
+                   : $this->currentPlayerGoodProposition(); // yay!
+
+        $this->endCurrentPlayerTurn();
+
+        return $result;
+    }
+
+    /**
+     * Propose an answer
+     *
+     * @param  string   $answer
+     * @return HangmanLost|HangmanWon
+     */
+    private function currentPlayerProposeAnswer($answer)
+    {
+        $this->checkAnswerIsValid($answer);
+
+        if ($this->isTheAnswer(strtoupper($answer))) {
+            return $this->currentPlayerWins(); // you win
+        } else {
+            return $this->currentPlayerLoses(); // you lose
+        }
+    }
+
+    /**
+     * Function to call when a bad proposition has been made
+     *
+     * @return HangmanBadProposition
+     */
+    private function currentPlayerBadProposition()
+    {
+        $playerId = $this->currentPlayer->getId();
+        $this->currentPlayer->loseLife();
+
+        if ($this->getRemainingLives($playerId) == 0) {
+            return $this->currentPlayerLoses();
+        }
+
+        return new HangmanBadProposition(
+            $this->id,
+            $playerId,
+            $this->buildCurrentPlayerWord(),
+            $this->getPlayedLettersForCurrentPlayer(),
+            $this->getRemainingLives($playerId)
+        ) ;
+    }
+
+    /**
+     * Function to call after a good proposition of letter has been made
+     *
+     * @return HangmanGoodProposition
+     */
+    private function currentPlayerGoodProposition()
+    {
+        $playerId = $this->currentPlayer->getId();
+
+        if ($this->isAllLettersFoundForCurrentPlayer()) {
+            return $this->currentPlayerWins();
+        }
+        return new HangmanGoodProposition(
+            $this->id,
+            $playerId,
+            $this->buildCurrentPlayerWord(),
+            $this->getPlayedLettersForCurrentPlayer(),
+            $this->getRemainingLives($playerId)
+        ) ;
+    }
+
+    /**
+     * Function to call when game is won by a player
+     *
+     * @return HangmanWon
+     */
+    private function currentPlayerWins()
+    {
+        $playerId = $this->currentPlayer->getId();
+
+        $result = new HangmanWon(
+            $this->id,
+            $playerId,
+            $this->getPlayedLettersForCurrentPlayer(),
+            $this->getRemainingLives($playerId),
+            $this->word
+        );
+
+        $this->currentPlayer = null;
+
+        return $result;
+    }
+
+    /**
+     * Function to call when game is lost by a player
+     *
+     * @return HangmanLost
+     */
+    private function currentPlayerLoses()
+    {
+        $playerId = $this->currentPlayer->getId();
+
+        $result = new HangmanLost(
+            $this->id,
+            $this->currentPlayer->getId(),
+            $this->getPlayedLettersForCurrentPlayer(),
+            $this->getRemainingLives($playerId),
+            $this->word
+        );
+
+        $this->currentPlayer = null;
+
+        return $result;
+    }
+
+    /**
      * Returns the next player in line
      *
      * @return void
      */
-    protected function endCurrentPlayerTurn()
+    private function endCurrentPlayerTurn()
     {
         if ($this->currentPlayer === null) {
             return;
@@ -295,101 +358,102 @@ class Hangman implements MiniGame
     }
 
     /**
-     * Function to call when an error must be returned
+     * Saves the letter played by the player and the result
      *
-     * @param  PlayerId $playerId
-     * @param  string   $message
-     * @return HangmanError
+     * @param  string   $letter
+     * @return void
      */
-    protected function error(PlayerId $playerId, $message)
+    private function savePlayedLetterForCurrentPlayer($letter)
     {
-        return new HangmanError(
-            $this->id,
-            $playerId,
-            $message,
-            $this->getPlayedLetters($playerId),
-            $this->getRemainingChances($playerId)
-        ) ;
+        $this->currentPlayer->playLetter($letter);
     }
 
     /**
-     * Function to call after a good proposition of letter has been made
+     * Returns the list of played letters
+     *
+     * @return array
+     */
+    private function getPlayedLettersForCurrentPlayer()
+    {
+        return $this->currentPlayer->getPlayedLetters();
+    }
+
+    /**
+     * Gets the remaining lives for the player
      *
      * @param  PlayerId $playerId
-     * @return HangmanGoodProposition
+     * @return int
      */
-    protected function goodProposition(PlayerId $playerId)
+    private function getRemainingLives(PlayerId $playerId)
     {
-        if ($this->isAllLettersFound($playerId)) {
-            return $this->win($playerId);
+        return $this->getPlayer($playerId)->getRemainingLives();
+    }
+
+    /**
+     * Returns the indexes of the letter in the word
+     *
+     * @param  string $letter
+     * @return boolean
+     */
+    private function wordContains($letter)
+    {
+        return strpos(strtoupper($this->word), strtoupper($letter)) !== false;
+    }
+
+    /**
+     * Get the letters of the word
+     *
+     * @return string[]
+     */
+    private function getLettersFromWord()
+    {
+        return array_unique(str_split(strtoupper($this->word)));
+    }
+
+    /**
+     * Returns the word found so far built for the player
+     *
+     * @return string
+     */
+    private function buildCurrentPlayerWord()
+    {
+        $wordLetters = $this->getLettersFromWord();
+        $playerLetters = $this->currentPlayer->getPlayedLetters();
+        $goodLetters = array_intersect($wordLetters, $playerLetters);
+
+        $splitWord = str_split(strtoupper($this->word));
+        $word = '';
+        foreach ($splitWord as $letter) {
+            $word .= (in_array($letter, $goodLetters) ? $letter : '_') . ' ';
         }
-        return new HangmanGoodProposition(
-            $this->id,
-            $playerId,
-            $this->buildWord($playerId),
-            $this->getPlayedLetters($playerId),
-            $this->getRemainingChances($playerId)
-        ) ;
+
+        return trim($word);
     }
 
     /**
-     * Function to call when a bad proposition has been made
+     * Checks if all letters for the word have been found
      *
-     * @param  PlayerId $playerId
-     * @return HangmanBadProposition
+     * @return bool
      */
-    protected function badProposition(PlayerId $playerId)
+    private function isAllLettersFoundForCurrentPlayer()
     {
+        $wordLetters = $this->getLettersFromWord();
+        $playerLetters = $this->currentPlayer->getPlayedLetters();
+        return count(array_intersect($wordLetters, $playerLetters)) == count($wordLetters);
+    }
 
-        $this->remainingChances[(string)$playerId]--;
-
-        if ($this->getRemainingChances($playerId) == 0) {
-            return $this->lose($playerId);
+    /**
+     * Checks if the answer is valid
+     * If it's not, ends player turn and throws an HangmanException
+     *
+     * @param  string $answer
+     * @throws HangmanException
+     */
+    private function checkAnswerIsValid($answer)
+    {
+        if (strlen($answer) !== strlen($this->word)) {
+            throw new HangmanException(sprintf('"%s" is not a valid answer!', $answer));
         }
-
-        return new HangmanBadProposition(
-            $this->id,
-            $playerId,
-            $this->buildWord($playerId),
-            $this->getPlayedLetters($playerId),
-            $this->getRemainingChances($playerId)
-        ) ;
-    }
-
-    /**
-     * Function to call when game is won by a player
-     *
-     * @param  PlayerId $playerId
-     * @return HangmanWon
-     */
-    protected function win(PlayerId $playerId)
-    {
-        $this->currentPlayer = null;
-        return new HangmanWon(
-            $this->id,
-            $playerId,
-            $this->getPlayedLetters($playerId),
-            $this->getRemainingChances($playerId),
-            $this->word
-        );
-    }
-
-    /**
-     * Function to call when game is lost by a player
-     *
-     * @param  PlayerId $playerId
-     * @return HangmanLost
-     */
-    protected function lose(PlayerId $playerId)
-    {
-        $this->currentPlayer = null;
-        return new HangmanLost(
-            $this->id,
-            $playerId,
-            $this->getPlayedLetters($playerId),
-            $this->getRemainingChances($playerId),
-            $this->word
-        );
     }
 
     /**
@@ -398,92 +462,24 @@ class Hangman implements MiniGame
      * @param  string $word
      * @return bool
      */
-    protected function isTheAnswer($word)
+    private function isTheAnswer($word)
     {
         return ($this->word === strtoupper($word));
     }
 
     /**
-     * Returns the indexes of the letter in the word
-     *
-     * @param  string $letter
-     * @return array
-     */
-    protected function contains($letter)
-    {
-        $lastPos = 0;
-        $positions = array();
-
-        while (($lastPos = strpos($this->word, $letter, $lastPos))!== false) {
-            $positions[] = $lastPos;
-            $lastPos = $lastPos + 1;
-        }
-
-        return $positions;
-    }
-
-    /**
-     * Saves the letter played by the player and the result
+     * Function to call when an error must be returned
      *
      * @param  PlayerId $playerId
-     * @param  string   $letter
-     * @param  array    $result
-     * @return void
+     * @param  string   $message
+     * @return HangmanError
      */
-    protected function savePlayedLetter(PlayerId $playerId, $letter, array $result)
+    private function playerError(PlayerId $playerId, $message)
     {
-        $playerId = $playerId->getId();
-        if ($result) {
-            foreach ($result as $position) {
-                $this->lettersPlayed[(string)$playerId][$position] = $letter;
-            }
-        } else {
-            $this->badLettersPlayed[(string)$playerId][] = $letter;
-        }
-    }
-
-    /**
-     * Checks if all letters for the word have been found
-     *
-     * @param  PlayerId $player
-     * @return bool
-     */
-    protected function isAllLettersFound(PlayerId $player)
-    {
-        return !in_array('_', $this->lettersPlayed[(string)$player]);
-    }
-
-    /**
-     * Returns the word built for the player
-     *
-     * @param  PlayerId $playerId
-     * @return string
-     */
-    protected function buildWord(PlayerId $playerId)
-    {
-        return implode(' ', $this->lettersPlayed[(string)$playerId]);
-    }
-
-    /**
-     * Returns the list of played letters
-     *
-     * @param  PlayerId $playerId
-     * @return array
-     */
-    protected function getPlayedLetters(PlayerId $playerId)
-    {
-        $letters = $this->lettersPlayed[(string)$playerId];
-        $badLetters = $this->badLettersPlayed[(string)$playerId];
-        return array_unique(
-            array_merge(
-                $badLetters,
-                array_filter(
-                    $letters,
-                    function ($l) {
-                        return $l != '_';
-                    }
-                )
-            )
-        );
+        return new HangmanError(
+            $this->id,
+            $playerId,
+            $message
+        ) ;
     }
 }

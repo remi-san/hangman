@@ -67,7 +67,9 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
         $this->playerTwoId = $this->getPlayerId(self::P2_ID);
 
         $this->playerOne = $this->getPlayer($this->playerOneId, self::P1_NAME);
+        $this->playerOne->shouldReceive('setGame');
         $this->playerTwo = $this->getPlayer($this->playerTwoId, self::P2_NAME);
+        $this->playerTwo->shouldReceive('setGame');
         $this->hangman = new Hangman(
             $this->hangmanId,
             self::WORD,
@@ -114,6 +116,10 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function testPlayerOnePlaysWithUnknownMove()
     {
+        $this->playerOne->shouldReceive('loseLife')->once();
+        $this->playerOne->shouldReceive('getRemainingLives')->andReturn(self::CHANCES - 1);
+        $this->playerOne->shouldReceive('getPlayedLetters')->andReturn(array());
+
         $this->setExpectedException('\\MiniGame\\Exceptions\\IllegalMoveException');
 
         /* @var $feedback HangmanGoodProposition */
@@ -125,17 +131,20 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function testPlayerOnePlaysOneGoodLetter()
     {
+        $letter = 'H';
+
+        $this->playerOne->shouldReceive('playLetter')->with($letter)->once();
+        $this->playerOne->shouldReceive('getPlayedLetters')->andReturn(array($letter));
+        $this->playerOne->shouldReceive('getRemainingLives')->andReturn(self::CHANCES);
+
         /* @var $feedback HangmanGoodProposition */
-        $feedback = $this->hangman->play($this->playerOneId, $this->getProposition('H'));
+        $feedback = $this->hangman->play($this->playerOneId, $this->getProposition($letter));
 
         $this->assertInstanceOf('\\Hangman\\Result\\HangmanGoodProposition', $feedback);
         $this->assertEquals($this->playerOneId, $feedback->getPlayerId());
         $this->assertEquals(array('H'), $feedback->getLettersPlayed());
         $this->assertEquals(self::CHANCES, $feedback->getRemainingChances());
         $this->assertEquals('H _ _ _ H H _ _ _ _ _', $feedback->getFeedBack());
-
-        $this->assertEquals(self::CHANCES, $this->hangman->getRemainingChances($this->playerOneId));
-        $this->assertEquals(self::CHANCES, $this->hangman->getRemainingChances($this->playerTwoId));
 
         $this->assertFalse($this->hangman->canPlayerPlay($this->playerOneId));
         $this->assertTrue($this->hangman->canPlayerPlay($this->playerTwoId));
@@ -146,17 +155,21 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function testPlayerOnePlaysOneBadLetter()
     {
+        $letter = 'Z';
+
+        $this->playerOne->shouldReceive('playLetter')->with($letter)->once();
+        $this->playerOne->shouldReceive('getPlayedLetters')->andReturn(array($letter));
+        $this->playerOne->shouldReceive('loseLife')->once();
+        $this->playerOne->shouldReceive('getRemainingLives')->andReturn(self::CHANCES - 1);
+
         /* @var $feedback HangmanBadProposition */
-        $feedback = $this->hangman->play($this->playerOneId, $this->getProposition('Z'));
+        $feedback = $this->hangman->play($this->playerOneId, $this->getProposition($letter));
 
         $this->assertInstanceOf('\\Hangman\\Result\\HangmanBadProposition', $feedback);
         $this->assertEquals($this->playerOneId, $feedback->getPlayerId());
         $this->assertEquals(array('Z'), $feedback->getLettersPlayed());
         $this->assertEquals(self::CHANCES-1, $feedback->getRemainingChances());
         $this->assertEquals('_ _ _ _ _ _ _ _ _ _ _', $feedback->getFeedBack());
-
-        $this->assertEquals(self::CHANCES-1, $this->hangman->getRemainingChances($this->playerOneId));
-        $this->assertEquals(self::CHANCES, $this->hangman->getRemainingChances($this->playerTwoId));
 
         $this->assertFalse($this->hangman->canPlayerPlay($this->playerOneId));
         $this->assertTrue($this->hangman->canPlayerPlay($this->playerTwoId));
@@ -167,15 +180,17 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function testPlayerOnePlaysIllegalAnswer()
     {
+        $this->playerOne->shouldReceive('loseLife')->once();
+        $this->playerOne->shouldReceive('getPlayedLetters')->andReturn(array());
+        $this->playerOne->shouldReceive('getRemainingLives')->andReturn(self::CHANCES - 1);
+
         $this->setExpectedException('\\MiniGame\\Exceptions\\IllegalMoveException');
         $move = $this->getAnswer('ABCD');
+
         try {
             $this->hangman->play($this->playerOneId, $move);
         } catch (IllegalMoveException $e) {
             $this->assertEquals($move, $e->getMove());
-
-            $this->assertEquals(self::CHANCES-1, $this->hangman->getRemainingChances($this->playerOneId));
-            $this->assertEquals(self::CHANCES, $this->hangman->getRemainingChances($this->playerTwoId));
 
             $this->assertFalse($this->hangman->canPlayerPlay($this->playerOneId));
             $this->assertTrue($this->hangman->canPlayerPlay($this->playerTwoId));
@@ -189,6 +204,9 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function testPlayerOneFindsSolution()
     {
+        $this->playerOne->shouldReceive('getRemainingLives')->andReturn(self::CHANCES);
+        $this->playerOne->shouldReceive('getPlayedLetters')->andReturn(array());
+
         /* @var $feedback \Hangman\Result\HangmanWon */
         $feedback = $this->hangman->play($this->playerOneId, $this->getAnswer(self::WORD));
 
@@ -197,9 +215,6 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $feedback->getLettersPlayed());
         $this->assertEquals(self::CHANCES, $feedback->getRemainingChances());
         $this->assertEquals(self::WORD, $feedback->getSolution());
-
-        $this->assertEquals(self::CHANCES, $this->hangman->getRemainingChances($this->playerOneId));
-        $this->assertEquals(self::CHANCES, $this->hangman->getRemainingChances($this->playerTwoId));
 
         $this->assertFalse($this->hangman->canPlayerPlay($this->playerOneId));
         $this->assertFalse($this->hangman->canPlayerPlay($this->playerTwoId));
@@ -211,19 +226,21 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
     public function testPlayerOneFindsLastLetter()
     {
         $word = 'AAAA';
+        $letter = 'A';
+
+        $this->playerOne->shouldReceive('playLetter')->with($letter)->once();
+        $this->playerOne->shouldReceive('getPlayedLetters')->andReturn(array($letter));
+        $this->playerOne->shouldReceive('getRemainingLives')->andReturn(self::CHANCES);
 
         /* @var $feedback \Hangman\Result\HangmanWon */
         $hangman = new Hangman($this->hangmanId, $word, array($this->playerOne, $this->playerTwo), self::CHANCES);
-        $feedback = $hangman->play($this->playerOneId, $this->getProposition('A'));
+        $feedback = $hangman->play($this->playerOneId, $this->getProposition($letter));
 
         $this->assertInstanceOf('\\Hangman\\Result\\HangmanWon', $feedback);
         $this->assertEquals($this->playerOneId, $feedback->getPlayerId());
         $this->assertEquals(array('A'), $feedback->getLettersPlayed());
         $this->assertEquals(self::CHANCES, $feedback->getRemainingChances());
         $this->assertEquals($word, $feedback->getSolution());
-
-        $this->assertEquals(self::CHANCES, $hangman->getRemainingChances($this->playerOneId));
-        $this->assertEquals(self::CHANCES, $hangman->getRemainingChances($this->playerTwoId));
 
         $this->assertFalse($hangman->canPlayerPlay($this->playerOneId));
         $this->assertFalse($hangman->canPlayerPlay($this->playerTwoId));
@@ -234,19 +251,23 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function testPlayerOneLoses()
     {
+        $letter = 'Z';
+
+        $this->playerOne->shouldReceive('playLetter')->with($letter)->once();
+        $this->playerOne->shouldReceive('getPlayedLetters')->andReturn(array($letter));
+        $this->playerOne->shouldReceive('loseLife')->once();
+        $this->playerOne->shouldReceive('getRemainingLives')->andReturn(0);
+
         $hangman = new Hangman($this->hangmanId, self::WORD, array($this->playerOne, $this->playerTwo), 1);
 
         /* @var $feedback \Hangman\Result\HangmanLost */
-        $feedback = $hangman->play($this->playerOneId, $this->getProposition('Z'));
+        $feedback = $hangman->play($this->playerOneId, $this->getProposition($letter));
 
         $this->assertInstanceOf('\\Hangman\\Result\\HangmanLost', $feedback);
         $this->assertEquals($this->playerOneId, $feedback->getPlayerId());
         $this->assertEquals(array('Z'), $feedback->getLettersPlayed());
         $this->assertEquals(0, $feedback->getRemainingChances());
         $this->assertEquals(self::WORD, $feedback->getSolution());
-
-        $this->assertEquals(0, $hangman->getRemainingChances($this->playerOneId));
-        $this->assertEquals(1, $hangman->getRemainingChances($this->playerTwoId));
 
         $this->assertFalse($hangman->canPlayerPlay($this->playerOneId));
         $this->assertFalse($hangman->canPlayerPlay($this->playerTwoId));
@@ -257,6 +278,9 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function testPlayerOneBadSolution()
     {
+        $this->playerOne->shouldReceive('getRemainingLives')->andReturn(self::CHANCES);
+        $this->playerOne->shouldReceive('getPlayedLetters')->andReturn(array());
+
         /* @var $feedback HangmanLost */
         $feedback = $this->hangman->play($this->playerOneId, $this->getAnswer('HHHHHHHHHHH'));
 
@@ -265,9 +289,6 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $feedback->getLettersPlayed());
         $this->assertEquals(self::CHANCES, $feedback->getRemainingChances());
         $this->assertEquals(self::WORD, $feedback->getSolution());
-
-        $this->assertEquals(self::CHANCES, $this->hangman->getRemainingChances($this->playerOneId));
-        $this->assertEquals(self::CHANCES, $this->hangman->getRemainingChances($this->playerTwoId));
 
         $this->assertFalse($this->hangman->canPlayerPlay($this->playerOneId));
         $this->assertFalse($this->hangman->canPlayerPlay($this->playerTwoId));
@@ -285,28 +306,9 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($this->playerTwoId, $e->getPlayerId());
             $this->assertEquals($this->hangmanId, $e->getMiniGameId());
 
-            $this->assertEquals(self::CHANCES, $this->hangman->getRemainingChances($this->playerOneId));
-            $this->assertEquals(self::CHANCES, $this->hangman->getRemainingChances($this->playerTwoId));
-
             $this->assertTrue($this->hangman->canPlayerPlay($this->playerOneId));
             throw $e;
         }
-    }
-
-    /**
-     * @test
-     */
-    public function testTwoPlayersPlayOnTheirTurn()
-    {
-        $this->hangman->play($this->playerOneId, $this->getProposition('A'));
-
-        $this->assertFalse($this->hangman->canPlayerPlay($this->playerOneId));
-        $this->assertTrue($this->hangman->canPlayerPlay($this->playerTwoId));
-
-        $this->hangman->play($this->playerTwoId, $this->getProposition('A'));
-
-        $this->assertTrue($this->hangman->canPlayerPlay($this->playerOneId));
-        $this->assertFalse($this->hangman->canPlayerPlay($this->playerTwoId));
     }
 
     /**
@@ -321,5 +323,19 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
 
         $hangman = new Hangman($this->hangmanId, 'word', $players);
         $this->assertEquals($players, $hangman->getPlayers());
+    }
+
+    /**
+     * @test
+     */
+    public function testGetPlayer()
+    {
+        $players = array(
+            $this->playerOne,
+            $this->playerTwo
+        );
+
+        $hangman = new Hangman($this->hangmanId, 'word', $players);
+        $this->assertNull($hangman->getPlayer($this->getPlayerId(999)));
     }
 }
