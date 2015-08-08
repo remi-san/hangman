@@ -1,12 +1,13 @@
 <?php
 namespace Hangman\Entity;
 
+use Broadway\EventSourcing\EventSourcedEntity;
 use MiniGame\Entity\MiniGame;
 use MiniGame\Entity\Player;
 use MiniGame\Entity\PlayerId;
 use Rhumsaa\Uuid\Uuid;
 
-class HangmanPlayer implements Player
+class HangmanPlayer extends EventSourcedEntity implements Player
 {
     /**
      * @var PlayerId

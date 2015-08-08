@@ -1,6 +1,7 @@
 <?php
 namespace Hangman\Entity;
 
+use Broadway\EventSourcing\EventSourcedAggregateRoot;
 use Hangman\Exception\HangmanException;
 use Hangman\Move\Answer;
 use Hangman\Move\Proposition;
@@ -19,7 +20,7 @@ use MiniGame\GameResult;
 use MiniGame\Move;
 use Rhumsaa\Uuid\Uuid;
 
-class Hangman implements MiniGame
+class Hangman extends EventSourcedAggregateRoot implements MiniGame
 {
     /**
      * @var MiniGameId
@@ -71,11 +72,21 @@ class Hangman implements MiniGame
     }
 
     /**
-     * Returns the id of the game (unique string)
+     * Returns the id of the game
      *
      * @return MiniGameId
      */
     public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Returns the aggregate id
+     *
+     * @return MiniGameId
+     */
+    public function getAggregateRootId()
     {
         return $this->id;
     }
