@@ -99,9 +99,11 @@ class Hangman implements MiniGame
     {
         $player->setGame($this);
         $this->gameOrder[] = (string)$player->getId();
+
         if ($this->currentPlayer === null) {
             $this->currentPlayer = $player;
         }
+
         $this->players[] = $player;
     }
 
@@ -476,10 +478,6 @@ class Hangman implements MiniGame
      */
     private function playerError(PlayerId $playerId, $message)
     {
-        return new HangmanError(
-            $this->id,
-            $playerId,
-            $message
-        ) ;
+        return new HangmanError($this->id, $playerId, $message) ;
     }
 }

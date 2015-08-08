@@ -18,18 +18,6 @@ Hangman\Entity\Hangman:
       column: game_order
       type: json_array
       nullable: false
-    lettersPlayed:
-      column: letters_played
-      type: json_array
-      nullable: false
-    badLettersPlayed:
-      column: bad_letters_played
-      type: json_array
-      nullable: false
-    remainingChances:
-      column: remaining_chances
-      type: json_array
-      nullable: false
   manyToOne:
     currentPlayer:
       targetEntity: HangmanPlayer
