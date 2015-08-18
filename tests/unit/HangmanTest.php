@@ -70,7 +70,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
         $this->playerOne->shouldReceive('setGame');
         $this->playerTwo = $this->getPlayer($this->playerTwoId, self::P2_NAME);
         $this->playerTwo->shouldReceive('setGame');
-        $this->hangman = new Hangman(
+        $this->hangman = Hangman::createGame(
             $this->hangmanId,
             self::WORD,
             array($this->playerOne, $this->playerTwo),
@@ -99,7 +99,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function testUuidIsGenerated()
     {
-        $hangman = new Hangman(null, self::WORD);
+        $hangman = Hangman::createGame(null, self::WORD);
         $this->assertTrue(Uuid::isValid($hangman->getId()->getId()));
     }
 
@@ -234,7 +234,12 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
         $this->playerOne->shouldReceive('getRemainingLives')->andReturn(self::CHANCES);
 
         /* @var $feedback \Hangman\Result\HangmanWon */
-        $hangman = new Hangman($this->hangmanId, $word, array($this->playerOne, $this->playerTwo), self::CHANCES);
+        $hangman = Hangman::createGame(
+            $this->hangmanId,
+            $word,
+            array($this->playerOne, $this->playerTwo),
+            self::CHANCES
+        );
         $feedback = $hangman->play($this->playerOneId, $this->getProposition($letter));
 
         $this->assertInstanceOf('\\Hangman\\Result\\HangmanWon', $feedback);
@@ -259,7 +264,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
         $this->playerOne->shouldReceive('loseLife')->once();
         $this->playerOne->shouldReceive('getRemainingLives')->andReturn(0);
 
-        $hangman = new Hangman($this->hangmanId, self::WORD, array($this->playerOne, $this->playerTwo), 1);
+        $hangman = Hangman::createGame($this->hangmanId, self::WORD, array($this->playerOne, $this->playerTwo), 1);
 
         /* @var $feedback \Hangman\Result\HangmanLost */
         $feedback = $hangman->play($this->playerOneId, $this->getProposition($letter));
@@ -322,7 +327,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
             $this->playerTwo
         );
 
-        $hangman = new Hangman($this->hangmanId, 'word', $players);
+        $hangman = Hangman::createGame($this->hangmanId, 'word', $players);
         $this->assertEquals($players, $hangman->getPlayers());
     }
 
@@ -336,7 +341,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
             $this->playerTwo
         );
 
-        $hangman = new Hangman($this->hangmanId, 'word', $players);
+        $hangman = Hangman::createGame($this->hangmanId, 'word', $players);
         $this->assertNull($hangman->getPlayer($this->getPlayerId(999)));
     }
 }

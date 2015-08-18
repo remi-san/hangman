@@ -21,7 +21,7 @@ $hangmanRepository = $entityManager->getRepository('\\Hangman\\Entity\\Hangman')
 $player = new \Hangman\Entity\HangmanPlayer(null, "remi");
 $playerRepository->save($player);
 
-$hangman = new \Hangman\Entity\Hangman(null, 'word', array($player));
+$hangman = \Hangman\Entity\Hangman::createGame(null, 'word', array($player));
 $hangmanRepository->save($hangman);
 
 $hangman = $hangmanRepository->find($hangman->getId());

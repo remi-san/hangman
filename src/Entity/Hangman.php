@@ -2,6 +2,8 @@
 namespace Hangman\Entity;
 
 use Broadway\EventSourcing\EventSourcedAggregateRoot;
+use Hangman\Event\HangmanGameCreatedEvent;
+use Hangman\Event\HangmanPlayerCreatedEvent;
 use Hangman\Exception\HangmanException;
 use Hangman\Move\Answer;
 use Hangman\Move\Proposition;
@@ -51,25 +53,21 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      * Constructor
      *
      * @param MiniGameId $id
-     * @param string     $word
-     * @param Player[]   $players
      */
-    public function __construct(MiniGameId $id = null, $word = 'HANGMAN', array $players = array())
+    private function __construct(MiniGameId $id = null)
     {
         if ($id === null) {
             $id = new MiniGameId(Uuid::uuid4()->toString());
         }
 
         $this->id = $id;
-        $this->word = strtoupper($word);
-        $this->players = array();
-
-        $this->gameOrder = array();
-
-        foreach ($players as $player) {
-            $this->addPlayer($player);
-        }
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////   PUBLIC METHODS   /////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Returns the id of the game
@@ -108,14 +106,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      */
     public function addPlayer(Player $player)
     {
-        $player->setGame($this);
-        $this->gameOrder[] = (string)$player->getId();
-
-        if ($this->currentPlayer === null) {
-            $this->currentPlayer = $player;
-        }
-
-        $this->players[] = $player;
+        $this->apply(new HangmanPlayerCreatedEvent($this->id, $player));
     }
 
     /**
@@ -202,6 +193,27 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
                 $move,
                 $e->getMessage()
             );
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////   PRIVATE METHODS   /////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Initialize the game
+     *
+     * @param string          $word
+     * @param HangmanPlayer[] $players
+     */
+    private function initialize($word, array $players)
+    {
+        $this->apply(new HangmanGameCreatedEvent($this->id, $word));
+
+        foreach ($players as $player) {
+            $this->addPlayer($player);
         }
     }
 
@@ -490,5 +502,67 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     private function playerError(PlayerId $playerId, $message)
     {
         return new HangmanError($this->id, $playerId, $message) ;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////   APPLY EVENTS   //////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Apply the player created event
+     *
+     * @param  HangmanPlayerCreatedEvent $event
+     * @return void
+     */
+    protected function applyHangmanPlayerCreatedEvent(HangmanPlayerCreatedEvent $event)
+    {
+        $player = $event->getPlayer();
+
+        $player->setGame($this);
+        $this->gameOrder[] = (string)$player->getId();
+
+        if ($this->currentPlayer === null) {
+            $this->currentPlayer = $player;
+        }
+
+        $this->players[] = $player;
+    }
+
+    /**
+     * Apply the game created event
+     *
+     * @param  HangmanGameCreatedEvent $event
+     * @return void
+     */
+    protected function applyHangmanGameCreatedEvent(HangmanGameCreatedEvent $event)
+    {
+        $this->word = strtoupper($event->getWord());
+        $this->players = array();
+
+        $this->gameOrder = array();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////   STATIC CONSTRUCTOR   ///////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Create a new instance
+     *
+     * @param  MiniGameId $id
+     * @param  string $word
+     * @param  array $players
+     * @return Hangman
+     */
+    public static function createGame(MiniGameId $id = null, $word = 'HANGMAN', array $players = array())
+    {
+        $hangman = new Hangman($id);
+        $hangman->initialize($word, $players);
+
+        return $hangman;
     }
 }
