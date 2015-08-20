@@ -1,11 +1,17 @@
 <?php
 namespace Hangman\Event;
 
+use League\Event\Event;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\Player;
 
-class HangmanPlayerCreatedEvent
+class HangmanPlayerCreatedEvent extends Event
 {
+    /**
+     * @var string
+     */
+    const NAME = 'game.created';
+
     /**
      * @var Player
      */
@@ -24,6 +30,7 @@ class HangmanPlayerCreatedEvent
      */
     public function __construct(MiniGameId $gameId, Player $player)
     {
+        parent::__construct(self::NAME);
         $this->gameId = $gameId;
         $this->player = $player;
     }
