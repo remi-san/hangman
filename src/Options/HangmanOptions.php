@@ -8,6 +8,12 @@ use MiniGame\Options\AbstractGameOptions;
 
 class HangmanOptions extends AbstractGameOptions implements GameOptions
 {
+
+    /**
+     * @var int
+     */
+    private $lives;
+
     /**
      * @var int
      */
@@ -47,11 +53,23 @@ class HangmanOptions extends AbstractGameOptions implements GameOptions
         $lives = 6,
         array $players = array()
     ) {
-        parent::__construct($lives, $players);
-        $this->setWord($word);
-        $this->setLanguage($language);
-        $this->setLength($length);
-        $this->setLevel($level);
+        parent::__construct($players);
+
+        $this->lives = $lives;
+        $this->word = $word;
+        $this->language = $language;
+        $this->length = $length;
+        $this->level = $level;
+
+        $this->checkOptions();
+    }
+
+    /**
+     * @return int
+     */
+    public function getLives()
+    {
+        return $this->lives;
     }
 
     /**
@@ -63,41 +81,11 @@ class HangmanOptions extends AbstractGameOptions implements GameOptions
     }
 
     /**
-     * @param  int $length
-     * @throws IllegalOptionException
-     */
-    public function setLength($length)
-    {
-        if ($length !== null && $this->word) {
-            throw new IllegalOptionException(
-                "You can't set the length if the word is already chosen!",
-                'length',
-                $length
-            );
-        }
-
-        $this->length = $length;
-    }
-
-    /**
      * @return int
      */
     public function getLevel()
     {
         return $this->level;
-    }
-
-    /**
-     * @param  int $level
-     * @throws IllegalOptionException
-     */
-    public function setLevel($level)
-    {
-        if ($level !== null && $this->word) {
-            throw new IllegalOptionException("You can't set the level if the word is already chosen!", 'level', $level);
-        }
-
-        $this->level = $level;
     }
 
     /**
@@ -109,23 +97,6 @@ class HangmanOptions extends AbstractGameOptions implements GameOptions
     }
 
     /**
-     * @param  string $word
-     * @throws IllegalOptionException
-     */
-    public function setWord($word)
-    {
-        if ($word !== null && ($this->length || $this->level)) {
-            throw new IllegalOptionException(
-                "You can't set the word if the level and/or the length are already chosen!",
-                'word',
-                $word
-            );
-        }
-
-        $this->word = $word;
-    }
-
-    /**
      * @return string
      */
     public function getLanguage()
@@ -134,10 +105,26 @@ class HangmanOptions extends AbstractGameOptions implements GameOptions
     }
 
     /**
-     * @param string $language
+     * Check the options
+     *
+     * @throws IllegalOptionException
      */
-    public function setLanguage($language)
+    private function checkOptions()
     {
-        $this->language = $language;
+        if ($this->length !== null && $this->word) {
+            throw new IllegalOptionException(
+                "You can't set the length if the word is already chosen!",
+                'length',
+                $this->length
+            );
+        }
+
+        if ($this->level !== null && $this->word) {
+            throw new IllegalOptionException(
+                "You can't set the level if the word is already chosen!",
+                'level',
+                $this->level
+            );
+        }
     }
 }

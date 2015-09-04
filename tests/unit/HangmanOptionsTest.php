@@ -110,19 +110,4 @@ class HangmanOptionsTest extends \PHPUnit_Framework_TestCase
 
         new HangmanOptions($word, 'en', $length, $level, $this->lives, $this->players);
     }
-
-    /**
-     * @test
-     */
-    public function testHangmanOptionsWithLengthAndLevelAndSetWord()
-    {
-        $word    = 'word';
-        $length  = 5;
-        $level   = 5;
-
-        $this->setExpectedException('\\MiniGame\\Exceptions\\IllegalOptionException');
-
-        $options = new HangmanOptions(null, 'en', $length, $level, $this->lives, $this->players);
-        $options->setWord($word);
-    }
 }
