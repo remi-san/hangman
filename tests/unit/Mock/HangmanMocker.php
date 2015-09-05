@@ -3,6 +3,7 @@ namespace Hangman\Test\Mock;
 
 use Hangman\Move\Answer;
 use Hangman\Move\Proposition;
+use MiniGame\Entity\MiniGameId;
 
 trait HangmanMocker
 {
@@ -20,14 +21,16 @@ trait HangmanMocker
     }
 
     /**
-     * @param  string $word
-     * @param  string $lang
-     * @param  int    $length
-     * @param  int    $level
-     * @param  array  $players
+     * @param  MiniGameId $id
+     * @param  string     $word
+     * @param  string     $lang
+     * @param  int        $length
+     * @param  int        $level
+     * @param  array      $players
      * @return \Hangman\Options\HangmanOptions
      */
     public function getHangmanOptions(
+        MiniGameId $id = null,
         $word = null,
         $lang = 'en',
         $length = null,
@@ -36,6 +39,7 @@ trait HangmanMocker
     ) {
         $options = \Mockery::mock('\\Hangman\\Options\\HangmanOptions');
 
+        $options->shouldReceive('getId')->andReturn($id);
         $options->shouldReceive('getWord')->andReturn($word);
         $options->shouldReceive('getLength')->andReturn($length);
         $options->shouldReceive('getLevel')->andReturn($level);
