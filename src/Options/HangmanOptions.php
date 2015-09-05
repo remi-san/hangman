@@ -1,6 +1,7 @@
 <?php
 namespace Hangman\Options;
 
+use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\Player;
 use MiniGame\Exceptions\IllegalOptionException;
 use MiniGame\GameOptions;
@@ -8,7 +9,6 @@ use MiniGame\Options\AbstractGameOptions;
 
 class HangmanOptions extends AbstractGameOptions implements GameOptions
 {
-
     /**
      * @var int
      */
@@ -37,15 +37,17 @@ class HangmanOptions extends AbstractGameOptions implements GameOptions
     /**
      * Constructor
      *
-     * @param  string   $word
-     * @param  string   $language
-     * @param  int      $length
-     * @param  int      $level
-     * @param  int      $lives
-     * @param  Player[] $players
+     * @param MiniGameId $id
+     * @param  string    $word
+     * @param  string    $language
+     * @param  int       $length
+     * @param  int       $level
+     * @param  int       $lives
+     * @param  Player[]  $players
      * @throws IllegalOptionException
      */
     public function __construct(
+        MiniGameId $id,
         $word = null,
         $language = 'en',
         $length = null,
@@ -53,7 +55,7 @@ class HangmanOptions extends AbstractGameOptions implements GameOptions
         $lives = 6,
         array $players = array()
     ) {
-        parent::__construct($players);
+        parent::__construct($id, $players);
 
         $this->lives = $lives;
         $this->word = $word;
