@@ -37,7 +37,6 @@ class HangmanOptions extends AbstractGameOptions implements GameOptions
     /**
      * Constructor
      *
-     * @param MiniGameId $id
      * @param  string    $word
      * @param  string    $language
      * @param  int       $length
@@ -47,7 +46,6 @@ class HangmanOptions extends AbstractGameOptions implements GameOptions
      * @throws IllegalOptionException
      */
     public function __construct(
-        MiniGameId $id,
         $word = null,
         $language = 'en',
         $length = null,
@@ -55,7 +53,7 @@ class HangmanOptions extends AbstractGameOptions implements GameOptions
         $lives = 6,
         array $players = array()
     ) {
-        parent::__construct($id, $players);
+        parent::__construct($players);
 
         $this->lives = $lives;
         $this->word = $word;
