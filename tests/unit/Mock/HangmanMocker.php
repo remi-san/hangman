@@ -21,7 +21,6 @@ trait HangmanMocker
     }
 
     /**
-     * @param  MiniGameId $id
      * @param  string     $word
      * @param  string     $lang
      * @param  int        $length
@@ -30,7 +29,6 @@ trait HangmanMocker
      * @return \Hangman\Options\HangmanOptions
      */
     public function getHangmanOptions(
-        MiniGameId $id = null,
         $word = null,
         $lang = 'en',
         $length = null,
@@ -39,7 +37,6 @@ trait HangmanMocker
     ) {
         $options = \Mockery::mock('\\Hangman\\Options\\HangmanOptions');
 
-        $options->shouldReceive('getId')->andReturn($id);
         $options->shouldReceive('getWord')->andReturn($word);
         $options->shouldReceive('getLength')->andReturn($length);
         $options->shouldReceive('getLevel')->andReturn($level);
