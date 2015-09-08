@@ -2,7 +2,9 @@
 namespace Hangman\Entity;
 
 use Broadway\EventSourcing\EventSourcedAggregateRoot;
+use Hangman\Event\HangmanBadLetterProposedEvent;
 use Hangman\Event\HangmanGameCreatedEvent;
+use Hangman\Event\HangmanGameStartedEvent;
 use Hangman\Event\HangmanPlayerCreatedEvent;
 use Hangman\Exception\HangmanException;
 use Hangman\Move\Answer;
@@ -20,6 +22,7 @@ use MiniGame\Exceptions\IllegalMoveException;
 use MiniGame\Exceptions\NotPlayerTurnException;
 use MiniGame\GameResult;
 use MiniGame\Move;
+use MiniGame\PlayerOptions;
 use Rhumsaa\Uuid\Uuid;
 
 class Hangman extends EventSourcedAggregateRoot implements MiniGame
@@ -48,6 +51,11 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      * @var HangmanPlayer
      **/
     protected $currentPlayer;
+
+    /**
+     * @var boolean
+     */
+    protected $active = false;
 
     /**
      * Constructor
@@ -100,13 +108,31 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     }
 
     /**
-     * Adds a player
+     * Starts the game
      *
-     * @param Player $player
+     * @return void
+     *
+     * @throws HangmanException
      */
-    public function addPlayer(Player $player)
+    public function startGame()
     {
-        $this->apply(new HangmanPlayerCreatedEvent($this->id, $player));
+        if ($this->active) {
+            throw new HangmanException("You can't start a game that's already started.");
+        }
+
+        $this->apply(new HangmanGameStartedEvent($this->id));
+    }
+
+    /**
+     * Adds a player to the game
+     *
+     * @param  PlayerOptions $playerOptions
+     * @return void
+     */
+    public function addPlayerToGame(PlayerOptions $playerOptions)
+    {
+        $player = null;
+        $this->addPlayer($player);
     }
 
     /**
@@ -184,8 +210,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
                 throw new HangmanException('Unsupported Move!');
             }
         } catch (HangmanException $e) {
-            $return = $this->currentPlayerBadProposition();
-            $this->endCurrentPlayerTurn();
+            $return = $this->currentPlayerBadProposition($move->getText());
             throw new IllegalMoveException(
                 $playerId,
                 $this->getId(),
@@ -218,6 +243,22 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     }
 
     /**
+     * Adds a player
+     *
+     * @param Player $player
+     *
+     * @throws HangmanException
+     */
+    private function addPlayer(Player $player)
+    {
+        if ($this->active) {
+            throw new HangmanException('You cannot add a player to a game that has already started.');
+        }
+
+        $this->apply(new HangmanPlayerCreatedEvent($this->id, $player));
+    }
+
+    /**
      * Propose a letter
      *
      * @param  string   $letter
@@ -227,13 +268,10 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     {
         $capLetter = strtoupper($letter);
         $letterPresent = $this->wordContains($capLetter);
-        $this->savePlayedLetterForCurrentPlayer($capLetter);
 
         $result =  (!$letterPresent)
-                   ? $this->currentPlayerBadProposition() // remove a life
-                   : $this->currentPlayerGoodProposition(); // yay!
-
-        $this->endCurrentPlayerTurn();
+                   ? $this->currentPlayerBadProposition($letter) // remove a life
+                   : $this->currentPlayerGoodProposition($letter); // yay!
 
         return $result;
     }
@@ -251,50 +289,79 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
         if ($this->isTheAnswer(strtoupper($answer))) {
             return $this->currentPlayerWins(); // you win
         } else {
-            return $this->currentPlayerLoses(); // you lose
+            return $this->playerLoses($this->currentPlayer); // you lose
         }
     }
 
     /**
      * Function to call when a bad proposition has been made
      *
+     * @param  string $letter
+     *
      * @return HangmanBadProposition
      */
-    private function currentPlayerBadProposition()
+    private function currentPlayerBadProposition($letter)
     {
-        $playerId = $this->currentPlayer->getId();
-        $this->currentPlayer->loseLife();
+        $capLetter = strtoupper($letter);
+        $player = $this->currentPlayer;
+        $playerId = $player->getId();
 
-        if ($this->getRemainingLives($playerId) == 0) {
-            return $this->currentPlayerLoses();
+        $playedLetters = $this->getPlayedLettersForPlayer($playerId);
+        $playedLetters[$capLetter] = $capLetter;
+        $wordSoFar = $this->buildWord($playedLetters);
+        $livesLost = 1;
+        $remainingLives = $this->getRemainingLives($playerId) - $livesLost;
+
+        $this->apply(
+            new HangmanBadLetterProposedEvent(
+                $this->id,
+                $playerId,
+                $capLetter,
+                $playedLetters,
+                $livesLost,
+                $remainingLives,
+                $wordSoFar
+            )
+        );
+
+        if ($remainingLives === 0) {
+            return $this->playerLoses($player);
         }
 
         return new HangmanBadProposition(
             $this->id,
             $playerId,
-            $this->buildCurrentPlayerWord(),
-            $this->getPlayedLettersForCurrentPlayer(),
-            $this->getRemainingLives($playerId)
+            $wordSoFar,
+            $playedLetters,
+            $remainingLives
         ) ;
     }
 
     /**
      * Function to call after a good proposition of letter has been made
      *
+     * @param  string $letter
+     *
      * @return HangmanGoodProposition
      */
-    private function currentPlayerGoodProposition()
+    private function currentPlayerGoodProposition($letter)
     {
-        $playerId = $this->currentPlayer->getId();
+        $this->savePlayedLetterForCurrentPlayer($letter);
+
+        $player = $this->currentPlayer;
+        $playerId = $player->getId();
 
         if ($this->isAllLettersFoundForCurrentPlayer()) {
             return $this->currentPlayerWins();
         }
+
+        $this->endCurrentPlayerTurn();
+
         return new HangmanGoodProposition(
             $this->id,
             $playerId,
-            $this->buildCurrentPlayerWord(),
-            $this->getPlayedLettersForCurrentPlayer(),
+            $this->buildPlayerWord($player),
+            $this->getPlayedLettersForPlayer($playerId),
             $this->getRemainingLives($playerId)
         ) ;
     }
@@ -311,7 +378,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
         $result = new HangmanWon(
             $this->id,
             $playerId,
-            $this->getPlayedLettersForCurrentPlayer(),
+            $this->getPlayedLettersForPlayer($playerId),
             $this->getRemainingLives($playerId),
             $this->word
         );
@@ -324,23 +391,21 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     /**
      * Function to call when game is lost by a player
      *
+     * @param  HangmanPlayer $player
      * @return HangmanLost
      */
-    private function currentPlayerLoses()
+    private function playerLoses(HangmanPlayer $player)
     {
-        $playerId = $this->currentPlayer->getId();
+        $playerId = $player->getId();
+        $this->currentPlayer = null;
 
-        $result = new HangmanLost(
+        return new HangmanLost(
             $this->id,
-            $this->currentPlayer->getId(),
-            $this->getPlayedLettersForCurrentPlayer(),
+            $playerId,
+            $this->getPlayedLettersForPlayer($playerId),
             $this->getRemainingLives($playerId),
             $this->word
         );
-
-        $this->currentPlayer = null;
-
-        return $result;
     }
 
     /**
@@ -396,11 +461,13 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     /**
      * Returns the list of played letters
      *
+     * @param  PlayerId $playerId
      * @return array
      */
-    private function getPlayedLettersForCurrentPlayer()
+    private function getPlayedLettersForPlayer(PlayerId $playerId)
     {
-        return $this->currentPlayer->getPlayedLetters();
+        $player = $this->getPlayer($playerId);
+        return $player->getPlayedLetters();
     }
 
     /**
@@ -438,13 +505,25 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     /**
      * Returns the word found so far built for the player
      *
+     * @param  HangmanPlayer $player
      * @return string
      */
-    private function buildCurrentPlayerWord()
+    private function buildPlayerWord(HangmanPlayer $player)
+    {
+        return $this->buildWord($player->getPlayedLetters());
+    }
+
+    /**
+     * Build the word from played letters
+     *
+     * @param  string[] $playedLetters
+     * @return string
+     */
+    private function buildWord($playedLetters)
     {
         $wordLetters = $this->getLettersFromWord();
-        $playerLetters = $this->currentPlayer->getPlayedLetters();
-        $goodLetters = array_intersect($wordLetters, $playerLetters);
+
+        $goodLetters = array_intersect($wordLetters, $playedLetters);
 
         $splitWord = str_split(strtoupper($this->word));
         $word = '';
@@ -542,6 +621,33 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
         $this->players = array();
 
         $this->gameOrder = array();
+    }
+
+    /**
+     * Apply the game created event
+     *
+     * @param  HangmanGameStartedEvent $event
+     * @return void
+     */
+    protected function applyHangmanGameStartedEvent(HangmanGameStartedEvent $event)
+    {
+        $this->active = true;
+    }
+
+    /**
+     * Apply the bad letter played event
+     *
+     * @param  HangmanBadLetterProposedEvent $event
+     * @return void
+     */
+    protected function applyHangmanBadLetterProposedEvent(HangmanBadLetterProposedEvent $event)
+    {
+        $player = $this->getPlayer($event->getPlayerId());
+
+        $this->savePlayedLetterForCurrentPlayer($event->getLetter());
+        $player->loseLife();
+
+        $this->endCurrentPlayerTurn();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

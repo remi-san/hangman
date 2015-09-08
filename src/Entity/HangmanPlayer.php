@@ -103,10 +103,12 @@ class HangmanPlayer extends EventSourcedEntity implements Player
 
     /**
      * Player loses a life
+     *
+     * @param int $nbLives
      */
-    public function loseLife()
+    public function loseLife($nbLives = 1)
     {
-        $this->lives--;
+        $this->lives -= $nbLives;
     }
 
     /**

@@ -4,12 +4,12 @@ namespace Hangman\Event;
 use League\Event\Event;
 use MiniGame\Entity\MiniGameId;
 
-class HangmanGameCreatedEvent extends Event
+class HangmanGameStartedEvent extends Event
 {
     /**
      * @var string
      */
-    const NAME = 'hangman.created';
+    const NAME = 'hangman.started';
 
     /**
      * @var MiniGameId
@@ -17,21 +17,14 @@ class HangmanGameCreatedEvent extends Event
     private $gameId;
 
     /**
-     * @var string
-     */
-    private $word;
-
-    /**
      * Constructor
      *
      * @param MiniGameId $gameId
-     * @param string     $word
      */
-    public function __construct(MiniGameId $gameId, $word)
+    public function __construct(MiniGameId $gameId)
     {
         parent::__construct(self::NAME);
         $this->gameId = $gameId;
-        $this->word = $word;
     }
 
     /**
@@ -40,13 +33,5 @@ class HangmanGameCreatedEvent extends Event
     public function getGameId()
     {
         return $this->gameId;
-    }
-
-    /**
-     * @return string
-     */
-    public function getWord()
-    {
-        return $this->word;
     }
 }

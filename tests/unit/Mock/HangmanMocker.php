@@ -1,9 +1,11 @@
 <?php
 namespace Hangman\Test\Mock;
 
+use Hangman\Entity\HangmanPlayer;
 use Hangman\Move\Answer;
 use Hangman\Move\Proposition;
-use MiniGame\Entity\MiniGameId;
+use MiniGame\Entity\MiniGame;
+use MiniGame\Entity\PlayerId;
 
 trait HangmanMocker
 {
@@ -18,6 +20,25 @@ trait HangmanMocker
         $h->shouldReceive('getId')->andReturn($id);
 
         return $h;
+    }
+
+    /**
+     * Returns a twitter player
+     *
+     * @param  PlayerId $id
+     * @param  string   $name
+     * @param  MiniGame $miniGame
+     * @return HangmanPlayer
+     */
+    public function getHangmanPlayer($id = null, $name = null, MiniGame $miniGame = null)
+    {
+        $player = \Mockery::mock('\\Hangman\\Entity\\HangmanPlayer');
+        $player->shouldReceive('getId')->andReturn($id);
+        $player->shouldReceive('getName')->andReturn($name);
+        $player->shouldReceive('setGame');
+        $player->shouldReceive('getGame')->andReturn($miniGame);
+
+        return $player;
     }
 
     /**

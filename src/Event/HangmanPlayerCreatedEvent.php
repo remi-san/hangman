@@ -10,7 +10,7 @@ class HangmanPlayerCreatedEvent extends Event
     /**
      * @var string
      */
-    const NAME = 'game.created';
+    const NAME = 'hangman.created';
 
     /**
      * @var Player
