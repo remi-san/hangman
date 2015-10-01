@@ -124,6 +124,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException('\\MiniGame\\Exceptions\\IllegalMoveException');
 
+        $this->hangman->startGame();
+
         /* @var $feedback HangmanGoodProposition */
         $this->hangman->play($this->playerOneId, $this->getMove('unknown'));
     }
@@ -138,6 +140,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
         $this->playerOne->shouldReceive('playLetter')->with($letter)->once();
         $this->playerOne->shouldReceive('getPlayedLetters')->andReturn(array($letter));
         $this->playerOne->shouldReceive('getRemainingLives')->andReturn(self::CHANCES);
+
+        $this->hangman->startGame();
 
         /* @var $feedback HangmanGoodProposition */
         $feedback = $this->hangman->play($this->playerOneId, $this->getProposition($letter));
@@ -163,6 +167,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
         $this->playerOne->shouldReceive('getPlayedLetters')->andReturn(array($letter=>$letter));
         $this->playerOne->shouldReceive('loseLife')->once();
         $this->playerOne->shouldReceive('getRemainingLives')->andReturn(self::CHANCES);
+
+        $this->hangman->startGame();
 
         /* @var $feedback HangmanBadProposition */
         $feedback = $this->hangman->play($this->playerOneId, $this->getProposition($letter));
@@ -190,6 +196,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('\\MiniGame\\Exceptions\\IllegalMoveException');
         $move = $this->getAnswer('ABCD');
 
+        $this->hangman->startGame();
+
         try {
             $this->hangman->play($this->playerOneId, $move);
         } catch (IllegalMoveException $e) {
@@ -209,6 +217,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
     {
         $this->playerOne->shouldReceive('getRemainingLives')->andReturn(self::CHANCES);
         $this->playerOne->shouldReceive('getPlayedLetters')->andReturn(array());
+
+        $this->hangman->startGame();
 
         /* @var $feedback \Hangman\Result\HangmanWon */
         $feedback = $this->hangman->play($this->playerOneId, $this->getAnswer(self::WORD));
@@ -242,6 +252,9 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
             array($this->playerOne, $this->playerTwo),
             self::CHANCES
         );
+
+        $hangman->startGame();
+
         $feedback = $hangman->play($this->playerOneId, $this->getProposition($letter));
 
         $this->assertInstanceOf('\\Hangman\\Result\\HangmanWon', $feedback);
@@ -268,6 +281,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
 
         $hangman = Hangman::createGame($this->hangmanId, self::WORD, array($this->playerOne, $this->playerTwo), 1);
 
+        $hangman->startGame();
+
         /* @var $feedback \Hangman\Result\HangmanLost */
         $feedback = $hangman->play($this->playerOneId, $this->getProposition($letter));
 
@@ -289,6 +304,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
         $this->playerOne->shouldReceive('getRemainingLives')->andReturn(self::CHANCES);
         $this->playerOne->shouldReceive('getPlayedLetters')->andReturn(array());
 
+        $this->hangman->startGame();
+
         /* @var $feedback HangmanLost */
         $feedback = $this->hangman->play($this->playerOneId, $this->getAnswer('HHHHHHHHHHH'));
 
@@ -308,6 +325,9 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
     public function testPlayerTwoPlaysWhenNotHisTurn()
     {
         $this->setExpectedException('\\MiniGame\\Exceptions\\NotPlayerTurnException');
+
+        $this->hangman->startGame();
+
         try {
             $this->hangman->play($this->playerTwoId, $this->getProposition('A'));
         } catch (NotPlayerTurnException $e) {
