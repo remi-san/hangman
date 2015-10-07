@@ -30,7 +30,7 @@ class HangmanPlayer extends EventSourcedEntity implements Player
     protected $playedLetters;
 
     /**
-     * @var MiniGame
+     * @var Hangman
      */
     protected $game;
 
@@ -40,15 +40,19 @@ class HangmanPlayer extends EventSourcedEntity implements Player
      * @param PlayerId $id
      * @param string   $name
      * @param int      $lives
-     * @param MiniGame $game
+     * @param Hangman  $game
      */
-    public function __construct(PlayerId $id = null, $name = null, $lives = 6, MiniGame $game = null)
+    public function __construct(PlayerId $id = null, $name = null, $lives = 6, Hangman $game = null)
     {
         $this->id = ($id !== null) ? $id : new PlayerId(Uuid::uuid4()->toString());
         $this->name = $name;
         $this->lives = $lives;
         $this->playedLetters = array();
         $this->game = $game;
+
+        if ($game) {
+            $this->registerAggregateRoot($game);
+        }
     }
 
     /**

@@ -5,12 +5,12 @@ use League\Event\Event;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
 
-class HangmanPlayerLostEvent extends Event
+class HangmanPlayerWinEvent extends Event
 {
     /**
      * @var string
      */
-    const NAME = 'hangman.player.lost';
+    const NAME = 'hangman.player.win';
 
     /**
      * @var MiniGameId
@@ -35,11 +35,6 @@ class HangmanPlayerLostEvent extends Event
     /**
      * @var string
      */
-    private $wordFound;
-
-    /**
-     * @var string
-     */
     private $word;
 
     /**
@@ -49,7 +44,6 @@ class HangmanPlayerLostEvent extends Event
      * @param PlayerId   $playerId
      * @param array      $playedLetters
      * @param int        $remainingLives
-     * @param string     $wordFound
      * @param string     $word
      */
     public function __construct(
@@ -57,7 +51,6 @@ class HangmanPlayerLostEvent extends Event
         PlayerId $playerId,
         array $playedLetters,
         $remainingLives,
-        $wordFound,
         $word
     ) {
         parent::__construct(self::NAME);
@@ -65,7 +58,6 @@ class HangmanPlayerLostEvent extends Event
         $this->playerId = $playerId;
         $this->playedLetters = $playedLetters;
         $this->remainingLives = $remainingLives;
-        $this->wordFound = $wordFound;
         $this->word = $word;
     }
 
@@ -99,14 +91,6 @@ class HangmanPlayerLostEvent extends Event
     public function getRemainingLives()
     {
         return $this->remainingLives;
-    }
-
-    /**
-     * @return string
-     */
-    public function getWordFound()
-    {
-        return $this->wordFound;
     }
 
     /**

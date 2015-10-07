@@ -42,7 +42,8 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
         $id = $this->getPlayerId(42);
         $name = 'Douglas';
         $lives = 5;
-        $game = $this->getMiniGame($this->getMiniGameId(33));
+        $game = \Mockery::mock('\Hangman\Entity\Hangman');
+        $game->shouldReceive('getId')->andReturn($this->getMiniGameId(33));
 
         $player = new HangmanPlayer($id, $name, $lives, $game);
 
@@ -60,7 +61,8 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
         $id = $this->getPlayerId(42);
         $name = 'Douglas';
         $lives = 5;
-        $game = $this->getMiniGame($this->getMiniGameId(33));
+        $game = \Mockery::mock('\Hangman\Entity\Hangman');
+        $game->shouldReceive('getId')->andReturn($this->getMiniGameId(33));
 
         $a = 'a';
         $b = 'b';

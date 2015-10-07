@@ -5,12 +5,12 @@ use League\Event\Event;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
 
-class HangmanPlayerLostEvent extends Event
+class HangmanGoodLetterProposedEvent extends Event
 {
     /**
      * @var string
      */
-    const NAME = 'hangman.player.lost';
+    const NAME = 'hangman.letter.good';
 
     /**
      * @var MiniGameId
@@ -21,6 +21,11 @@ class HangmanPlayerLostEvent extends Event
      * @var PlayerId
      */
     private $playerId;
+
+    /**
+     * @var string
+     */
+    private $letter;
 
     /**
      * @var string[]
@@ -35,38 +40,33 @@ class HangmanPlayerLostEvent extends Event
     /**
      * @var string
      */
-    private $wordFound;
-
-    /**
-     * @var string
-     */
-    private $word;
+    private $wordSoFar;
 
     /**
      * Constructor
      *
      * @param MiniGameId $gameId
      * @param PlayerId   $playerId
+     * @param string     $letter
      * @param array      $playedLetters
      * @param int        $remainingLives
-     * @param string     $wordFound
-     * @param string     $word
+     * @param string     $wordSoFar
      */
     public function __construct(
         MiniGameId $gameId,
         PlayerId $playerId,
+        $letter,
         array $playedLetters,
         $remainingLives,
-        $wordFound,
-        $word
+        $wordSoFar
     ) {
         parent::__construct(self::NAME);
         $this->gameId = $gameId;
         $this->playerId = $playerId;
+        $this->letter = $letter;
         $this->playedLetters = $playedLetters;
         $this->remainingLives = $remainingLives;
-        $this->wordFound = $wordFound;
-        $this->word = $word;
+        $this->wordSoFar = $wordSoFar;
     }
 
     /**
@@ -83,6 +83,14 @@ class HangmanPlayerLostEvent extends Event
     public function getPlayerId()
     {
         return $this->playerId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLetter()
+    {
+        return $this->letter;
     }
 
     /**
@@ -104,16 +112,8 @@ class HangmanPlayerLostEvent extends Event
     /**
      * @return string
      */
-    public function getWordFound()
+    public function getWordSoFar()
     {
-        return $this->wordFound;
-    }
-
-    /**
-     * @return string
-     */
-    public function getWord()
-    {
-        return $this->word;
+        return $this->wordSoFar;
     }
 }

@@ -4,18 +4,19 @@ namespace Hangman\Event;
 use League\Event\Event;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\Player;
+use MiniGame\Entity\PlayerId;
 
-class HangmanPlayerCreatedEvent extends Event
+class HangmanPlayerDeletedEvent extends Event
 {
     /**
      * @var string
      */
-    const NAME = 'hangman.player.created';
+    const NAME = 'hangman.player.deleted';
 
     /**
-     * @var Player
+     * @var PlayerId
      */
-    private $player;
+    private $playerId;
 
     /**
      * @var MiniGameId
@@ -26,13 +27,13 @@ class HangmanPlayerCreatedEvent extends Event
      * Constructor
      *
      * @param MiniGameId $gameId
-     * @param Player     $player
+     * @param PlayerId   $playerId
      */
-    public function __construct(MiniGameId $gameId, Player $player)
+    public function __construct(MiniGameId $gameId, PlayerId $playerId)
     {
         parent::__construct(self::NAME);
         $this->gameId = $gameId;
-        $this->player = $player;
+        $this->playerId = $playerId;
     }
 
     /**
@@ -44,10 +45,10 @@ class HangmanPlayerCreatedEvent extends Event
     }
 
     /**
-     * @return Player
+     * @return PlayerId
      */
-    public function getPlayer()
+    public function getPlayerId()
     {
-        return $this->player;
+        return $this->playerId;
     }
 }
