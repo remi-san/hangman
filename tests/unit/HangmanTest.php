@@ -6,6 +6,7 @@ use Hangman\Result\HangmanBadProposition;
 use Hangman\Result\HangmanGoodProposition;
 use Hangman\Result\HangmanLost;
 use Hangman\Test\Mock\HangmanMocker;
+use Hangman\Test\Mock\PlayerOptionsMock;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\Player;
 use MiniGame\Entity\PlayerId;
@@ -101,6 +102,55 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
     {
         $hangman = Hangman::createGame(null, self::WORD);
         $this->assertTrue(Uuid::isValid($hangman->getId()->getId()));
+    }
+
+    /**
+     * @test
+     */
+    public function testCannotStartAGameTwice()
+    {
+        $hangman = Hangman::createGame(null, self::WORD);
+        $hangman->startGame();
+
+        $this->setExpectedException('\Hangman\Exception\HangmanException');
+
+        $hangman->startGame();
+    }
+
+    /**
+     * @test
+     */
+    public function testCannotAddAPlayerOnceGameStarted()
+    {
+        $this->hangman->startGame();
+
+        $this->setExpectedException('\Hangman\Exception\HangmanException');
+
+        $this->hangman->addPlayerToGame(new PlayerOptionsMock());
+    }
+
+    /**
+     * @test
+     */
+    public function testAddAPlayer()
+    {
+        $hangman = Hangman::createGame(null, self::WORD);
+
+        $this->assertEquals(0, count($hangman->getPlayers()));
+
+        $hangman->addPlayerToGame(new PlayerOptionsMock());
+
+        $this->assertEquals(1, count($hangman->getPlayers()));
+    }
+
+    /**
+     * @test
+     */
+    public function testPlayBeforeGamestarted()
+    {
+        $this->setExpectedException('\MiniGame\Exceptions\InactiveGameException');
+
+        $this->hangman->play($this->playerOneId, $this->getProposition('A'));
     }
 
     /**

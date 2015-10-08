@@ -127,7 +127,13 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      */
     public function addPlayerToGame(PlayerOptions $playerOptions)
     {
-        $player = null;
+        $player = new HangmanPlayer(
+            new PlayerId(),
+            'John Doe',
+            6,
+            $this
+        ); // TODO add hangman options
+
         $this->addPlayer($player);
     }
 
@@ -434,10 +440,6 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      */
     private function endCurrentPlayerTurn()
     {
-        if ($this->currentPlayer === null) {
-            return;
-        }
-
         $currentPlayerId = (string)$this->currentPlayer->getId();
         $nextPlayerId = null;
 
