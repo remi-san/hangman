@@ -13,6 +13,7 @@ use MiniGame\Entity\PlayerId;
 use MiniGame\Exceptions\IllegalMoveException;
 use MiniGame\Exceptions\NotPlayerTurnException;
 use MiniGame\Test\Mock\GameObjectMocker;
+use Mockery\MockInterface;
 use Rhumsaa\Uuid\Uuid;
 
 class HangmanTest extends \PHPUnit_Framework_TestCase
@@ -107,9 +108,21 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function testCannotStartAGameTwice()
+    public function testCannotStartAGameWithNoPlayer()
     {
         $hangman = Hangman::createGame(null, self::WORD);
+
+        $this->setExpectedException('\Hangman\Exception\HangmanException');
+
+        $hangman->startGame();
+    }
+
+    /**
+     * @test
+     */
+    public function testCannotStartAGameTwice()
+    {
+        $hangman = Hangman::createGame(null, self::WORD, array($this->playerOne));
         $hangman->startGame();
 
         $this->setExpectedException('\Hangman\Exception\HangmanException');
@@ -126,7 +139,27 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException('\Hangman\Exception\HangmanException');
 
-        $this->hangman->addPlayerToGame(new PlayerOptionsMock());
+        $hangmanPlayerOptions = \Mockery::mock('\Hangman\Options\HangmanPlayerOptions', function (MockInterface $mock) {
+            $mock->shouldReceive('getPlayerId')->andReturn(new PlayerId(42))->byDefault();
+            $mock->shouldReceive('getName')->andReturn('toto')->byDefault();
+            $mock->shouldReceive('getLives')->andReturn(6)->byDefault();
+        });
+
+        $this->hangman->addPlayerToGame($hangmanPlayerOptions);
+    }
+
+    /**
+     * @test
+     */
+    public function testAddAPlayerWithIllegalOptions()
+    {
+        $hangman = Hangman::createGame(null, self::WORD);
+
+        $this->setExpectedException('\Hangman\Exception\HangmanException');
+
+        $hangmanPlayerOptions = \Mockery::mock('\MiniGame\PlayerOptions');
+        $hangman->addPlayerToGame($hangmanPlayerOptions);
+
     }
 
     /**
@@ -138,7 +171,12 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(0, count($hangman->getPlayers()));
 
-        $hangman->addPlayerToGame(new PlayerOptionsMock());
+        $hangmanPlayerOptions = \Mockery::mock('\Hangman\Options\HangmanPlayerOptions', function (MockInterface $mock) {
+            $mock->shouldReceive('getPlayerId')->andReturn(new PlayerId(42))->byDefault();
+            $mock->shouldReceive('getName')->andReturn('toto')->byDefault();
+            $mock->shouldReceive('getLives')->andReturn(6)->byDefault();
+        });
+        $hangman->addPlayerToGame($hangmanPlayerOptions);
 
         $this->assertEquals(1, count($hangman->getPlayers()));
     }

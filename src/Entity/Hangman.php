@@ -10,6 +10,7 @@ use Hangman\Event\HangmanPlayerLostEvent;
 use Hangman\Exception\HangmanException;
 use Hangman\Move\Answer;
 use Hangman\Move\Proposition;
+use Hangman\Options\HangmanPlayerOptions;
 use Hangman\Result\HangmanBadProposition;
 use Hangman\Result\HangmanError;
 use Hangman\Result\HangmanGoodProposition;
@@ -116,6 +117,10 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
             throw new HangmanException("You can't start a game that's already started.");
         }
 
+        if (count($this->players) === 0) {
+            throw new HangmanException("You can't start a game that has no player.");
+        }
+
         $this->apply(new HangmanGameStartedEvent($this->id));
     }
 
@@ -124,15 +129,20 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      *
      * @param  PlayerOptions $playerOptions
      * @return void
+     * @throws HangmanException
      */
     public function addPlayerToGame(PlayerOptions $playerOptions)
     {
+        if (! $playerOptions instanceof HangmanPlayerOptions) {
+            throw new HangmanException('Player options must be compatible with a hangman game.');
+        }
+
         $player = new HangmanPlayer(
-            new PlayerId(),
-            'John Doe',
-            6,
+            $playerOptions->getPlayerId(),
+            $playerOptions->getName(),
+            $playerOptions->getLives(),
             $this
-        ); // TODO add hangman options
+        );
 
         $this->addPlayer($player);
     }
