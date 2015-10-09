@@ -226,7 +226,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
         $letter = 'H';
 
         $this->playerOne->shouldReceive('playLetter')->with($letter)->once();
-        $this->playerOne->shouldReceive('getPlayedLetters')->andReturn(array($letter));
+        $this->playerOne->shouldReceive('getPlayedLetters')->andReturn(array($letter=>$letter));
         $this->playerOne->shouldReceive('getRemainingLives')->andReturn(self::CHANCES);
 
         $this->hangman->startGame();
@@ -236,7 +236,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('\\Hangman\\Result\\HangmanGoodProposition', $feedback);
         $this->assertEquals($this->playerOneId, $feedback->getPlayerId());
-        $this->assertEquals(array('H'), $feedback->getLettersPlayed());
+        $this->assertEquals(array('H' => 'H'), $feedback->getLettersPlayed());
         $this->assertEquals(self::CHANCES, $feedback->getRemainingChances());
         $this->assertEquals('H _ _ _ H H _ _ _ _ _', $feedback->getFeedBack());
 
