@@ -37,38 +37,4 @@ class HangmanRepositoryTest extends \PHPUnit_Framework_TestCase
         $mr->save($hangman);
         $mr->delete($hangman);
     }
-
-    /**
-     * @test
-     */
-    public function testCustom()
-    {
-        /* @var $hangman Hangman */
-        $hangman = \Mockery::mock('\\Hangman\\Entity\\Hangman');
-        $playerId = $this->getPlayerId('42');
-
-        $configuration = \Mockery::mock('\\Doctrine\\ORM\\Configuration');
-        $configuration->shouldReceive('getDefaultQueryHints')->andReturn(array());
-        $configuration->shouldReceive('isSecondLevelCacheEnabled')->andReturn(false);
-
-        /* @var $entityManager EntityManager */
-        $entityManager = \Mockery::mock('\\Doctrine\\ORM\\EntityManager');
-        $entityManager->shouldReceive('getConfiguration')->andReturn($configuration);
-
-        $query = \Mockery::mock(new Query($entityManager));
-        $query->shouldReceive('setParameter')->andReturn($query);
-        $query->shouldReceive('setMaxResults')->andReturn($query);
-        $query->shouldReceive('getSingleResult')->andReturn($hangman);
-
-        $entityManager = \Mockery::mock('\\Doctrine\\ORM\\EntityManager');
-        $entityManager->shouldReceive('createQuery')->andReturn($query);
-
-        $classMetadata = \Mockery::mock('\\Doctrine\\ORM\\Mapping\ClassMetadata');
-
-        /* @var $classMetadata ClassMetadata */
-        $mr = new HangmanRepository($entityManager, $classMetadata);
-        $hangmanResult = $mr->findPlayerMinigame($playerId);
-
-        $this->assertEquals($hangman, $hangmanResult);
-    }
 }
