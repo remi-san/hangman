@@ -2,6 +2,7 @@
 namespace Hangman\Test;
 
 use Hangman\Entity\HangmanPlayer;
+use Hangman\Event\HangmanBadLetterProposedEvent;
 use MiniGame\Test\Mock\GameObjectMocker;
 use Rhumsaa\Uuid\Uuid;
 
@@ -80,5 +81,59 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
 
         $player->playLetter($b);
         $this->assertEquals(array ('A'=>'A', 'B'=>'B'), $player->getPlayedLetters());
+    }
+
+    /**
+     * @test
+     */
+    public function testHandleHangmanBadLetterProposedEventForOtherPlayer()
+    {
+        $id = $this->getPlayerId(42);
+        $name = 'Douglas';
+        $lives = 5;
+        $game = \Mockery::mock('\Hangman\Entity\Hangman');
+
+        $player = new HangmanPlayer($id, $name, $lives, $game);
+
+        $player->handleRecursively(
+            new HangmanBadLetterProposedEvent(
+                $this->getMiniGameId(33),
+                $this->getPlayerId(25),
+                'A',
+                array(),
+                1,
+                $lives-1,
+                ''
+            )
+        );
+
+        $this->assertEquals($lives, $player->getRemainingLives());
+    }
+
+    /**
+     * @test
+     */
+    public function testHandleHangmanBadLetterProposedEventForPlayer()
+    {
+        $id = $this->getPlayerId(42);
+        $name = 'Douglas';
+        $lives = 5;
+        $game = \Mockery::mock('\Hangman\Entity\Hangman');
+
+        $player = new HangmanPlayer($id, $name, $lives, $game);
+
+        $player->handleRecursively(
+            new HangmanBadLetterProposedEvent(
+                $this->getMiniGameId(33),
+                $id,
+                'A',
+                array(),
+                1,
+                $lives-1,
+                ''
+            )
+        );
+
+        $this->assertEquals($lives-1, $player->getRemainingLives());
     }
 }

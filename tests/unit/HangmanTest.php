@@ -70,14 +70,22 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
 
         $this->playerOne = $this->getHangmanPlayer($this->playerOneId, self::P1_NAME);
         $this->playerOne->shouldReceive('setGame');
+        $this->playerOne->shouldReceive('registerAggregateRoot');
+        $this->playerOne->shouldReceive('handleRecursively');
+
         $this->playerTwo = $this->getHangmanPlayer($this->playerTwoId, self::P2_NAME);
         $this->playerTwo->shouldReceive('setGame');
+        $this->playerTwo->shouldReceive('registerAggregateRoot');
+        $this->playerTwo->shouldReceive('handleRecursively');
+
         $this->hangman = Hangman::createGame(
             $this->hangmanId,
             self::WORD,
             array($this->playerOne, $this->playerTwo),
             self::CHANCES
         );
+
+
     }
 
     public function tearDown()
@@ -205,7 +213,6 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function testPlayerOnePlaysWithUnknownMove()
     {
-        $this->playerOne->shouldReceive('loseLife')->once();
         $this->playerOne->shouldReceive('getRemainingLives')->andReturn(self::CHANCES - 1);
         $this->playerOne->shouldReceive('getPlayedLetters')->andReturn(array());
         $this->playerOne->shouldReceive('playLetter');
@@ -253,7 +260,6 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
 
         $this->playerOne->shouldReceive('playLetter')->with($letter)->once();
         $this->playerOne->shouldReceive('getPlayedLetters')->andReturn(array($letter=>$letter));
-        $this->playerOne->shouldReceive('loseLife')->once();
         $this->playerOne->shouldReceive('getRemainingLives')->andReturn(self::CHANCES);
 
         $this->hangman->startGame();
@@ -276,7 +282,6 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function testPlayerOnePlaysIllegalAnswer()
     {
-        $this->playerOne->shouldReceive('loseLife')->once();
         $this->playerOne->shouldReceive('getPlayedLetters')->andReturn(array());
         $this->playerOne->shouldReceive('getRemainingLives')->andReturn(self::CHANCES - 1);
         $this->playerOne->shouldReceive('playLetter');
@@ -364,7 +369,6 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
 
         $this->playerOne->shouldReceive('playLetter')->with($letter)->once();
         $this->playerOne->shouldReceive('getPlayedLetters')->andReturn(array($letter));
-        $this->playerOne->shouldReceive('loseLife')->once();
         $this->playerOne->shouldReceive('getRemainingLives')->andReturn(1, 0);
 
         $hangman = Hangman::createGame($this->hangmanId, self::WORD, array($this->playerOne, $this->playerTwo), 1);

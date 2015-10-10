@@ -2,6 +2,7 @@
 namespace Hangman\Entity;
 
 use Broadway\EventSourcing\EventSourcedEntity;
+use Hangman\Event\HangmanBadLetterProposedEvent;
 use MiniGame\Entity\MiniGame;
 use MiniGame\Entity\Player;
 use MiniGame\Entity\PlayerId;
@@ -49,10 +50,6 @@ class HangmanPlayer extends EventSourcedEntity implements Player
         $this->lives = $lives;
         $this->playedLetters = array();
         $this->game = $game;
-
-        if ($game) {
-            $this->registerAggregateRoot($game);
-        }
     }
 
     /**
@@ -134,5 +131,24 @@ class HangmanPlayer extends EventSourcedEntity implements Player
     public function setGame(MiniGame $game)
     {
         $this->game = $game;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////   APPLY EVENTS   //////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Apply the bad letter played event
+     *
+     * @param  HangmanBadLetterProposedEvent $event
+     * @return void
+     */
+    protected function applyHangmanBadLetterProposedEvent(HangmanBadLetterProposedEvent $event)
+    {
+        if ((string)$event->getPlayerId() === (string)$this->getId()) {
+            $this->loseLife($event->getLivesLost());
+        }
     }
 }
