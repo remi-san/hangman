@@ -32,6 +32,23 @@ use Rhumsaa\Uuid\Uuid;
 
 class Hangman extends EventSourcedAggregateRoot implements MiniGame
 {
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////   CONSTANTS   ///////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    const STATE_UNINITIALIZED = 'uninitialized';
+    const STATE_READY = 'ready';
+    const STATE_STARTED = 'started';
+    const STATE_OVER = 'over';
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////   PROPERTIES   ///////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     /**
      * @var MiniGameId
      */
@@ -58,16 +75,16 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     protected $currentPlayer;
 
     /**
-     * @var boolean
+     * @var string
      */
-    protected $started;
+    protected $state;
 
     /**
      * Constructor
      */
     private function __construct()
     {
-        $this->started = false;
+        $this->state = self::STATE_UNINITIALIZED;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -115,8 +132,8 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      */
     public function startGame()
     {
-        if ($this->started) {
-            throw new HangmanException("You can't start a game that's already started.");
+        if ($this->state !== self::STATE_READY) {
+            throw new HangmanException("You can't start a game that's already started or is over.");
         }
 
         if (count($this->players) === 0) {
@@ -206,7 +223,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      */
     public function play(PlayerId $playerId, Move $move)
     {
-        if (!$this->started) {
+        if ($this->state !== self::STATE_STARTED) {
             throw new InactiveGameException(
                 $playerId,
                 $this->getId(),
@@ -275,7 +292,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      */
     private function addPlayer(Player $player)
     {
-        if ($this->started) {
+        if ($this->state !== self::STATE_READY) {
             throw new HangmanException('You cannot add a player to a game that has already started.');
         }
 
@@ -352,13 +369,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
             return $this->playerLoses($player);
         }
 
-        return new HangmanBadProposition(
-            $this->id,
-            $playerId,
-            $wordSoFar,
-            $playedLetters,
-            $remainingLives
-        ) ;
+        return new HangmanBadProposition($this->id, $playerId, $wordSoFar, $playedLetters, $remainingLives) ;
     }
 
     /**
@@ -394,13 +405,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
             return $this->playerWins($player);
         }
 
-        return new HangmanGoodProposition(
-            $this->id,
-            $playerId,
-            $wordSoFar,
-            $playedLetters,
-            $remainingLives
-        ) ;
+        return new HangmanGoodProposition($this->id, $playerId, $wordSoFar, $playedLetters, $remainingLives) ;
     }
 
     /**
@@ -426,13 +431,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
             )
         );
 
-        return new HangmanWon(
-            $this->id,
-            $playerId,
-            $playedLetters,
-            $remainingLives,
-            $this->word
-        );
+        return new HangmanWon($this->id, $playerId, $playedLetters, $remainingLives, $this->word);
     }
 
     /**
@@ -459,13 +458,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
             )
         );
 
-        return new HangmanLost(
-            $this->id,
-            $playerId,
-            $playedLetters,
-            $remainingLives,
-            $this->word
-        );
+        return new HangmanLost($this->id, $playerId, $playedLetters, $remainingLives, $this->word);
     }
 
     /**
@@ -668,6 +661,8 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
         $this->players = array();
 
         $this->gameOrder = array();
+
+        $this->state = self::STATE_READY;
     }
 
     /**
@@ -678,7 +673,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      */
     protected function applyHangmanGameStartedEvent(HangmanGameStartedEvent $event)
     {
-        $this->started = true;
+        $this->state = self::STATE_STARTED;
     }
 
     /**
@@ -716,7 +711,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     protected function applyHangmanPlayerLostEvent(HangmanPlayerLostEvent $event)
     {
         $this->currentPlayer = null;
-        $this->started = false;
+        $this->state = self::STATE_OVER;
     }
 
     /**
@@ -728,7 +723,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     protected function applyHangmanPlayerWinEvent(HangmanPlayerWinEvent $event)
     {
         $this->currentPlayer = null;
-        $this->started = false;
+        $this->state = self::STATE_OVER;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

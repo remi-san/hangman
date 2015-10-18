@@ -84,8 +84,6 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
             array($this->playerOne, $this->playerTwo),
             self::CHANCES
         );
-
-
     }
 
     public function tearDown()
