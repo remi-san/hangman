@@ -1,6 +1,6 @@
 Hangman\Entity\Hangman:
   type: entity
-  repositoryClass: Hangman\Repository\HangmanRepository
+  repositoryClass: TwitterHangman\ReadModel\Repository\ORM\HangmanRepository
   table: hangman
   schema: minigame
   id:
