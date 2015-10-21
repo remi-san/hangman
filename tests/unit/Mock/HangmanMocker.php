@@ -4,6 +4,7 @@ namespace Hangman\Test\Mock;
 use Hangman\Entity\HangmanPlayer;
 use Hangman\Move\Answer;
 use Hangman\Move\Proposition;
+use Hangman\Options\HangmanPlayerOptions;
 use MiniGame\Entity\MiniGame;
 use MiniGame\Entity\PlayerId;
 
@@ -63,6 +64,29 @@ trait HangmanMocker
         $options->shouldReceive('getLevel')->andReturn($level);
         $options->shouldReceive('getPlayers')->andReturn($players);
         $options->shouldReceive('getLanguage')->andReturn($lang);
+
+        return $options;
+    }
+
+    /**
+     * @param  PlayerId $playerId
+     * @param  string   $playerName
+     * @param  int      $lives
+     * @param  string   $externalReference
+     * @return HangmanPlayerOptions
+     */
+    public function getHangmanPlayerOptions(
+        PlayerId $playerId = null,
+        $playerName = null,
+        $lives = null,
+        $externalReference = null
+    ) {
+        $options = \Mockery::mock('\\Hangman\\Options\\HangmanPlayerOptions');
+
+        $options->shouldReceive('getPlayerId')->andReturn($playerId);
+        $options->shouldReceive('getName')->andReturn($playerName);
+        $options->shouldReceive('getLives')->andReturn($lives);
+        $options->shouldReceive('getExternalReference')->andReturn($externalReference);
 
         return $options;
     }
