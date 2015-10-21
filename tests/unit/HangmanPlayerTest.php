@@ -29,10 +29,6 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($name, $player->getName());
         $this->assertEquals(6, $player->getRemainingLives());
         $this->assertNull($player->getGame());
-
-        $player->setGame($game);
-
-        $this->assertEquals($game, $player->getGame());
     }
 
     /**
