@@ -24,10 +24,13 @@ class HangmanPlayerOptionsTest extends \PHPUnit_Framework_TestCase
     {
         $options = new HangmanPlayerOptions(
             $this->getPlayerId(42),
+            $this->getMiniGameId(666),
             'toto',
-            6
+            6,
+            'ext'
         );
 
         $this->assertEquals(6, $options->getLives());
+        $this->assertEquals('ext', $options->getExternalReference());
     }
 }

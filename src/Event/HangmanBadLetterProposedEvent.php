@@ -1,11 +1,12 @@
 <?php
 namespace Hangman\Event;
 
+use Broadway\Serializer\SerializableInterface;
 use League\Event\Event;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
 
-class HangmanBadLetterProposedEvent extends Event
+class HangmanBadLetterProposedEvent extends Event implements SerializableInterface
 {
     /**
      * @var string
@@ -131,5 +132,39 @@ class HangmanBadLetterProposedEvent extends Event
     public function getWordSoFar()
     {
         return $this->wordSoFar;
+    }
+
+    /**
+     * @return array
+     */
+    public function serialize()
+    {
+        return array(
+            'name' => self::NAME,
+            'gameId' => $this->gameId->getId(),
+            'playerId' => $this->playerId->getId(),
+            'letter' => $this->letter,
+            'playedLetters' => $this->playedLetters,
+            'livesLost' => $this->livesLost,
+            'remainingLives' => $this->remainingLives,
+            'wordSoFar' => $this->wordSoFar
+        );
+    }
+
+    /**
+     * @param  array $data
+     * @return HangmanBadLetterProposedEvent
+     */
+    public static function deserialize(array $data)
+    {
+        return new self(
+            new MiniGameId($data['gameId']),
+            new PlayerId($data['playerId']),
+            $data['letter'],
+            $data['playedLetters'],
+            $data['livesLost'],
+            $data['remainingLives'],
+            $data['wordSoFar']
+        );
     }
 }

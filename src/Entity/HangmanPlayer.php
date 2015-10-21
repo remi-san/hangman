@@ -36,20 +36,32 @@ class HangmanPlayer extends EventSourcedEntity implements Player
     protected $game;
 
     /**
+     * @var string
+     */
+    private $externalReference;
+
+    /**
      * Constructor
      *
      * @param PlayerId $id
      * @param string   $name
      * @param int      $lives
      * @param Hangman  $game
+     * @param string   $externalReference
      */
-    public function __construct(PlayerId $id = null, $name = null, $lives = 6, Hangman $game = null)
-    {
+    public function __construct(
+        PlayerId $id = null,
+        $name = null,
+        $lives = 6,
+        Hangman $game = null,
+        $externalReference = null
+    ) {
         $this->id = ($id !== null) ? $id : new PlayerId(Uuid::uuid4()->toString());
         $this->name = $name;
         $this->lives = $lives;
         $this->playedLetters = array();
         $this->game = $game;
+        $this->externalReference = $externalReference;
     }
 
     /**
@@ -100,6 +112,16 @@ class HangmanPlayer extends EventSourcedEntity implements Player
     public function getPlayedLetters()
     {
         return $this->playedLetters;
+    }
+
+    /**
+     * Gets the external reference
+     *
+     * @return string
+     */
+    public function getExternalReference()
+    {
+        return $this->externalReference;
     }
 
     /**

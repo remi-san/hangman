@@ -9,6 +9,7 @@ use Hangman\Event\HangmanPlayerCreatedEvent;
 use Hangman\Event\HangmanPlayerDeletedEvent;
 use Hangman\Event\HangmanPlayerLostEvent;
 use Hangman\Event\HangmanPlayerWinEvent;
+use Hangman\Options\HangmanPlayerOptions;
 use MiniGame\Test\Mock\GameObjectMocker;
 
 class HangmanEventTest extends \PHPUnit_Framework_TestCase
@@ -32,6 +33,26 @@ class HangmanEventTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($id, $event->getGameId());
         $this->assertEquals($word, $event->getWord());
+
+        $this->assertEquals(
+            array(
+                'name' => 'hangman.created',
+                'gameId' => 666,
+                'word' => $word
+            ),
+            $event->serialize()
+        );
+
+        $unserializedEvent = HangmanGameCreatedEvent::deserialize(
+            array(
+                'name' => 'hangman.created',
+                'gameId' => 666,
+                'word' => $word
+            )
+        );
+
+        $this->assertEquals(666, (string)$unserializedEvent->getGameId());
+        $this->assertEquals($word, $unserializedEvent->getWord());
     }
 
     /**
@@ -44,6 +65,23 @@ class HangmanEventTest extends \PHPUnit_Framework_TestCase
         $event = new HangmanGameStartedEvent($id);
 
         $this->assertEquals($id, $event->getGameId());
+
+        $this->assertEquals(
+            array(
+                'name' => 'hangman.started',
+                'gameId' => 666
+            ),
+            $event->serialize()
+        );
+
+        $unserializedEvent = HangmanGameStartedEvent::deserialize(
+            array(
+                'name' => 'hangman.started',
+                'gameId' => 666
+            )
+        );
+
+        $this->assertEquals(666, (string)$unserializedEvent->getGameId());
     }
 
     /**
@@ -51,13 +89,45 @@ class HangmanEventTest extends \PHPUnit_Framework_TestCase
      */
     public function testPlayerCreated()
     {
-        $id = $this->getMiniGameId(666);
-        $player = $this->getPlayer();
+        $gameId = $this->getMiniGameId(666);
+        $playerId = $this->getPlayerId(42);
 
-        $event = new HangmanPlayerCreatedEvent($id, $player);
+        $event = new HangmanPlayerCreatedEvent($gameId, $playerId, 'name', 6, 'ext');
 
-        $this->assertEquals($id, $event->getGameId());
-        $this->assertEquals($player, $event->getPlayer());
+        $this->assertEquals($gameId, $event->getGameId());
+        $this->assertEquals($playerId, $event->getPlayerId());
+        $this->assertEquals('name', $event->getPlayerName());
+        $this->assertEquals(6, $event->getLives());
+        $this->assertEquals('ext', $event->getExternalReference());
+
+        $this->assertEquals(
+            array(
+                'name' => 'hangman.player.created',
+                'gameId' => 666,
+                'playerId' => 42,
+                'playerName' => 'name',
+                'lives' => 6,
+                'externalReference' => 'ext'
+            ),
+            $event->serialize()
+        );
+
+        $unserializedEvent = HangmanPlayerCreatedEvent::deserialize(
+            array(
+                'name' => 'hangman.player.created',
+                'gameId' => 666,
+                'playerId' => 42,
+                'playerName' => 'name',
+                'lives' => 6,
+                'externalReference' => 'ext'
+            )
+        );
+
+        $this->assertEquals(666, (string)$unserializedEvent->getGameId());
+        $this->assertEquals(42, (string)$unserializedEvent->getPlayerId());
+        $this->assertEquals('name', $unserializedEvent->getPlayerName());
+        $this->assertEquals(6, $unserializedEvent->getLives());
+        $this->assertEquals('ext', $unserializedEvent->getExternalReference());
     }
 
     /**
@@ -72,6 +142,26 @@ class HangmanEventTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($id, $event->getGameId());
         $this->assertEquals($playerId, $event->getPlayerId());
+
+        $this->assertEquals(
+            array(
+                'name' => 'hangman.player.deleted',
+                'gameId' => 666,
+                'playerId' => 42
+            ),
+            $event->serialize()
+        );
+
+        $unserializedEvent = HangmanPlayerDeletedEvent::deserialize(
+            array(
+                'name' => 'hangman.player.deleted',
+                'gameId' => 666,
+                'playerId' => 42
+            )
+        );
+
+        $this->assertEquals(666, (string)$unserializedEvent->getGameId());
+        $this->assertEquals(42, (string)$unserializedEvent->getPlayerId());
     }
 
     /**
@@ -104,6 +194,41 @@ class HangmanEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($livesLost, $event->getLivesLost());
         $this->assertEquals($remainingLives, $event->getRemainingLives());
         $this->assertEquals($wordSoFar, $event->getWordSoFar());
+
+        $this->assertEquals(
+            array(
+                'name' => 'hangman.letter.bad',
+                'gameId' => 666,
+                'playerId' => 42,
+                'letter' => $letter,
+                'playedLetters' => $playedLetters,
+                'livesLost' => $livesLost,
+                'remainingLives' => $remainingLives,
+                'wordSoFar' => $wordSoFar
+            ),
+            $event->serialize()
+        );
+
+        $unserializedEvent = HangmanBadLetterProposedEvent::deserialize(
+            array(
+                'name' => 'hangman.letter.bad',
+                'gameId' => 666,
+                'playerId' => 42,
+                'letter' => $letter,
+                'playedLetters' => $playedLetters,
+                'livesLost' => $livesLost,
+                'remainingLives' => $remainingLives,
+                'wordSoFar' => $wordSoFar
+            )
+        );
+
+        $this->assertEquals(666, (string)$unserializedEvent->getGameId());
+        $this->assertEquals(42, (string)$unserializedEvent->getPlayerId());
+        $this->assertEquals($letter, $unserializedEvent->getLetter());
+        $this->assertEquals($playedLetters, $unserializedEvent->getPlayedLetters());
+        $this->assertEquals($livesLost, $unserializedEvent->getLivesLost());
+        $this->assertEquals($remainingLives, $unserializedEvent->getRemainingLives());
+        $this->assertEquals($wordSoFar, $unserializedEvent->getWordSoFar());
     }
 
     /**
@@ -133,6 +258,38 @@ class HangmanEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($playedLetters, $event->getPlayedLetters());
         $this->assertEquals($remainingLives, $event->getRemainingLives());
         $this->assertEquals($wordSoFar, $event->getWordSoFar());
+
+        $this->assertEquals(
+            array(
+                'name' => 'hangman.letter.good',
+                'gameId' => 666,
+                'playerId' => 42,
+                'letter' => $letter,
+                'playedLetters' => $playedLetters,
+                'remainingLives' => $remainingLives,
+                'wordSoFar' => $wordSoFar
+            ),
+            $event->serialize()
+        );
+
+        $unserializedEvent = HangmanGoodLetterProposedEvent::deserialize(
+            array(
+                'name' => 'hangman.letter.good',
+                'gameId' => 666,
+                'playerId' => 42,
+                'letter' => $letter,
+                'playedLetters' => $playedLetters,
+                'remainingLives' => $remainingLives,
+                'wordSoFar' => $wordSoFar
+            )
+        );
+
+        $this->assertEquals(666, (string)$unserializedEvent->getGameId());
+        $this->assertEquals(42, (string)$unserializedEvent->getPlayerId());
+        $this->assertEquals($letter, $unserializedEvent->getLetter());
+        $this->assertEquals($playedLetters, $unserializedEvent->getPlayedLetters());
+        $this->assertEquals($remainingLives, $unserializedEvent->getRemainingLives());
+        $this->assertEquals($wordSoFar, $unserializedEvent->getWordSoFar());
     }
 
     /**
@@ -162,6 +319,38 @@ class HangmanEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($remainingLives, $event->getRemainingLives());
         $this->assertEquals($wordSoFar, $event->getWordFound());
         $this->assertEquals($word, $event->getWord());
+
+        $this->assertEquals(
+            array(
+                'name' => 'hangman.player.lost',
+                'gameId' => 666,
+                'playerId' => 42,
+                'playedLetters' => $playedLetters,
+                'remainingLives' => $remainingLives,
+                'wordFound' => $wordSoFar,
+                'word' => $word
+            ),
+            $event->serialize()
+        );
+
+        $unserializedEvent = HangmanPlayerLostEvent::deserialize(
+            array(
+                'name' => 'hangman.player.lost',
+                'gameId' => 666,
+                'playerId' => 42,
+                'playedLetters' => $playedLetters,
+                'remainingLives' => $remainingLives,
+                'wordFound' => $wordSoFar,
+                'word' => $word
+            )
+        );
+
+        $this->assertEquals(666, (string)$unserializedEvent->getGameId());
+        $this->assertEquals(42, (string)$unserializedEvent->getPlayerId());
+        $this->assertEquals($playedLetters, $unserializedEvent->getPlayedLetters());
+        $this->assertEquals($remainingLives, $unserializedEvent->getRemainingLives());
+        $this->assertEquals($wordSoFar, $unserializedEvent->getWordFound());
+        $this->assertEquals($word, $unserializedEvent->getWord());
     }
 
     /**
@@ -188,5 +377,34 @@ class HangmanEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($playedLetters, $event->getPlayedLetters());
         $this->assertEquals($remainingLives, $event->getRemainingLives());
         $this->assertEquals($word, $event->getWord());
+
+        $this->assertEquals(
+            array(
+                'name' => 'hangman.player.win',
+                'gameId' => 666,
+                'playerId' => 42,
+                'playedLetters' => $playedLetters,
+                'remainingLives' => $remainingLives,
+                'word' => $word
+            ),
+            $event->serialize()
+        );
+
+        $unserializedEvent = HangmanPlayerWinEvent::deserialize(
+            array(
+                'name' => 'hangman.player.win',
+                'gameId' => 666,
+                'playerId' => 42,
+                'playedLetters' => $playedLetters,
+                'remainingLives' => $remainingLives,
+                'word' => $word
+            )
+        );
+
+        $this->assertEquals(666, (string)$unserializedEvent->getGameId());
+        $this->assertEquals(42, (string)$unserializedEvent->getPlayerId());
+        $this->assertEquals($playedLetters, $unserializedEvent->getPlayedLetters());
+        $this->assertEquals($remainingLives, $unserializedEvent->getRemainingLives());
+        $this->assertEquals($word, $unserializedEvent->getWord());
     }
 }

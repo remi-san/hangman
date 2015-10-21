@@ -156,14 +156,19 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
             throw new HangmanException('Player options must be compatible with a hangman game.');
         }
 
-        $player = new HangmanPlayer(
-            $playerOptions->getPlayerId(),
-            $playerOptions->getName(),
-            $playerOptions->getLives(),
-            $this
-        );
+        if ($this->state !== self::STATE_READY) {
+            throw new HangmanException('You cannot add a player to a game that has already started.');
+        }
 
-        $this->addPlayer($player);
+        $this->apply(
+            new HangmanPlayerCreatedEvent(
+                $this->id,
+                $playerOptions->getPlayerId(),
+                $playerOptions->getName(),
+                $playerOptions->getLives(),
+                $playerOptions->getExternalReference()
+            )
+        );
     }
 
     /**
@@ -270,33 +275,17 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     /**
      * Initialize the game
      *
-     * @param MiniGameId      $id
-     * @param string          $word
-     * @param HangmanPlayer[] $players
+     * @param MiniGameId             $id
+     * @param string                 $word
+     * @param HangmanPlayerOptions[] $players
      */
     private function initialize(MiniGameId $id, $word, array $players)
     {
         $this->apply(new HangmanGameCreatedEvent($id, $word));
 
-        foreach ($players as $player) {
-            $this->addPlayer($player);
+        foreach ($players as $playerOptions) {
+            $this->addPlayerToGame($playerOptions);
         }
-    }
-
-    /**
-     * Adds a player
-     *
-     * @param Player $player
-     *
-     * @throws HangmanException
-     */
-    private function addPlayer(Player $player)
-    {
-        if ($this->state !== self::STATE_READY) {
-            throw new HangmanException('You cannot add a player to a game that has already started.');
-        }
-
-        $this->apply(new HangmanPlayerCreatedEvent($this->id, $player));
     }
 
     /**
@@ -636,9 +625,14 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      */
     protected function applyHangmanPlayerCreatedEvent(HangmanPlayerCreatedEvent $event)
     {
-        $player = $event->getPlayer();
+        $player = new HangmanPlayer(
+            $event->getPlayerId(),
+            $event->getPlayerName(),
+            $event->getLives(),
+            $this,
+            $event->getExternalReference()
+        );
 
-        $player->setGame($this);
         $this->gameOrder[] = (string)$player->getId();
 
         if ($this->currentPlayer === null) {
@@ -749,9 +743,9 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     /**
      * Create a new instance
      *
-     * @param  MiniGameId $id
-     * @param  string $word
-     * @param  array $players
+     * @param  MiniGameId             $id
+     * @param  string                 $word
+     * @param  HangmanPlayerOptions[] $players
      * @return Hangman
      */
     public static function createGame(MiniGameId $id = null, $word = 'HANGMAN', array $players = array())

@@ -46,12 +46,13 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
         $game = \Mockery::mock('\Hangman\Entity\Hangman');
         $game->shouldReceive('getId')->andReturn($this->getMiniGameId(33));
 
-        $player = new HangmanPlayer($id, $name, $lives, $game);
+        $player = new HangmanPlayer($id, $name, $lives, $game, 'ext');
 
         $this->assertEquals($id, $player->getId());
         $this->assertEquals($name, $player->getName());
         $this->assertEquals($lives, $player->getRemainingLives());
         $this->assertEquals($game, $player->getGame());
+        $this->assertEquals('ext', $player->getExternalReference());
     }
 
     /**

@@ -1,10 +1,11 @@
 <?php
 namespace Hangman\Event;
 
+use Broadway\Serializer\SerializableInterface;
 use League\Event\Event;
 use MiniGame\Entity\MiniGameId;
 
-class HangmanGameCreatedEvent extends Event
+class HangmanGameCreatedEvent extends Event implements SerializableInterface
 {
     /**
      * @var string
@@ -48,5 +49,29 @@ class HangmanGameCreatedEvent extends Event
     public function getWord()
     {
         return $this->word;
+    }
+
+    /**
+     * @return array
+     */
+    public function serialize()
+    {
+        return array(
+            'name' => self::NAME,
+            'gameId' => $this->gameId->getId(),
+            'word' => $this->word
+        );
+    }
+
+    /**
+     * @param  array $data
+     * @return HangmanGameCreatedEvent
+     */
+    public static function deserialize(array $data)
+    {
+        return new self(
+            new MiniGameId($data['gameId']),
+            $data['word']
+        );
     }
 }
