@@ -22,7 +22,7 @@
     "require": {
         "ramsey/uuid" : "~2.8",
         "remi-san/mini-game" : "dev-master",
-        "broadway/broadway" : "~0.7.1",
+        "broadway/broadway" : "~0.8.0",
         "league/event" : "~2.1"
     },
     "require-dev": {
