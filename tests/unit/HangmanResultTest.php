@@ -30,6 +30,9 @@ class HangmanResultTest extends \PHPUnit_Framework_TestCase
      */
     private $gameId;
 
+    /**
+     * @var string[]
+     */
     private $lettersPlayed;
 
     public function setUp()
@@ -43,116 +46,6 @@ class HangmanResultTest extends \PHPUnit_Framework_TestCase
     public function tearDown()
     {
         \Mockery::close();
-    }
-
-    /**
-     * @test
-     */
-    public function testBadProposition()
-    {
-        $feedback = 'feedback';
-        $remainingChances = 5;
-        $message = sprintf(
-            'Too bad... %s (letters played: %s) - Remaining chances: %d',
-            $feedback,
-            implode(', ', $this->lettersPlayed),
-            $remainingChances
-        );
-
-        $badProposition = new HangmanBadProposition(
-            $this->gameId,
-            $this->playerId,
-            $feedback,
-            $this->lettersPlayed,
-            $remainingChances
-        );
-
-        $this->assertEquals($this->gameId, $badProposition->getGameId());
-        $this->assertEquals($this->playerId, $badProposition->getPlayerId());
-        $this->assertEquals($feedback, $badProposition->getFeedBack());
-        $this->assertEquals($this->lettersPlayed, $badProposition->getLettersPlayed());
-        $this->assertEquals($remainingChances, $badProposition->getRemainingChances());
-        $this->assertEquals($message, $badProposition->getAsMessage());
-    }
-
-    /**
-     * @test
-     */
-    public function testGoodProposition()
-    {
-        $feedback = 'feedback';
-        $remainingChances = 6;
-        $message = sprintf(
-            'Well played! %s (letters played: %s) - Remaining chances: %d',
-            $feedback,
-            implode(', ', $this->lettersPlayed),
-            $remainingChances
-        );
-
-        $badProposition = new HangmanGoodProposition(
-            $this->gameId,
-            $this->playerId,
-            $feedback,
-            $this->lettersPlayed,
-            $remainingChances
-        );
-
-        $this->assertEquals($this->gameId, $badProposition->getGameId());
-        $this->assertEquals($this->playerId, $badProposition->getPlayerId());
-        $this->assertEquals($feedback, $badProposition->getFeedBack());
-        $this->assertEquals($this->lettersPlayed, $badProposition->getLettersPlayed());
-        $this->assertEquals($remainingChances, $badProposition->getRemainingChances());
-        $this->assertEquals($message, $badProposition->getAsMessage());
-    }
-
-    /**
-     * @test
-     */
-    public function testLost()
-    {
-        $solution = 'solution';
-        $remainingChances = 0;
-        $message = sprintf('You lose... The word was %s.', $solution);
-
-        $badProposition = new HangmanLost(
-            $this->gameId,
-            $this->playerId,
-            $this->lettersPlayed,
-            $remainingChances,
-            $solution
-        );
-
-        $this->assertEquals($this->gameId, $badProposition->getGameId());
-        $this->assertEquals($this->playerId, $badProposition->getPlayerId());
-        $this->assertEquals($solution, $badProposition->getSolution());
-        $this->assertEquals($this->lettersPlayed, $badProposition->getLettersPlayed());
-        $this->assertEquals($remainingChances, $badProposition->getRemainingChances());
-        $this->assertEquals($message, $badProposition->getAsMessage());
-    }
-
-    /**
-     * @test
-     */
-    public function testWon()
-    {
-        $solution = 'solution';
-        $remainingChances = 0;
-        $message = sprintf('Congratulations! The word was %s.', $solution);
-
-        $badProposition = new HangmanWon(
-            $this->gameId,
-            $this->playerId,
-            $this->lettersPlayed,
-            $remainingChances,
-            $solution
-        );
-
-        $this->assertEquals($this->gameId, $badProposition->getGameId());
-        $this->assertEquals($this->playerId, $badProposition->getPlayerId());
-        $this->assertEquals($solution, $badProposition->getSolution());
-        $this->assertEquals($this->lettersPlayed, $badProposition->getLettersPlayed());
-        $this->assertEquals($remainingChances, $badProposition->getRemainingChances());
-        $this->assertEquals($message, $badProposition->getAsMessage());
     }
 
     /**
@@ -173,8 +66,8 @@ class HangmanResultTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($this->gameId, $badProposition->getGameId());
         $this->assertEquals($this->playerId, $badProposition->getPlayerId());
-        $this->assertEquals($this->lettersPlayed, $badProposition->getLettersPlayed());
-        $this->assertEquals($remainingChances, $badProposition->getRemainingChances());
+        $this->assertEquals($this->lettersPlayed, $badProposition->getPlayedLetters());
+        $this->assertEquals($remainingChances, $badProposition->getRemainingLives());
         $this->assertEquals($message, $badProposition->getAsMessage());
     }
 }

@@ -2,36 +2,16 @@
 namespace Hangman\Event;
 
 use Broadway\Serializer\SerializableInterface;
-use League\Event\Event;
+use Hangman\Result\HangmanWon;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
 
-class HangmanPlayerWinEvent extends Event implements SerializableInterface
+class HangmanPlayerWinEvent extends HangmanResultEvent implements HangmanWon, SerializableInterface
 {
     /**
      * @var string
      */
     const NAME = 'hangman.player.win';
-
-    /**
-     * @var MiniGameId
-     */
-    private $gameId;
-
-    /**
-     * @var PlayerId
-     */
-    private $playerId;
-
-    /**
-     * @var string[]
-     */
-    private $playedLetters;
-
-    /**
-     * @var int
-     */
-    private $remainingLives;
 
     /**
      * @var string
@@ -54,44 +34,8 @@ class HangmanPlayerWinEvent extends Event implements SerializableInterface
         $remainingLives,
         $word
     ) {
-        parent::__construct(self::NAME);
-        $this->gameId = $gameId;
-        $this->playerId = $playerId;
-        $this->playedLetters = $playedLetters;
-        $this->remainingLives = $remainingLives;
+        parent::__construct(self::NAME, $gameId, $playerId, $playedLetters, $remainingLives);
         $this->word = $word;
-    }
-
-    /**
-     * @return MiniGameId
-     */
-    public function getGameId()
-    {
-        return $this->gameId;
-    }
-
-    /**
-     * @return PlayerId
-     */
-    public function getPlayerId()
-    {
-        return $this->playerId;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getPlayedLetters()
-    {
-        return $this->playedLetters;
-    }
-
-    /**
-     * @return int
-     */
-    public function getRemainingLives()
-    {
-        return $this->remainingLives;
     }
 
     /**
@@ -103,16 +47,32 @@ class HangmanPlayerWinEvent extends Event implements SerializableInterface
     }
 
     /**
+     * @return string
+     */
+    public function getSolution()
+    {
+        return $this->word;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAsMessage()
+    {
+        return sprintf('Congratulations! The word was %s.', $this->getWord());
+    }
+
+    /**
      * @return array
      */
     public function serialize()
     {
         return array(
             'name' => self::NAME,
-            'gameId' => $this->gameId->getId(),
-            'playerId' => $this->playerId->getId(),
-            'playedLetters' => $this->playedLetters,
-            'remainingLives' => $this->remainingLives,
+            'gameId' => $this->getGameId()->getId(),
+            'playerId' => $this->getPlayerId()->getId(),
+            'playedLetters' => $this->getPlayedLetters(),
+            'remainingLives' => $this->getRemainingLives(),
             'word' => $this->word
         );
     }

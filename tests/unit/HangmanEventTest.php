@@ -9,7 +9,6 @@ use Hangman\Event\HangmanPlayerCreatedEvent;
 use Hangman\Event\HangmanPlayerDeletedEvent;
 use Hangman\Event\HangmanPlayerLostEvent;
 use Hangman\Event\HangmanPlayerWinEvent;
-use Hangman\Options\HangmanPlayerOptions;
 use MiniGame\Test\Mock\GameObjectMocker;
 
 class HangmanEventTest extends \PHPUnit_Framework_TestCase
@@ -194,6 +193,16 @@ class HangmanEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($livesLost, $event->getLivesLost());
         $this->assertEquals($remainingLives, $event->getRemainingLives());
         $this->assertEquals($wordSoFar, $event->getWordSoFar());
+        $this->assertEquals($wordSoFar, $event->getFeedback());
+        $this->assertEquals(
+            sprintf(
+                'Too bad... %s (letters played: %s) - Remaining chances: %d',
+                $wordSoFar,
+                implode(', ', $event->getPlayedLetters()),
+                $event->getRemainingLives()
+            ),
+            $event->getAsMessage()
+        );
 
         $this->assertEquals(
             array(
@@ -258,6 +267,16 @@ class HangmanEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($playedLetters, $event->getPlayedLetters());
         $this->assertEquals($remainingLives, $event->getRemainingLives());
         $this->assertEquals($wordSoFar, $event->getWordSoFar());
+        $this->assertEquals($wordSoFar, $event->getFeedback());
+        $this->assertEquals(
+            sprintf(
+                'Well played! %s (letters played: %s) - Remaining chances: %d',
+                $wordSoFar,
+                implode(', ', $event->getPlayedLetters()),
+                $event->getRemainingLives()
+            ),
+            $event->getAsMessage()
+        );
 
         $this->assertEquals(
             array(
@@ -319,6 +338,7 @@ class HangmanEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($remainingLives, $event->getRemainingLives());
         $this->assertEquals($wordSoFar, $event->getWordFound());
         $this->assertEquals($word, $event->getWord());
+        $this->assertEquals(sprintf('You lose... The word was %s.', $event->getWord()), $event->getAsMessage());
 
         $this->assertEquals(
             array(
@@ -377,6 +397,7 @@ class HangmanEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($playedLetters, $event->getPlayedLetters());
         $this->assertEquals($remainingLives, $event->getRemainingLives());
         $this->assertEquals($word, $event->getWord());
+        $this->assertEquals(sprintf('Congratulations! The word was %s.', $event->getWord()), $event->getAsMessage());
 
         $this->assertEquals(
             array(

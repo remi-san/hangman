@@ -2,11 +2,11 @@
 namespace Hangman\Event;
 
 use Broadway\Serializer\SerializableInterface;
-use League\Event\Event;
+use Hangman\Result\HangmanGoodProposition;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
 
-class HangmanGoodLetterProposedEvent extends Event implements SerializableInterface
+class HangmanGoodLetterProposedEvent extends HangmanResultEvent implements HangmanGoodProposition, SerializableInterface
 {
     /**
      * @var string
@@ -14,29 +14,9 @@ class HangmanGoodLetterProposedEvent extends Event implements SerializableInterf
     const NAME = 'hangman.letter.good';
 
     /**
-     * @var MiniGameId
-     */
-    private $gameId;
-
-    /**
-     * @var PlayerId
-     */
-    private $playerId;
-
-    /**
      * @var string
      */
     private $letter;
-
-    /**
-     * @var string[]
-     */
-    private $playedLetters;
-
-    /**
-     * @var int
-     */
-    private $remainingLives;
 
     /**
      * @var string
@@ -61,29 +41,9 @@ class HangmanGoodLetterProposedEvent extends Event implements SerializableInterf
         $remainingLives,
         $wordSoFar
     ) {
-        parent::__construct(self::NAME);
-        $this->gameId = $gameId;
-        $this->playerId = $playerId;
+        parent::__construct(self::NAME, $gameId, $playerId, $playedLetters, $remainingLives);
         $this->letter = $letter;
-        $this->playedLetters = $playedLetters;
-        $this->remainingLives = $remainingLives;
         $this->wordSoFar = $wordSoFar;
-    }
-
-    /**
-     * @return MiniGameId
-     */
-    public function getGameId()
-    {
-        return $this->gameId;
-    }
-
-    /**
-     * @return PlayerId
-     */
-    public function getPlayerId()
-    {
-        return $this->playerId;
     }
 
     /**
@@ -95,27 +55,32 @@ class HangmanGoodLetterProposedEvent extends Event implements SerializableInterf
     }
 
     /**
-     * @return string[]
-     */
-    public function getPlayedLetters()
-    {
-        return $this->playedLetters;
-    }
-
-    /**
-     * @return int
-     */
-    public function getRemainingLives()
-    {
-        return $this->remainingLives;
-    }
-
-    /**
      * @return string
      */
     public function getWordSoFar()
     {
         return $this->wordSoFar;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFeedBack()
+    {
+        return $this->wordSoFar;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAsMessage()
+    {
+        return sprintf(
+            'Well played! %s (letters played: %s) - Remaining chances: %d',
+            $this->getFeedBack(),
+            implode(', ', $this->getPlayedLetters()),
+            $this->getRemainingLives()
+        );
     }
 
     /**
@@ -125,11 +90,11 @@ class HangmanGoodLetterProposedEvent extends Event implements SerializableInterf
     {
         return array(
             'name' => self::NAME,
-            'gameId' => $this->gameId->getId(),
-            'playerId' => $this->playerId->getId(),
+            'gameId' => $this->getGameId()->getId(),
+            'playerId' => $this->getPlayerId()->getId(),
             'letter' => $this->letter,
-            'playedLetters' => $this->playedLetters,
-            'remainingLives' => $this->remainingLives,
+            'playedLetters' => $this->getPlayedLetters(),
+            'remainingLives' => $this->getRemainingLives(),
             'wordSoFar' => $this->wordSoFar
         );
     }

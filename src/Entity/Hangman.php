@@ -342,23 +342,22 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
         $livesLost = 1;
         $remainingLives = $this->getRemainingLives($playerId) - $livesLost;
 
-        $this->apply(
-            new HangmanBadLetterProposedEvent(
-                $this->id,
-                $playerId,
-                $capLetter,
-                $playedLetters,
-                $livesLost,
-                $remainingLives,
-                $wordSoFar
-            )
+        $event = new HangmanBadLetterProposedEvent(
+            $this->id,
+            $playerId,
+            $capLetter,
+            $playedLetters,
+            $livesLost,
+            $remainingLives,
+            $wordSoFar
         );
+        $this->apply($event);
 
         if ($remainingLives === 0) {
             return $this->playerLoses($player);
         }
 
-        return new HangmanBadProposition($this->id, $playerId, $wordSoFar, $playedLetters, $remainingLives) ;
+        return $event;
     }
 
     /**
@@ -379,22 +378,21 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
         $wordSoFar = $this->buildWord($playedLetters);
         $remainingLives = $this->getRemainingLives($playerId);
 
-        $this->apply(
-            new HangmanGoodLetterProposedEvent(
-                $this->id,
-                $playerId,
-                $capLetter,
-                $playedLetters,
-                $remainingLives,
-                $wordSoFar
-            )
+        $event = new HangmanGoodLetterProposedEvent(
+            $this->id,
+            $playerId,
+            $capLetter,
+            $playedLetters,
+            $remainingLives,
+            $wordSoFar
         );
+        $this->apply($event);
 
         if ($this->isAllLettersFoundForPlayer($player)) {
             return $this->playerWins($player);
         }
 
-        return new HangmanGoodProposition($this->id, $playerId, $wordSoFar, $playedLetters, $remainingLives) ;
+        return $event;
     }
 
     /**
@@ -410,17 +408,16 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
         $playedLetters = $this->getPlayedLettersForPlayer($playerId);
         $remainingLives = $this->getRemainingLives($playerId);
 
-        $this->apply(
-            new HangmanPlayerWinEvent(
-                $this->id,
-                $playerId,
-                $playedLetters,
-                $remainingLives,
-                $this->word
-            )
+        $event = new HangmanPlayerWinEvent(
+            $this->id,
+            $playerId,
+            $playedLetters,
+            $remainingLives,
+            $this->word
         );
+        $this->apply($event);
 
-        return new HangmanWon($this->id, $playerId, $playedLetters, $remainingLives, $this->word);
+        return $event;
     }
 
     /**
@@ -436,18 +433,17 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
         $playedLetters = $this->getPlayedLettersForPlayer($playerId);
         $remainingLives = $this->getRemainingLives($playerId);
 
-        $this->apply(
-            new HangmanPlayerLostEvent(
-                $this->id,
-                $playerId,
-                $playedLetters,
-                $remainingLives,
-                $this->buildWord($playedLetters),
-                $this->word
-            )
+        $event = new HangmanPlayerLostEvent(
+            $this->id,
+            $playerId,
+            $playedLetters,
+            $remainingLives,
+            $this->buildWord($playedLetters),
+            $this->word
         );
+        $this->apply($event);
 
-        return new HangmanLost($this->id, $playerId, $playedLetters, $remainingLives, $this->word);
+        return $event;
     }
 
     /**

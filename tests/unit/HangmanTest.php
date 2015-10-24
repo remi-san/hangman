@@ -229,8 +229,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('\\Hangman\\Result\\HangmanGoodProposition', $feedback);
         $this->assertEquals($this->playerOneId, $feedback->getPlayerId());
-        $this->assertEquals(array('H' => 'H'), $feedback->getLettersPlayed());
-        $this->assertEquals(self::CHANCES, $feedback->getRemainingChances());
+        $this->assertEquals(array('H' => 'H'), $feedback->getPlayedLetters());
+        $this->assertEquals(self::CHANCES, $feedback->getRemainingLives());
         $this->assertEquals('H _ _ _ H H _ _ _ _ _', $feedback->getFeedBack());
 
         $this->assertFalse($this->hangman->canPlayerPlay($this->playerOneId));
@@ -251,8 +251,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('\\Hangman\\Result\\HangmanBadProposition', $feedback);
         $this->assertEquals($this->playerOneId, $feedback->getPlayerId());
-        $this->assertEquals(array('Z'=>'Z'), $feedback->getLettersPlayed());
-        $this->assertEquals(self::CHANCES-1, $feedback->getRemainingChances());
+        $this->assertEquals(array('Z'=>'Z'), $feedback->getPlayedLetters());
+        $this->assertEquals(self::CHANCES-1, $feedback->getRemainingLives());
         $this->assertEquals('_ _ _ _ _ _ _ _ _ _ _', $feedback->getFeedBack());
 
         $this->assertFalse($this->hangman->canPlayerPlay($this->playerOneId));
@@ -293,8 +293,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('\\Hangman\\Result\\HangmanWon', $feedback);
         $this->assertEquals($this->playerOneId, $feedback->getPlayerId());
-        $this->assertEquals(array(), $feedback->getLettersPlayed());
-        $this->assertEquals(self::CHANCES, $feedback->getRemainingChances());
+        $this->assertEquals(array(), $feedback->getPlayedLetters());
+        $this->assertEquals(self::CHANCES, $feedback->getRemainingLives());
         $this->assertEquals(self::WORD, $feedback->getSolution());
 
         $this->assertFalse($this->hangman->canPlayerPlay($this->playerOneId));
@@ -323,8 +323,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('\\Hangman\\Result\\HangmanWon', $feedback);
         $this->assertEquals($this->playerOneId, $feedback->getPlayerId());
-        $this->assertEquals(array('A'=>'A'), $feedback->getLettersPlayed());
-        $this->assertEquals(self::CHANCES, $feedback->getRemainingChances());
+        $this->assertEquals(array('A'=>'A'), $feedback->getPlayedLetters());
+        $this->assertEquals(self::CHANCES, $feedback->getRemainingLives());
         $this->assertEquals($word, $feedback->getSolution());
 
         $this->assertFalse($hangman->canPlayerPlay($this->playerOneId));
@@ -349,8 +349,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('\\Hangman\\Result\\HangmanLost', $feedback);
         $this->assertEquals($this->playerOneId, $feedback->getPlayerId());
-        $this->assertEquals(array('Z'=>'Z'), $feedback->getLettersPlayed());
-        $this->assertEquals(0, $feedback->getRemainingChances());
+        $this->assertEquals(array('Z'=>'Z'), $feedback->getPlayedLetters());
+        $this->assertEquals(0, $feedback->getRemainingLives());
         $this->assertEquals(self::WORD, $feedback->getSolution());
 
         $this->assertFalse($hangman->canPlayerPlay($this->playerOneId));
@@ -369,8 +369,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('\\Hangman\\Result\\HangmanLost', $feedback);
         $this->assertEquals($this->playerOneId, $feedback->getPlayerId());
-        $this->assertEquals(array(), $feedback->getLettersPlayed());
-        $this->assertEquals(self::CHANCES, $feedback->getRemainingChances());
+        $this->assertEquals(array(), $feedback->getPlayedLetters());
+        $this->assertEquals(self::CHANCES, $feedback->getRemainingLives());
         $this->assertEquals(self::WORD, $feedback->getSolution());
 
         $this->assertFalse($this->hangman->canPlayerPlay($this->playerOneId));

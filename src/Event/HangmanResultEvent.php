@@ -1,11 +1,12 @@
 <?php
-namespace Hangman\Result;
+namespace Hangman\Event;
 
+use Hangman\Result\HangmanGameResult;
+use League\Event\Event;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
-use MiniGame\Result\Error;
 
-class HangmanError implements HangmanGameResult, Error
+abstract class HangmanResultEvent extends Event implements HangmanGameResult
 {
     /**
      * @var MiniGameId
@@ -18,42 +19,33 @@ class HangmanError implements HangmanGameResult, Error
     private $playerId;
 
     /**
-     * @var string
+     * @var string[]
      */
-    private $message;
-
-    /**
-     * @var array
-     */
-    private $lettersPlayed;
+    private $playedLetters;
 
     /**
      * @var int
      */
-    private $remainingChances;
+    private $remainingLives;
 
     /**
      * Constructor
      *
+     * @param string     $name
      * @param MiniGameId $gameId
      * @param PlayerId   $playerId
-     * @param string     $message
-     * @param array      $lettersPlayed
-     * @param int        $remainingChances
+     * @param string[]   $playedLetters
+     * @param int        $remainingLives
      */
-    public function __construct(
-        MiniGameId $gameId,
-        PlayerId $playerId,
-        $message,
-        array $lettersPlayed = array(),
-        $remainingChances = null
-    ) {
+    public function __construct($name, MiniGameId $gameId, PlayerId $playerId, array $playedLetters, $remainingLives)
+    {
+        parent::__construct($name);
         $this->gameId = $gameId;
+        $this->playedLetters = $playedLetters;
         $this->playerId = $playerId;
-        $this->message = $message;
-        $this->lettersPlayed = $lettersPlayed;
-        $this->getRemainingLives();
+        $this->remainingLives = $remainingLives;
     }
+
 
     /**
      * @return MiniGameId
@@ -76,7 +68,7 @@ class HangmanError implements HangmanGameResult, Error
      */
     public function getPlayedLetters()
     {
-        return $this->lettersPlayed;
+        return $this->playedLetters;
     }
 
     /**
@@ -84,14 +76,11 @@ class HangmanError implements HangmanGameResult, Error
      */
     public function getRemainingLives()
     {
-        return $this->remainingChances;
+        return $this->remainingLives;
     }
 
     /**
      * @return string
      */
-    public function getAsMessage()
-    {
-        return $this->message;
-    }
+    abstract public function getAsMessage();
 }
