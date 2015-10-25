@@ -100,10 +100,9 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function testUuidIsGenerated()
+    public function testReconstitution()
     {
-        $hangman = Hangman::createGame(null, self::WORD);
-        $this->assertTrue(Uuid::isValid($hangman->getId()->getId()));
+        $this->assertTrue(Hangman::instantiateForReconstitution() instanceof Hangman);
     }
 
     /**
@@ -111,7 +110,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function testCannotStartAGameWithNoPlayer()
     {
-        $hangman = Hangman::createGame(null, self::WORD);
+        $hangman = Hangman::createGame($this->hangmanId, self::WORD);
 
         $this->setExpectedException('\Hangman\Exception\HangmanException');
 
@@ -123,7 +122,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function testCannotStartAGameTwice()
     {
-        $hangman = Hangman::createGame(null, self::WORD, array($this->playerOne));
+        $hangman = Hangman::createGame($this->hangmanId, self::WORD, array($this->playerOne));
         $hangman->startGame();
 
         $this->setExpectedException('\Hangman\Exception\HangmanException');
@@ -154,7 +153,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddAPlayerWithIllegalOptions()
     {
-        $hangman = Hangman::createGame(null, self::WORD);
+        $hangman = Hangman::createGame($this->hangmanId, self::WORD);
 
         $this->setExpectedException('\Hangman\Exception\HangmanException');
 
@@ -168,7 +167,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddAPlayer()
     {
-        $hangman = Hangman::createGame(null, self::WORD);
+        $hangman = Hangman::createGame($this->hangmanId, self::WORD);
 
         $this->assertEquals(0, count($hangman->getPlayers()));
 

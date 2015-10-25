@@ -28,7 +28,6 @@ use MiniGame\Exceptions\NotPlayerTurnException;
 use MiniGame\GameResult;
 use MiniGame\Move;
 use MiniGame\PlayerOptions;
-use Rhumsaa\Uuid\Uuid;
 
 class Hangman extends EventSourcedAggregateRoot implements MiniGame
 {
@@ -79,6 +78,12 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      */
     protected $state;
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////   PRIVATE CONSTRUCTOR   //////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     /**
      * Constructor
      */
@@ -89,7 +94,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////   PUBLIC METHODS   /////////////////////////////////////////////////
+    //////////////////////////////////////////////   ACCESSORS   ///////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -122,6 +127,59 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     {
         return 'HANGMAN';
     }
+
+    /**
+     * Get the player identified by PlayerId
+     *
+     * @param  PlayerId $playerId
+     * @return HangmanPlayer
+     */
+    public function getPlayer(PlayerId $playerId)
+    {
+        foreach ($this->players as $player) {
+            if ((string)$player->getId() == (string)$playerId) {
+                return $player;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the player who can play
+     *
+     * @return Player
+     */
+    public function getCurrentPlayer()
+    {
+        return $this->currentPlayer;
+    }
+
+    /**
+     * Get the players
+     *
+     * @return Player[]
+     */
+    public function getPlayers()
+    {
+        return $this->players;
+    }
+
+    /**
+     * Is it the player's turn?
+     *
+     * @param  PlayerId $playerId
+     * @return bool
+     */
+    public function canPlayerPlay(PlayerId $playerId)
+    {
+        return $this->currentPlayer && $this->currentPlayer->getId() === $playerId;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////   DOMAIN METHODS   /////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Starts the game
@@ -169,53 +227,6 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
                 $playerOptions->getExternalReference()
             )
         );
-    }
-
-    /**
-     * Is it the player's turn?
-     *
-     * @param  PlayerId $playerId
-     * @return bool
-     */
-    public function canPlayerPlay(PlayerId $playerId)
-    {
-        return $this->currentPlayer && $this->currentPlayer->getId() === $playerId;
-    }
-
-    /**
-     * Get the player identified by PlayerId
-     *
-     * @param  PlayerId $playerId
-     * @return HangmanPlayer
-     */
-    public function getPlayer(PlayerId $playerId)
-    {
-        foreach ($this->players as $player) {
-            if ((string)$player->getId() == (string)$playerId) {
-                return $player;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns the player who can play
-     *
-     * @return Player
-     */
-    public function getCurrentPlayer()
-    {
-        return $this->currentPlayer;
-    }
-
-    /**
-     * Get the players
-     *
-     * @return Player[]
-     */
-    public function getPlayers()
-    {
-        return $this->players;
     }
 
     /**
@@ -614,6 +625,23 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
+     * Apply the game created event
+     *
+     * @param  HangmanGameCreatedEvent $event
+     * @return void
+     */
+    protected function applyHangmanGameCreatedEvent(HangmanGameCreatedEvent $event)
+    {
+        $this->id = $event->getGameId();
+        $this->word = strtoupper($event->getWord());
+        $this->players = array();
+
+        $this->gameOrder = array();
+
+        $this->state = self::STATE_READY;
+    }
+
+    /**
      * Apply the player created event
      *
      * @param  HangmanPlayerCreatedEvent $event
@@ -636,23 +664,6 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
         }
 
         $this->players[] = $player;
-    }
-
-    /**
-     * Apply the game created event
-     *
-     * @param  HangmanGameCreatedEvent $event
-     * @return void
-     */
-    protected function applyHangmanGameCreatedEvent(HangmanGameCreatedEvent $event)
-    {
-        $this->id = $event->getGameId();
-        $this->word = strtoupper($event->getWord());
-        $this->players = array();
-
-        $this->gameOrder = array();
-
-        $this->state = self::STATE_READY;
     }
 
     /**
@@ -744,15 +755,31 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      * @param  HangmanPlayerOptions[] $players
      * @return Hangman
      */
-    public static function createGame(MiniGameId $id = null, $word = 'HANGMAN', array $players = array())
+    public static function createGame(MiniGameId $id, $word, array $players = array())
     {
-        $hangman = new Hangman(false);
+        $hangman = new self();
         $hangman->initialize(
-            $id ? : new MiniGameId(Uuid::uuid4()->toString()),
+            $id,
             $word,
             $players
         );
 
         return $hangman;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////   RECONSTITUTION   /////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Static construction method for reconstitution
+     *
+     * @return Hangman
+     */
+    public static function instantiateForReconstitution()
+    {
+        return new self();
     }
 }
