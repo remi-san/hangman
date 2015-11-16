@@ -4,12 +4,15 @@ namespace Hangman\Entity;
 use Broadway\EventSourcing\EventSourcedAggregateRoot;
 use Hangman\Event\HangmanBadLetterProposedEvent;
 use Hangman\Event\HangmanGameCreatedEvent;
+use Hangman\Event\HangmanGameFailedStartingEvent;
 use Hangman\Event\HangmanGameStartedEvent;
 use Hangman\Event\HangmanGoodLetterProposedEvent;
 use Hangman\Event\HangmanPlayerCreatedEvent;
+use Hangman\Event\HangmanPlayerFailedCreatingEvent;
 use Hangman\Event\HangmanPlayerLostEvent;
 use Hangman\Event\HangmanPlayerWinEvent;
 use Hangman\Exception\HangmanException;
+use Hangman\Exception\HangmanPlayerOptionsException;
 use Hangman\Move\Answer;
 use Hangman\Move\Proposition;
 use Hangman\Options\HangmanPlayerOptions;
@@ -22,6 +25,7 @@ use MiniGame\Entity\MiniGame;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\Player;
 use MiniGame\Entity\PlayerId;
+use MiniGame\Exceptions\GameException;
 use MiniGame\Exceptions\IllegalMoveException;
 use MiniGame\Exceptions\InactiveGameException;
 use MiniGame\Exceptions\NotPlayerTurnException;
@@ -191,11 +195,15 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     public function startGame()
     {
         if ($this->state !== self::STATE_READY) {
-            throw new HangmanException("You can't start a game that's already started or is over.");
+            $event = new HangmanGameFailedStartingEvent($this->id, HangmanGameFailedStartingEvent::BAD_STATE);
+            $this->apply($event);
+            throw $event->getException(); // TODO delete once event managed
         }
 
         if (count($this->players) === 0) {
-            throw new HangmanException("You can't start a game that has no player.");
+            $event = new HangmanGameFailedStartingEvent($this->id, HangmanGameFailedStartingEvent::BAD_STATE);
+            $this->apply($event);
+            throw $event->getException(); // TODO delete once event managed
         }
 
         $this->apply(new HangmanGameStartedEvent($this->id));
@@ -206,16 +214,31 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      *
      * @param  PlayerOptions $playerOptions
      * @return void
+     * @throws HangmanPlayerOptionsException
      * @throws HangmanException
      */
     public function addPlayerToGame(PlayerOptions $playerOptions)
     {
         if (! $playerOptions instanceof HangmanPlayerOptions) {
-            throw new HangmanException('Player options must be compatible with a hangman game.');
+            throw new HangmanPlayerOptionsException(
+                $playerOptions->getPlayerId(),
+                $this->getId(),
+                $this->playerError(
+                    $playerOptions->getPlayerId(),
+                    'Player options must be compatible with a hangman game.'
+                ),
+                'Error'
+            );
         }
 
         if ($this->state !== self::STATE_READY) {
-            throw new HangmanException('You cannot add a player to a game that has already started.');
+            $event = new HangmanPlayerFailedCreatingEvent(
+                $this->id,
+                $playerOptions->getPlayerId(),
+                $playerOptions->getExternalReference()
+            );
+            $this->apply($event);
+            throw $event->getException(); // TODO delete once event managed
         }
 
         $this->apply(
@@ -245,7 +268,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
                 $this->getId(),
                 $this->playerError($playerId, 'Error!'),
                 'You cannot play'
-            );
+            ); // TODO transform into event
         }
 
         if (!$this->canPlayerPlay($playerId)) {
@@ -254,27 +277,34 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
                 $this->getId(),
                 $this->playerError($playerId, 'Error!'),
                 'It is not your turn to play'
-            );
+            ); // TODO transform into event
         }
 
-        try {
-            if ($move instanceof Proposition) {
-                return $this->currentPlayerProposeLetter($move->getText());
-            } elseif ($move instanceof Answer) {
+        if ($move instanceof Proposition) {
+            return $this->currentPlayerProposeLetter($move->getText());
+        } elseif ($move instanceof Answer) {
+            try {
                 return $this->currentPlayerProposeAnswer($move->getText());
-            } else {
-                throw new HangmanException('Unsupported Move!');
+            } catch (HangmanException $e) {
+                $return = $this->currentPlayerBadProposition($move->getText());
+                throw new IllegalMoveException(
+                    $playerId,
+                    $this->getId(),
+                    $return,
+                    $move,
+                    $e->getMessage()
+                ); // TODO transform into event
             }
-        } catch (HangmanException $e) {
-            $return = $this->currentPlayerBadProposition($move->getText());
+        } else {
             throw new IllegalMoveException(
                 $playerId,
                 $this->getId(),
-                $return,
+                $this->playerError($playerId, 'Unsupported Move!'),
                 $move,
-                $e->getMessage()
+                'Error'
             );
         }
+
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

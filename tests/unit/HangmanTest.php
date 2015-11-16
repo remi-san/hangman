@@ -143,6 +143,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
             $mock->shouldReceive('getPlayerId')->andReturn(new PlayerId(42))->byDefault();
             $mock->shouldReceive('getName')->andReturn('toto')->byDefault();
             $mock->shouldReceive('getLives')->andReturn(6)->byDefault();
+            $mock->shouldReceive('getExternalReference')->andReturn('ext-ref')->byDefault();
         });
 
         $this->hangman->addPlayerToGame($hangmanPlayerOptions);
@@ -155,9 +156,10 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
     {
         $hangman = Hangman::createGame($this->hangmanId, self::WORD);
 
-        $this->setExpectedException('\Hangman\Exception\HangmanException');
+        $this->setExpectedException('\Hangman\Exception\HangmanPlayerOptionsException');
 
         $hangmanPlayerOptions = \Mockery::mock('\MiniGame\PlayerOptions');
+        $hangmanPlayerOptions->shouldReceive('getPlayerId')->andReturn(new PlayerId(42));
         $hangman->addPlayerToGame($hangmanPlayerOptions);
 
     }
