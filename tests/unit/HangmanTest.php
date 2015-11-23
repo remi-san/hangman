@@ -390,9 +390,6 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
         try {
             $this->hangman->play($this->playerTwoId, $this->getProposition('A'));
         } catch (NotPlayerTurnException $e) {
-            $this->assertEquals($this->playerTwoId, $e->getPlayerId());
-            $this->assertEquals($this->hangmanId, $e->getMiniGameId());
-
             $this->assertTrue($this->hangman->canPlayerPlay($this->playerOneId));
             throw $e;
         }

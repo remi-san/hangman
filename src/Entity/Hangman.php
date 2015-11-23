@@ -10,6 +10,8 @@ use Hangman\Event\HangmanGoodLetterProposedEvent;
 use Hangman\Event\HangmanPlayerCreatedEvent;
 use Hangman\Event\HangmanPlayerFailedCreatingEvent;
 use Hangman\Event\HangmanPlayerLostEvent;
+use Hangman\Event\HangmanPlayerTriedPlayingDuringAnotherPlayerTurnEvent;
+use Hangman\Event\HangmanPlayerTriedPlayingInactiveGameEvent;
 use Hangman\Event\HangmanPlayerWinEvent;
 use Hangman\Exception\HangmanException;
 use Hangman\Exception\HangmanPlayerOptionsException;
@@ -25,10 +27,7 @@ use MiniGame\Entity\MiniGame;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\Player;
 use MiniGame\Entity\PlayerId;
-use MiniGame\Exceptions\GameException;
 use MiniGame\Exceptions\IllegalMoveException;
-use MiniGame\Exceptions\InactiveGameException;
-use MiniGame\Exceptions\NotPlayerTurnException;
 use MiniGame\GameResult;
 use MiniGame\Move;
 use MiniGame\PlayerOptions;
@@ -195,15 +194,11 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     public function startGame()
     {
         if ($this->state !== self::STATE_READY) {
-            $event = new HangmanGameFailedStartingEvent($this->id, HangmanGameFailedStartingEvent::BAD_STATE);
-            $this->apply($event);
-            throw $event->getException(); // TODO delete once event managed
+            $this->apply(new HangmanGameFailedStartingEvent($this->id, HangmanGameFailedStartingEvent::BAD_STATE));
         }
 
         if (count($this->players) === 0) {
-            $event = new HangmanGameFailedStartingEvent($this->id, HangmanGameFailedStartingEvent::BAD_STATE);
-            $this->apply($event);
-            throw $event->getException(); // TODO delete once event managed
+            $this->apply(new HangmanGameFailedStartingEvent($this->id, HangmanGameFailedStartingEvent::BAD_STATE));
         }
 
         $this->apply(new HangmanGameStartedEvent($this->id));
@@ -232,13 +227,13 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
         }
 
         if ($this->state !== self::STATE_READY) {
-            $event = new HangmanPlayerFailedCreatingEvent(
-                $this->id,
-                $playerOptions->getPlayerId(),
-                $playerOptions->getExternalReference()
+            $this->apply(
+                new HangmanPlayerFailedCreatingEvent(
+                    $this->id,
+                    $playerOptions->getPlayerId(),
+                    $playerOptions->getExternalReference()
+                )
             );
-            $this->apply($event);
-            throw $event->getException(); // TODO delete once event managed
         }
 
         $this->apply(
@@ -263,21 +258,21 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     public function play(PlayerId $playerId, Move $move)
     {
         if ($this->state !== self::STATE_STARTED) {
-            throw new InactiveGameException(
-                $playerId,
-                $this->getId(),
-                $this->playerError($playerId, 'Error!'),
-                'You cannot play'
-            ); // TODO transform into event
+            $this->apply(
+                new HangmanPlayerTriedPlayingInactiveGameEvent(
+                    $this->getId(),
+                    $playerId
+                )
+            );
         }
 
         if (!$this->canPlayerPlay($playerId)) {
-            throw new NotPlayerTurnException(
-                $playerId,
-                $this->getId(),
-                $this->playerError($playerId, 'Error!'),
-                'It is not your turn to play'
-            ); // TODO transform into event
+            $this->apply(
+                new HangmanPlayerTriedPlayingDuringAnotherPlayerTurnEvent(
+                    $this->getId(),
+                    $playerId
+                )
+            );
         }
 
         if ($move instanceof Proposition) {
@@ -653,6 +648,28 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     ////////////////////////////////////////////   APPLY EVENTS   //////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    protected function applyHangmanGameFailedStartingEvent(HangmanGameFailedStartingEvent $event)
+    {
+        throw $event->getException(); // TODO delete once all is event based
+    }
+
+    protected function applyHangmanPlayerFailedCreatingEvent(HangmanPlayerFailedCreatingEvent $event)
+    {
+        throw $event->getException(); // TODO delete once all is event based
+    }
+
+    protected function applyHangmanPlayerTriedPlayingInactiveGameEvent(
+        HangmanPlayerTriedPlayingInactiveGameEvent $event
+    ) {
+        throw $event->getException(); // TODO delete once all is event based
+    }
+
+    protected function applyHangmanPlayerTriedPlayingDuringAnotherPlayerTurnEvent(
+        HangmanPlayerTriedPlayingDuringAnotherPlayerTurnEvent $event
+    ) {
+        throw $event->getException(); // TODO delete once all is event based
+    }
 
     /**
      * Apply the game created event
