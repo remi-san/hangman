@@ -275,8 +275,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
         } catch (IllegalMoveException $e) {
             $this->assertEquals($move, $e->getMove());
 
-            $this->assertFalse($this->hangman->canPlayerPlay($this->playerOneId));
-            $this->assertTrue($this->hangman->canPlayerPlay($this->playerTwoId));
+            $this->assertTrue($this->hangman->canPlayerPlay($this->playerOneId));
+            $this->assertFalse($this->hangman->canPlayerPlay($this->playerTwoId));
 
             throw $e;
         }

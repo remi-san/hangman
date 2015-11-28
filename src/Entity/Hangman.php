@@ -10,6 +10,7 @@ use Hangman\Event\HangmanGoodLetterProposedEvent;
 use Hangman\Event\HangmanPlayerCreatedEvent;
 use Hangman\Event\HangmanPlayerFailedCreatingEvent;
 use Hangman\Event\HangmanPlayerLostEvent;
+use Hangman\Event\HangmanPlayerProposedInvalidAnswerEvent;
 use Hangman\Event\HangmanPlayerTriedPlayingDuringAnotherPlayerTurnEvent;
 use Hangman\Event\HangmanPlayerTriedPlayingInactiveGameEvent;
 use Hangman\Event\HangmanPlayerWinEvent;
@@ -281,25 +282,19 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
             try {
                 return $this->currentPlayerProposeAnswer($move->getText());
             } catch (HangmanException $e) {
-                $return = $this->currentPlayerBadProposition($move->getText());
-                throw new IllegalMoveException(
-                    $playerId,
-                    $this->getId(),
-                    $return,
-                    $move,
-                    $e->getMessage()
-                ); // TODO transform into event
+                $this->apply(
+                    new HangmanPlayerProposedInvalidAnswerEvent(
+                        $this->getId(),
+                        $playerId,
+                        $move
+                    )
+                );
             }
         } else {
-            throw new IllegalMoveException(
-                $playerId,
-                $this->getId(),
-                $this->playerError($playerId, 'Unsupported Move!'),
-                $move,
-                'Error'
-            );
+            throw new IllegalMoveException($move, 'Error');
         }
 
+        return null;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -671,6 +666,12 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
         throw $event->getException(); // TODO delete once all is event based
     }
 
+    protected function applyHangmanPlayerProposedInvalidAnswerEvent(
+        HangmanPlayerProposedInvalidAnswerEvent $event
+    ) {
+        throw $event->getException(); // TODO delete once all is event based
+    }
+
     /**
      * Apply the game created event
      *
@@ -716,10 +717,9 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     /**
      * Apply the game created event
      *
-     * @param  HangmanGameStartedEvent $event
      * @return void
      */
-    protected function applyHangmanGameStartedEvent(HangmanGameStartedEvent $event)
+    protected function applyHangmanGameStartedEvent()
     {
         $this->state = self::STATE_STARTED;
     }
@@ -753,10 +753,9 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     /**
      * Apply the hangman player lost event
      *
-     * @param  HangmanPlayerLostEvent $event
      * @return void
      */
-    protected function applyHangmanPlayerLostEvent(HangmanPlayerLostEvent $event)
+    protected function applyHangmanPlayerLostEvent()
     {
         $this->currentPlayer = null;
         $this->state = self::STATE_OVER;
@@ -765,10 +764,9 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     /**
      * Apply the hangman player win event
      *
-     * @param  HangmanPlayerWinEvent $event
      * @return void
      */
-    protected function applyHangmanPlayerWinEvent(HangmanPlayerWinEvent $event)
+    protected function applyHangmanPlayerWinEvent()
     {
         $this->currentPlayer = null;
         $this->state = self::STATE_OVER;
