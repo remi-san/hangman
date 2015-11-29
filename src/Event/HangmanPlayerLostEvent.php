@@ -2,6 +2,7 @@
 namespace Hangman\Event;
 
 use Broadway\Serializer\SerializableInterface;
+use Hangman\Event\Util\HangmanResultEvent;
 use Hangman\Result\HangmanLost;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;

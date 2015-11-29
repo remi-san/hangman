@@ -14,14 +14,14 @@ class HangmanPlayerDeletedEvent extends Event implements SerializableInterface
     const NAME = 'hangman.player.deleted';
 
     /**
-     * @var PlayerId
-     */
-    private $playerId;
-
-    /**
      * @var MiniGameId
      */
     private $gameId;
+
+    /**
+     * @var PlayerId
+     */
+    private $playerId;
 
     /**
      * Constructor

@@ -62,7 +62,7 @@ trait HangmanMocker
         $options->shouldReceive('getWord')->andReturn($word);
         $options->shouldReceive('getLength')->andReturn($length);
         $options->shouldReceive('getLevel')->andReturn($level);
-        $options->shouldReceive('getPlayers')->andReturn($players);
+        $options->shouldReceive('getPlayerOptions')->andReturn($players);
         $options->shouldReceive('getLanguage')->andReturn($lang);
 
         return $options;

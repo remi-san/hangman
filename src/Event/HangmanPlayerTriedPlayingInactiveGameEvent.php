@@ -2,28 +2,17 @@
 namespace Hangman\Event;
 
 use Broadway\Serializer\SerializableInterface;
-use Hangman\Exception\HangmanException;
-use League\Event\Event;
+use Hangman\Event\Util\HangmanErrorEvent;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
 use MiniGame\Exceptions\InactiveGameException;
 
-class HangmanPlayerTriedPlayingInactiveGameEvent extends Event implements SerializableInterface
+class HangmanPlayerTriedPlayingInactiveGameEvent extends HangmanErrorEvent implements SerializableInterface
 {
     /**
      * @var string
      */
     const NAME = 'hangman.player.inactive-game';
-
-    /**
-     * @var MiniGameId
-     */
-    private $gameId;
-
-    /**
-     * @var PlayerId
-     */
-    private $playerId;
 
     /**
      * Constructor
@@ -33,26 +22,17 @@ class HangmanPlayerTriedPlayingInactiveGameEvent extends Event implements Serial
      */
     public function __construct(MiniGameId $gameId, PlayerId $playerId)
     {
-        parent::__construct(self::NAME);
-        $this->gameId = $gameId;
-        $this->playerId = $playerId;
+        parent::__construct(self::NAME, $gameId, $playerId);
     }
 
     /**
-     * @return MiniGameId
+     * @return string
      */
-    public function getGameId()
+    public function getAsMessage()
     {
-        return $this->gameId;
+        return 'You cannot play.';
     }
 
-    /**
-     * @return PlayerId
-     */
-    public function getPlayerId()
-    {
-        return $this->playerId;
-    }
 
     /**
      * Returns the appropriate exception
@@ -61,7 +41,7 @@ class HangmanPlayerTriedPlayingInactiveGameEvent extends Event implements Serial
      */
     public function getException()
     {
-        return new InactiveGameException('You cannot play.');
+        return new InactiveGameException($this->getAsMessage());
     }
 
     /**
@@ -71,8 +51,8 @@ class HangmanPlayerTriedPlayingInactiveGameEvent extends Event implements Serial
     {
         return array(
             'name' => self::NAME,
-            'gameId' => (string)$this->gameId,
-            'playerId' => (string)$this->playerId
+            'gameId' => (string)$this->getGameId()->getId(),
+            'playerId' => (string)$this->getGameId()->getId()
         );
     }
 

@@ -4,6 +4,7 @@ namespace Hangman\Event;
 use Broadway\Serializer\SerializableInterface;
 use League\Event\Event;
 use MiniGame\Entity\MiniGameId;
+use MiniGame\Entity\PlayerId;
 
 class HangmanGameStartedEvent extends Event implements SerializableInterface
 {
@@ -18,14 +19,21 @@ class HangmanGameStartedEvent extends Event implements SerializableInterface
     private $gameId;
 
     /**
+     * @var PlayerId
+     */
+    private $playerId;
+
+    /**
      * Constructor
      *
      * @param MiniGameId $gameId
+     * @param PlayerId   $playerId
      */
-    public function __construct(MiniGameId $gameId)
+    public function __construct(MiniGameId $gameId, PlayerId $playerId = null)
     {
         parent::__construct(self::NAME);
         $this->gameId = $gameId;
+        $this->playerId = $playerId;
     }
 
     /**
@@ -37,13 +45,22 @@ class HangmanGameStartedEvent extends Event implements SerializableInterface
     }
 
     /**
+     * @return PlayerId
+     */
+    public function getPlayerId()
+    {
+        return $this->playerId;
+    }
+
+    /**
      * @return array
      */
     public function serialize()
     {
         return array(
             'name' => self::NAME,
-            'gameId' => $this->gameId->getId()
+            'gameId' => $this->gameId->getId(),
+            'playerId' => ($this->getPlayerId()) ? $this->getPlayerId()->getId() : null
         );
     }
 
@@ -54,7 +71,8 @@ class HangmanGameStartedEvent extends Event implements SerializableInterface
     public static function deserialize(array $data)
     {
         return new self(
-            new MiniGameId($data['gameId'])
+            new MiniGameId($data['gameId']),
+            isset($data['playerId']) ? new PlayerId($data['playerId']) : null
         );
     }
 }

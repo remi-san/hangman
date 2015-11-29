@@ -1,5 +1,5 @@
 <?php
-namespace Hangman\Event;
+namespace Hangman\Event\Util;
 
 use Hangman\Result\HangmanGameResult;
 use League\Event\Event;

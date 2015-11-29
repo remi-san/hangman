@@ -195,14 +195,18 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     public function startGame(PlayerId $playerId = null)
     {
         if ($this->state !== self::STATE_READY) {
-            $this->apply(new HangmanGameFailedStartingEvent($this->id, HangmanGameFailedStartingEvent::BAD_STATE));
+            $this->apply(
+                new HangmanGameFailedStartingEvent($this->id, $playerId, HangmanGameFailedStartingEvent::BAD_STATE)
+            );
         }
 
         if (count($this->players) === 0) {
-            $this->apply(new HangmanGameFailedStartingEvent($this->id, HangmanGameFailedStartingEvent::BAD_STATE));
+            $this->apply(
+                new HangmanGameFailedStartingEvent($this->id, $playerId, HangmanGameFailedStartingEvent::BAD_STATE)
+            );
         }
 
-        $this->apply(new HangmanGameStartedEvent($this->id));
+        $this->apply(new HangmanGameStartedEvent($this->id, $playerId));
     }
 
     /**

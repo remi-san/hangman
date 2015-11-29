@@ -2,29 +2,19 @@
 namespace Hangman\Event;
 
 use Broadway\Serializer\SerializableInterface;
+use Hangman\Event\Util\HangmanErrorEvent;
 use Hangman\Move\Answer;
-use League\Event\Event;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
 use MiniGame\Exceptions\IllegalMoveException;
 use MiniGame\Move;
 
-class HangmanPlayerProposedInvalidAnswerEvent extends Event implements SerializableInterface
+class HangmanPlayerProposedInvalidAnswerEvent extends HangmanErrorEvent implements SerializableInterface
 {
     /**
      * @var string
      */
     const NAME = 'hangman.player.invalid-answer';
-
-    /**
-     * @var MiniGameId
-     */
-    private $gameId;
-
-    /**
-     * @var PlayerId
-     */
-    private $playerId;
 
     /**
      * @var Answer
@@ -40,26 +30,8 @@ class HangmanPlayerProposedInvalidAnswerEvent extends Event implements Serializa
      */
     public function __construct(MiniGameId $gameId, PlayerId $playerId, Answer $answer)
     {
-        parent::__construct(self::NAME);
-        $this->gameId = $gameId;
-        $this->playerId = $playerId;
+        parent::__construct(self::NAME, $gameId, $playerId);
         $this->answer = $answer;
-    }
-
-    /**
-     * @return MiniGameId
-     */
-    public function getGameId()
-    {
-        return $this->gameId;
-    }
-
-    /**
-     * @return PlayerId
-     */
-    public function getPlayerId()
-    {
-        return $this->playerId;
     }
 
     /**
@@ -71,13 +43,21 @@ class HangmanPlayerProposedInvalidAnswerEvent extends Event implements Serializa
     }
 
     /**
+     * @return string
+     */
+    public function getAsMessage()
+    {
+        return 'Invalid answer';
+    }
+
+    /**
      * Returns the appropriate exception
      *
      * @return IllegalMoveException
      */
     public function getException()
     {
-        return new IllegalMoveException($this->answer, 'Invalid answer');
+        return new IllegalMoveException($this->answer, $this->getAsMessage());
     }
 
     /**
@@ -87,8 +67,8 @@ class HangmanPlayerProposedInvalidAnswerEvent extends Event implements Serializa
     {
         return array(
             'name' => self::NAME,
-            'gameId' => (string)$this->gameId,
-            'playerId' => (string)$this->playerId,
+            'gameId' => (string)$this->getGameId()->getId(),
+            'playerId' => (string)$this->getPlayerId()->getId(),
             'answer' => (string)$this->answer->getText()
         );
     }

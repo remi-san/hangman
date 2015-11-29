@@ -2,27 +2,17 @@
 namespace Hangman\Event;
 
 use Broadway\Serializer\SerializableInterface;
+use Hangman\Event\Util\HangmanErrorEvent;
 use Hangman\Exception\HangmanException;
-use League\Event\Event;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
 
-class HangmanPlayerFailedCreatingEvent extends Event implements SerializableInterface
+class HangmanPlayerFailedCreatingEvent extends HangmanErrorEvent implements SerializableInterface
 {
     /**
      * @var string
      */
     const NAME = 'hangman.player.created';
-
-    /**
-     * @var MiniGameId
-     */
-    private $gameId;
-
-    /**
-     * @var PlayerId
-     */
-    private $playerId;
 
     /**
      * @var string
@@ -38,26 +28,8 @@ class HangmanPlayerFailedCreatingEvent extends Event implements SerializableInte
      */
     public function __construct(MiniGameId $gameId, PlayerId $playerId, $externalReference)
     {
-        parent::__construct(self::NAME);
-        $this->gameId = $gameId;
-        $this->playerId = $playerId;
+        parent::__construct(self::NAME, $gameId, $playerId);
         $this->externalReference = $externalReference;
-    }
-
-    /**
-     * @return MiniGameId
-     */
-    public function getGameId()
-    {
-        return $this->gameId;
-    }
-
-    /**
-     * @return PlayerId
-     */
-    public function getPlayerId()
-    {
-        return $this->playerId;
     }
 
     /**
@@ -69,13 +41,21 @@ class HangmanPlayerFailedCreatingEvent extends Event implements SerializableInte
     }
 
     /**
+     * @return string
+     */
+    public function getAsMessage()
+    {
+        return 'You cannot add a player to a game that has already started.';
+    }
+
+    /**
      * Returns the appropriate exception
      *
      * @return HangmanException
      */
     public function getException()
     {
-        return new HangmanException('You cannot add a player to a game that has already started.');
+        return new HangmanException($this->getAsMessage());
     }
 
     /**
@@ -85,8 +65,8 @@ class HangmanPlayerFailedCreatingEvent extends Event implements SerializableInte
     {
         return array(
             'name' => self::NAME,
-            'gameId' => (string)$this->gameId,
-            'playerId' => (string)$this->playerId,
+            'gameId' => (string)$this->getGameId()->getId(),
+            'playerId' => (string)$this->getPlayerId()->getId(),
             'externalReference' => $this->externalReference
         );
     }
