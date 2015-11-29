@@ -39,7 +39,7 @@ class HangmanOptionsTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($options->getLength());
         $this->assertNull($options->getLevel());
         $this->assertEquals($this->lives, $options->getLives());
-        $this->assertEquals($this->players, $options->getPlayers());
+        $this->assertEquals($this->players, $options->getPlayerOptions());
         $this->assertEquals($lang, $options->getLanguage());
     }
 
@@ -55,7 +55,7 @@ class HangmanOptionsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($length, $options->getLength());
         $this->assertNull($options->getLevel());
         $this->assertEquals($this->lives, $options->getLives());
-        $this->assertEquals($this->players, $options->getPlayers());
+        $this->assertEquals($this->players, $options->getPlayerOptions());
     }
 
     /**
@@ -71,7 +71,7 @@ class HangmanOptionsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($length, $options->getLength());
         $this->assertEquals($level, $options->getLevel());
         $this->assertEquals($this->lives, $options->getLives());
-        $this->assertEquals($this->players, $options->getPlayers());
+        $this->assertEquals($this->players, $options->getPlayerOptions());
     }
 
     /**

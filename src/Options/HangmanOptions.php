@@ -6,6 +6,7 @@ use MiniGame\Entity\Player;
 use MiniGame\Exceptions\IllegalOptionException;
 use MiniGame\GameOptions;
 use MiniGame\Options\AbstractGameOptions;
+use MiniGame\PlayerOptions;
 
 class HangmanOptions extends AbstractGameOptions implements GameOptions
 {
@@ -37,12 +38,12 @@ class HangmanOptions extends AbstractGameOptions implements GameOptions
     /**
      * Constructor
      *
-     * @param  string    $word
-     * @param  string    $language
-     * @param  int       $length
-     * @param  int       $level
-     * @param  int       $lives
-     * @param  Player[]  $players
+     * @param  string           $word
+     * @param  string           $language
+     * @param  int              $length
+     * @param  int              $level
+     * @param  int              $lives
+     * @param  PlayerOptions[]  $players
      * @throws IllegalOptionException
      */
     public function __construct(
