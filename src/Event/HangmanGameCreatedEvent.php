@@ -2,20 +2,15 @@
 namespace Hangman\Event;
 
 use Broadway\Serializer\SerializableInterface;
-use League\Event\Event;
+use Hangman\Event\Util\HangmanBasicResultEvent;
 use MiniGame\Entity\MiniGameId;
 
-class HangmanGameCreatedEvent extends Event implements SerializableInterface
+class HangmanGameCreatedEvent extends HangmanBasicResultEvent implements SerializableInterface
 {
     /**
      * @var string
      */
     const NAME = 'hangman.created';
-
-    /**
-     * @var MiniGameId
-     */
-    private $gameId;
 
     /**
      * @var string
@@ -30,17 +25,8 @@ class HangmanGameCreatedEvent extends Event implements SerializableInterface
      */
     public function __construct(MiniGameId $gameId, $word)
     {
-        parent::__construct(self::NAME);
-        $this->gameId = $gameId;
+        parent::__construct(self::NAME, $gameId);
         $this->word = $word;
-    }
-
-    /**
-     * @return MiniGameId
-     */
-    public function getGameId()
-    {
-        return $this->gameId;
     }
 
     /**
@@ -52,13 +38,21 @@ class HangmanGameCreatedEvent extends Event implements SerializableInterface
     }
 
     /**
+     * @return string
+     */
+    public function getAsMessage()
+    {
+        return 'Game created';
+    }
+
+    /**
      * @return array
      */
     public function serialize()
     {
         return array(
             'name' => self::NAME,
-            'gameId' => $this->gameId->getId(),
+            'gameId' => $this->getGameId()->getId(),
             'word' => $this->word
         );
     }

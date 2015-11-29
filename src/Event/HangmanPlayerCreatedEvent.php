@@ -2,26 +2,16 @@
 namespace Hangman\Event;
 
 use Broadway\Serializer\SerializableInterface;
-use League\Event\Event;
+use Hangman\Event\Util\HangmanBasicResultEvent;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
 
-class HangmanPlayerCreatedEvent extends Event implements SerializableInterface
+class HangmanPlayerCreatedEvent extends HangmanBasicResultEvent implements SerializableInterface
 {
     /**
      * @var string
      */
     const NAME = 'hangman.player.created';
-
-    /**
-     * @var MiniGameId
-     */
-    private $gameId;
-
-    /**
-     * @var PlayerId
-     */
-    private $playerId;
 
     /**
      * @var string
@@ -49,28 +39,10 @@ class HangmanPlayerCreatedEvent extends Event implements SerializableInterface
      */
     public function __construct(MiniGameId $gameId, PlayerId $playerId, $playerName, $lives, $externalReference)
     {
-        parent::__construct(self::NAME);
-        $this->gameId = $gameId;
-        $this->playerId = $playerId;
+        parent::__construct(self::NAME, $gameId, $playerId);
         $this->playerName = $playerName;
         $this->lives = $lives;
         $this->externalReference = $externalReference;
-    }
-
-    /**
-     * @return MiniGameId
-     */
-    public function getGameId()
-    {
-        return $this->gameId;
-    }
-
-    /**
-     * @return PlayerId
-     */
-    public function getPlayerId()
-    {
-        return $this->playerId;
     }
 
     /**
@@ -92,6 +64,14 @@ class HangmanPlayerCreatedEvent extends Event implements SerializableInterface
     /**
      * @return string
      */
+    public function getAsMessage()
+    {
+        return 'Player created';
+    }
+
+    /**
+     * @return string
+     */
     public function getExternalReference()
     {
         return $this->externalReference;
@@ -105,8 +85,8 @@ class HangmanPlayerCreatedEvent extends Event implements SerializableInterface
     {
         return array(
             'name' => self::NAME,
-            'gameId' => (string)$this->gameId,
-            'playerId' => (string)$this->playerId,
+            'gameId' => (string)$this->getGameId()->getId(),
+            'playerId' => (string)$this->getPlayerId()->getId(),
             'playerName' => $this->playerName,
             'lives' => $this->lives,
             'externalReference' => $this->externalReference
