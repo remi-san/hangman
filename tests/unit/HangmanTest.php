@@ -75,10 +75,10 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
 
         $this->hangman = Hangman::createGame(
             $this->hangmanId,
-            self::WORD,
-            array($this->playerOne, $this->playerTwo),
-            self::CHANCES
+            self::WORD
         );
+        $this->hangman->addPlayerToGame($this->playerOne);
+        $this->hangman->addPlayerToGame($this->playerTwo);
     }
 
     public function tearDown()
@@ -122,7 +122,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function testCannotStartAGameTwice()
     {
-        $hangman = Hangman::createGame($this->hangmanId, self::WORD, array($this->playerOne));
+        $hangman = Hangman::createGame($this->hangmanId, self::WORD);
+        $hangman->addPlayerToGame($this->playerOne);
         $hangman->startGame();
 
         $this->setExpectedException('\Hangman\Exception\HangmanException');
@@ -311,12 +312,10 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
         $letter = 'A';
 
         /* @var $feedback \Hangman\Result\HangmanWon */
-        $hangman = Hangman::createGame(
-            $this->hangmanId,
-            $word,
-            array($this->playerOne, $this->playerTwo),
-            self::CHANCES
-        );
+        $hangman = Hangman::createGame($this->hangmanId, $word);
+
+        $hangman->addPlayerToGame($this->playerOne);
+        $hangman->addPlayerToGame($this->playerTwo);
 
         $hangman->startGame();
 
@@ -341,7 +340,10 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
 
         $playerOne = new HangmanPlayerOptions($this->playerOneId, $this->hangmanId, self::P1_NAME, 1);
 
-        $hangman = Hangman::createGame($this->hangmanId, self::WORD, array($playerOne, $this->playerTwo));
+        $hangman = Hangman::createGame($this->hangmanId, self::WORD);
+
+        $hangman->addPlayerToGame($playerOne);
+        $hangman->addPlayerToGame($this->playerTwo);
 
         $hangman->startGame();
 
@@ -400,12 +402,9 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetPlayers()
     {
-        $players = array(
-            $this->playerOne,
-            $this->playerTwo
-        );
-
-        $hangman = Hangman::createGame($this->hangmanId, 'word', $players);
+        $hangman = Hangman::createGame($this->hangmanId, 'word');
+        $hangman->addPlayerToGame($this->playerOne);
+        $hangman->addPlayerToGame($this->playerTwo);
         $retrievedPlayers = $hangman->getPlayers();
         $this->assertEquals(2, count($retrievedPlayers));
     }
@@ -415,12 +414,9 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetPlayer()
     {
-        $players = array(
-            $this->playerOne,
-            $this->playerTwo
-        );
-
-        $hangman = Hangman::createGame($this->hangmanId, 'word', $players);
+        $hangman = Hangman::createGame($this->hangmanId, 'word');
+        $hangman->addPlayerToGame($this->playerOne);
+        $hangman->addPlayerToGame($this->playerTwo);
         $this->assertNull($hangman->getPlayer($this->getPlayerId(999)));
     }
 }

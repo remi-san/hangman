@@ -312,15 +312,10 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      *
      * @param MiniGameId             $id
      * @param string                 $word
-     * @param HangmanPlayerOptions[] $players
      */
-    private function initialize(MiniGameId $id, $word, array $players)
+    private function initialize(MiniGameId $id, $word)
     {
         $this->apply(new HangmanGameCreatedEvent($id, $word));
-
-        foreach ($players as $playerOptions) {
-            $this->addPlayerToGame($playerOptions);
-        }
     }
 
     /**
@@ -801,17 +796,12 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      *
      * @param  MiniGameId             $id
      * @param  string                 $word
-     * @param  HangmanPlayerOptions[] $players
      * @return Hangman
      */
-    public static function createGame(MiniGameId $id, $word, array $players = array())
+    public static function createGame(MiniGameId $id, $word)
     {
         $hangman = new self();
-        $hangman->initialize(
-            $id,
-            $word,
-            $players
-        );
+        $hangman->initialize($id, $word);
 
         return $hangman;
     }
