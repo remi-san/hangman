@@ -33,17 +33,6 @@ class HangmanPlayerTriedPlayingInactiveGameEvent extends HangmanErrorEvent imple
         return 'You cannot play.';
     }
 
-
-    /**
-     * Returns the appropriate exception
-     *
-     * @return InactiveGameException
-     */
-    public function getException()
-    {
-        return new InactiveGameException($this->getAsMessage());
-    }
-
     /**
      * @return array
      */

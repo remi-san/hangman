@@ -55,16 +55,6 @@ class HangmanGameFailedStartingEvent extends HangmanErrorEvent implements Serial
     }
 
     /**
-     * Returns the appropriate exception
-     *
-     * @return HangmanException
-     */
-    public function getException()
-    {
-        return new HangmanException($this->getAsMessage());
-    }
-
-    /**
      * @return array
      */
     public function serialize()

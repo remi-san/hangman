@@ -34,16 +34,6 @@ class HangmanPlayerTriedPlayingDuringAnotherPlayerTurnEvent extends HangmanError
     }
 
     /**
-     * Returns the appropriate exception
-     *
-     * @return NotPlayerTurnException
-     */
-    public function getException()
-    {
-        return new NotPlayerTurnException($this->getAsMessage());
-    }
-
-    /**
      * @return array
      */
     public function serialize()

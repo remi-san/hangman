@@ -190,30 +190,40 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      *
      * @param  PlayerId $playerId
      *
-     * @return void
+     * @return GameResult
      */
     public function startGame(PlayerId $playerId = null)
     {
         if ($this->state !== self::STATE_READY) {
-            $this->apply(
-                new HangmanGameFailedStartingEvent($this->id, $playerId, HangmanGameFailedStartingEvent::BAD_STATE)
+            $event = new HangmanGameFailedStartingEvent(
+                $this->id,
+                $playerId,
+                HangmanGameFailedStartingEvent::BAD_STATE
             );
+            $this->apply($event);
+            return $event;
         }
 
         if (count($this->players) === 0) {
-            $this->apply(
-                new HangmanGameFailedStartingEvent($this->id, $playerId, HangmanGameFailedStartingEvent::BAD_STATE)
+            $event = new HangmanGameFailedStartingEvent(
+                $this->id,
+                $playerId,
+                HangmanGameFailedStartingEvent::NO_PLAYER
             );
+            $this->apply($event);
+            return $event;
         }
 
-        $this->apply(new HangmanGameStartedEvent($this->id, $playerId));
+        $event = new HangmanGameStartedEvent($this->id, $playerId);
+        $this->apply($event);
+        return $event;
     }
 
     /**
      * Adds a player to the game
      *
      * @param  PlayerOptions $playerOptions
-     * @return void
+     * @return GameResult
      * @throws HangmanPlayerOptionsException
      * @throws HangmanException
      */
@@ -232,24 +242,24 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
         }
 
         if ($this->state !== self::STATE_READY) {
-            $this->apply(
-                new HangmanPlayerFailedCreatingEvent(
-                    $this->id,
-                    $playerOptions->getPlayerId(),
-                    $playerOptions->getExternalReference()
-                )
-            );
-        }
-
-        $this->apply(
-            new HangmanPlayerCreatedEvent(
+            $event = new HangmanPlayerFailedCreatingEvent(
                 $this->id,
                 $playerOptions->getPlayerId(),
-                $playerOptions->getName(),
-                $playerOptions->getLives(),
                 $playerOptions->getExternalReference()
-            )
+            );
+            $this->apply($event);
+            return $event;
+        }
+
+        $event = new HangmanPlayerCreatedEvent(
+            $this->id,
+            $playerOptions->getPlayerId(),
+            $playerOptions->getName(),
+            $playerOptions->getLives(),
+            $playerOptions->getExternalReference()
         );
+        $this->apply($event);
+        return $event;
     }
 
     /**
@@ -263,21 +273,21 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     public function play(PlayerId $playerId, Move $move)
     {
         if ($this->state !== self::STATE_STARTED) {
-            $this->apply(
-                new HangmanPlayerTriedPlayingInactiveGameEvent(
-                    $this->getId(),
-                    $playerId
-                )
+            $event = new HangmanPlayerTriedPlayingInactiveGameEvent(
+                $this->getId(),
+                $playerId
             );
+            $this->apply($event);
+            return $event;
         }
 
         if (!$this->canPlayerPlay($playerId)) {
-            $this->apply(
-                new HangmanPlayerTriedPlayingDuringAnotherPlayerTurnEvent(
-                    $this->getId(),
-                    $playerId
-                )
+            $event = new HangmanPlayerTriedPlayingDuringAnotherPlayerTurnEvent(
+                $this->getId(),
+                $playerId
             );
+            $this->apply($event);
+            return $event;
         }
 
         if ($move instanceof Proposition) {
@@ -286,19 +296,17 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
             try {
                 return $this->currentPlayerProposeAnswer($move->getText());
             } catch (HangmanException $e) {
-                $this->apply(
-                    new HangmanPlayerProposedInvalidAnswerEvent(
-                        $this->getId(),
-                        $playerId,
-                        $move
-                    )
+                $event = new HangmanPlayerProposedInvalidAnswerEvent(
+                    $this->getId(),
+                    $playerId,
+                    $move
                 );
+                $this->apply($event);
+                return $event;
             }
         } else {
             throw new IllegalMoveException($move, 'Error');
         }
-
-        return null;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -642,34 +650,6 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     ////////////////////////////////////////////   APPLY EVENTS   //////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    protected function applyHangmanGameFailedStartingEvent(HangmanGameFailedStartingEvent $event)
-    {
-        throw $event->getException(); // TODO delete once all is event based
-    }
-
-    protected function applyHangmanPlayerFailedCreatingEvent(HangmanPlayerFailedCreatingEvent $event)
-    {
-        throw $event->getException(); // TODO delete once all is event based
-    }
-
-    protected function applyHangmanPlayerTriedPlayingInactiveGameEvent(
-        HangmanPlayerTriedPlayingInactiveGameEvent $event
-    ) {
-        throw $event->getException(); // TODO delete once all is event based
-    }
-
-    protected function applyHangmanPlayerTriedPlayingDuringAnotherPlayerTurnEvent(
-        HangmanPlayerTriedPlayingDuringAnotherPlayerTurnEvent $event
-    ) {
-        throw $event->getException(); // TODO delete once all is event based
-    }
-
-    protected function applyHangmanPlayerProposedInvalidAnswerEvent(
-        HangmanPlayerProposedInvalidAnswerEvent $event
-    ) {
-        throw $event->getException(); // TODO delete once all is event based
-    }
 
     /**
      * Apply the game created event

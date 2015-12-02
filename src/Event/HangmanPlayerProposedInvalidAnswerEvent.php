@@ -51,16 +51,6 @@ class HangmanPlayerProposedInvalidAnswerEvent extends HangmanErrorEvent implemen
     }
 
     /**
-     * Returns the appropriate exception
-     *
-     * @return IllegalMoveException
-     */
-    public function getException()
-    {
-        return new IllegalMoveException($this->answer, $this->getAsMessage());
-    }
-
-    /**
      * @return array
      */
     public function serialize()

@@ -2,6 +2,13 @@
 namespace Hangman\Test;
 
 use Hangman\Entity\Hangman;
+use Hangman\Event\HangmanGameFailedStartingEvent;
+use Hangman\Event\HangmanGameStartedEvent;
+use Hangman\Event\HangmanPlayerCreatedEvent;
+use Hangman\Event\HangmanPlayerFailedCreatingEvent;
+use Hangman\Event\HangmanPlayerProposedInvalidAnswerEvent;
+use Hangman\Event\HangmanPlayerTriedPlayingDuringAnotherPlayerTurnEvent;
+use Hangman\Event\HangmanPlayerTriedPlayingInactiveGameEvent;
 use Hangman\Options\HangmanPlayerOptions;
 use Hangman\Result\HangmanBadProposition;
 use Hangman\Result\HangmanGoodProposition;
@@ -112,9 +119,9 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
     {
         $hangman = Hangman::createGame($this->hangmanId, self::WORD);
 
-        $this->setExpectedException('\Hangman\Exception\HangmanException');
+        $result = $hangman->startGame();
 
-        $hangman->startGame();
+        $this->assertTrue($result instanceof HangmanGameFailedStartingEvent);
     }
 
     /**
@@ -124,11 +131,13 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
     {
         $hangman = Hangman::createGame($this->hangmanId, self::WORD);
         $hangman->addPlayerToGame($this->playerOne);
-        $hangman->startGame();
+        $result = $hangman->startGame();
 
-        $this->setExpectedException('\Hangman\Exception\HangmanException');
+        $this->assertTrue($result instanceof HangmanGameStartedEvent);
 
-        $hangman->startGame();
+        $result = $hangman->startGame();
+
+        $this->assertTrue($result instanceof HangmanGameFailedStartingEvent);
     }
 
     /**
@@ -138,8 +147,6 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
     {
         $this->hangman->startGame();
 
-        $this->setExpectedException('\Hangman\Exception\HangmanException');
-
         $hangmanPlayerOptions = \Mockery::mock('\Hangman\Options\HangmanPlayerOptions', function (MockInterface $mock) {
             $mock->shouldReceive('getPlayerId')->andReturn(new PlayerId(42))->byDefault();
             $mock->shouldReceive('getName')->andReturn('toto')->byDefault();
@@ -147,7 +154,9 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
             $mock->shouldReceive('getExternalReference')->andReturn('ext-ref')->byDefault();
         });
 
-        $this->hangman->addPlayerToGame($hangmanPlayerOptions);
+        $result = $this->hangman->addPlayerToGame($hangmanPlayerOptions);
+
+        $this->assertTrue($result instanceof HangmanPlayerFailedCreatingEvent);
     }
 
     /**
@@ -180,8 +189,9 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
             $mock->shouldReceive('getLives')->andReturn(6)->byDefault();
             $mock->shouldReceive('getExternalReference')->andReturn('ext-ref')->byDefault();
         });
-        $hangman->addPlayerToGame($hangmanPlayerOptions);
+        $result = $hangman->addPlayerToGame($hangmanPlayerOptions);
 
+        $this->assertTrue($result instanceof HangmanPlayerCreatedEvent);
         $this->assertEquals(1, count($hangman->getPlayers()));
     }
 
@@ -190,9 +200,9 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function testPlayBeforeGamestarted()
     {
-        $this->setExpectedException('\MiniGame\Exceptions\InactiveGameException');
+        $result = $this->hangman->play($this->playerOneId, $this->getProposition('A'));
 
-        $this->hangman->play($this->playerOneId, $this->getProposition('A'));
+        $this->assertTrue($result instanceof HangmanPlayerTriedPlayingInactiveGameEvent);
     }
 
     /**
@@ -266,21 +276,15 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function testPlayerOnePlaysIllegalAnswer()
     {
-        $this->setExpectedException('\\MiniGame\\Exceptions\\IllegalMoveException');
         $move = $this->getAnswer('ABCD');
 
         $this->hangman->startGame();
 
-        try {
-            $this->hangman->play($this->playerOneId, $move);
-        } catch (IllegalMoveException $e) {
-            $this->assertEquals($move, $e->getMove());
+        $result = $this->hangman->play($this->playerOneId, $move);
 
-            $this->assertTrue($this->hangman->canPlayerPlay($this->playerOneId));
-            $this->assertFalse($this->hangman->canPlayerPlay($this->playerTwoId));
-
-            throw $e;
-        }
+        $this->assertTrue($result instanceof HangmanPlayerProposedInvalidAnswerEvent);
+        $this->assertTrue($this->hangman->canPlayerPlay($this->playerOneId));
+        $this->assertFalse($this->hangman->canPlayerPlay($this->playerTwoId));
     }
 
     /**
@@ -385,16 +389,12 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function testPlayerTwoPlaysWhenNotHisTurn()
     {
-        $this->setExpectedException('\\MiniGame\\Exceptions\\NotPlayerTurnException');
-
         $this->hangman->startGame();
 
-        try {
-            $this->hangman->play($this->playerTwoId, $this->getProposition('A'));
-        } catch (NotPlayerTurnException $e) {
-            $this->assertTrue($this->hangman->canPlayerPlay($this->playerOneId));
-            throw $e;
-        }
+        $result = $this->hangman->play($this->playerTwoId, $this->getProposition('A'));
+
+        $this->assertTrue($result instanceof HangmanPlayerTriedPlayingDuringAnotherPlayerTurnEvent);
+        $this->assertTrue($this->hangman->canPlayerPlay($this->playerOneId));
     }
 
     /**
