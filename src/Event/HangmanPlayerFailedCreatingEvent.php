@@ -3,7 +3,6 @@ namespace Hangman\Event;
 
 use Broadway\Serializer\SerializableInterface;
 use Hangman\Event\Util\HangmanErrorEvent;
-use Hangman\Exception\HangmanException;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
 

@@ -20,7 +20,6 @@ use Hangman\Move\Answer;
 use Hangman\Move\Proposition;
 use Hangman\Options\HangmanPlayerOptions;
 use Hangman\Result\HangmanBadProposition;
-use Hangman\Result\HangmanError;
 use Hangman\Result\HangmanGoodProposition;
 use Hangman\Result\HangmanLost;
 use Hangman\Result\HangmanWon;
@@ -233,11 +232,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
             throw new HangmanPlayerOptionsException(
                 $playerOptions->getPlayerId(),
                 $this->getId(),
-                $this->playerError(
-                    $playerOptions->getPlayerId(),
-                    'Player options must be compatible with a hangman game.'
-                ),
-                'Error'
+                'Options are not recognized'
             );
         }
 
@@ -631,18 +626,6 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     private function isTheAnswer($word)
     {
         return ($this->word === strtoupper($word));
-    }
-
-    /**
-     * Function to call when an error must be returned
-     *
-     * @param  PlayerId $playerId
-     * @param  string   $message
-     * @return HangmanError
-     */
-    private function playerError(PlayerId $playerId, $message)
-    {
-        return new HangmanError($this->id, $playerId, $message) ;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
