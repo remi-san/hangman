@@ -14,15 +14,10 @@ use Hangman\Result\HangmanBadProposition;
 use Hangman\Result\HangmanGoodProposition;
 use Hangman\Result\HangmanLost;
 use Hangman\Test\Mock\HangmanMocker;
-use Hangman\Test\Mock\PlayerOptionsMock;
 use MiniGame\Entity\MiniGameId;
-use MiniGame\Entity\Player;
 use MiniGame\Entity\PlayerId;
-use MiniGame\Exceptions\IllegalMoveException;
-use MiniGame\Exceptions\NotPlayerTurnException;
 use MiniGame\Test\Mock\GameObjectMocker;
 use Mockery\MockInterface;
-use Rhumsaa\Uuid\Uuid;
 
 class HangmanTest extends \PHPUnit_Framework_TestCase
 {
