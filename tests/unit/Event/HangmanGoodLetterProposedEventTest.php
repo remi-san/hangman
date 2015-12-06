@@ -50,12 +50,34 @@ class HangmanGoodLetterProposedEventTest extends \PHPUnit_Framework_TestCase
             ),
             $event->getAsMessage()
         );
+    }
+
+    /**
+     * @test
+     */
+    public function testSerialize()
+    {
+        $gameId = $this->getMiniGameId(666);
+        $playerId = $this->getPlayerId(42);
+        $letter = 'A';
+        $playedLetters = array('A');
+        $remainingLives = 5;
+        $wordSoFar = 'A _ _';
+
+        $event = new HangmanGoodLetterProposedEvent(
+            $gameId,
+            $playerId,
+            $letter,
+            $playedLetters,
+            $remainingLives,
+            $wordSoFar
+        );
 
         $this->assertEquals(
             array(
                 'name' => 'hangman.letter.good',
-                'gameId' => 666,
-                'playerId' => 42,
+                'gameId' => $gameId->getId(),
+                'playerId' => $playerId->getId(),
                 'letter' => $letter,
                 'playedLetters' => $playedLetters,
                 'remainingLives' => $remainingLives,
@@ -63,12 +85,25 @@ class HangmanGoodLetterProposedEventTest extends \PHPUnit_Framework_TestCase
             ),
             $event->serialize()
         );
+    }
+
+    /**
+     * @test
+     */
+    public function testUnserialize()
+    {
+        $gameId = 666;
+        $playerId = 42;
+        $letter = 'A';
+        $playedLetters = array('A');
+        $remainingLives = 5;
+        $wordSoFar = 'A _ _';
 
         $unserializedEvent = HangmanGoodLetterProposedEvent::deserialize(
             array(
                 'name' => 'hangman.letter.good',
-                'gameId' => 666,
-                'playerId' => 42,
+                'gameId' => $gameId,
+                'playerId' => $playerId,
                 'letter' => $letter,
                 'playedLetters' => $playedLetters,
                 'remainingLives' => $remainingLives,
@@ -76,8 +111,8 @@ class HangmanGoodLetterProposedEventTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $this->assertEquals(666, (string)$unserializedEvent->getGameId());
-        $this->assertEquals(42, (string)$unserializedEvent->getPlayerId());
+        $this->assertEquals($gameId, $unserializedEvent->getGameId()->getId());
+        $this->assertEquals($playerId, $unserializedEvent->getPlayerId()->getId());
         $this->assertEquals($letter, $unserializedEvent->getLetter());
         $this->assertEquals($playedLetters, $unserializedEvent->getPlayedLetters());
         $this->assertEquals($remainingLives, $unserializedEvent->getRemainingLives());

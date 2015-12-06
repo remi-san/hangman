@@ -64,7 +64,7 @@ class HangmanPlayerProposedInvalidAnswerEvent extends HangmanErrorEvent implemen
 
     /**
      * @param  array $data
-     * @return HangmanPlayerCreatedEvent
+     * @return HangmanPlayerProposedInvalidAnswerEvent
      */
     public static function deserialize(array $data)
     {

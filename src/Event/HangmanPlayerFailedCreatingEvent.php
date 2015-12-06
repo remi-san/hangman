@@ -11,7 +11,7 @@ class HangmanPlayerFailedCreatingEvent extends HangmanErrorEvent implements Seri
     /**
      * @var string
      */
-    const NAME = 'hangman.player.created';
+    const NAME = 'hangman.player.failed-creating';
 
     /**
      * @var string
@@ -62,7 +62,7 @@ class HangmanPlayerFailedCreatingEvent extends HangmanErrorEvent implements Seri
 
     /**
      * @param  array $data
-     * @return HangmanPlayerCreatedEvent
+     * @return HangmanPlayerFailedCreatingEvent
      */
     public static function deserialize(array $data)
     {

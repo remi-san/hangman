@@ -46,7 +46,7 @@ class HangmanPlayerTriedPlayingDuringAnotherPlayerTurnEvent extends HangmanError
 
     /**
      * @param  array $data
-     * @return HangmanPlayerCreatedEvent
+     * @return HangmanPlayerTriedPlayingDuringAnotherPlayerTurnEvent
      */
     public static function deserialize(array $data)
     {

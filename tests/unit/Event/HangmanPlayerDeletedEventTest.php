@@ -25,25 +25,46 @@ class HangmanPlayerDeletedEventTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($id, $event->getGameId());
         $this->assertEquals($playerId, $event->getPlayerId());
+        $this->assertEquals('Player deleted', $event->getAsMessage());
+    }
+
+    /**
+     * @test
+     */
+    public function testSerialize()
+    {
+        $id = $this->getMiniGameId(666);
+        $playerId = $this->getPlayerId(42);
+
+        $event = new HangmanPlayerDeletedEvent($id, $playerId);
 
         $this->assertEquals(
             array(
                 'name' => 'hangman.player.deleted',
-                'gameId' => 666,
-                'playerId' => 42
+                'gameId' => $id->getId(),
+                'playerId' => $playerId->getId()
             ),
             $event->serialize()
         );
+    }
+
+    /**
+     * @test
+     */
+    public function testUnserialize()
+    {
+        $id = 666;
+        $playerId = 42;
 
         $unserializedEvent = HangmanPlayerDeletedEvent::deserialize(
             array(
                 'name' => 'hangman.player.deleted',
-                'gameId' => 666,
-                'playerId' => 42
+                'gameId' => $id,
+                'playerId' => $playerId
             )
         );
 
-        $this->assertEquals(666, (string)$unserializedEvent->getGameId());
-        $this->assertEquals(42, (string)$unserializedEvent->getPlayerId());
+        $this->assertEquals($id, $unserializedEvent->getGameId()->getId());
+        $this->assertEquals($playerId, $unserializedEvent->getPlayerId()->getId());
     }
 }
