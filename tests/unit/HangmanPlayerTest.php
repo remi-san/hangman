@@ -3,12 +3,13 @@ namespace Hangman\Test;
 
 use Hangman\Entity\HangmanPlayer;
 use Hangman\Event\HangmanBadLetterProposedEvent;
+use Hangman\Test\Mock\HangmanMocker;
 use MiniGame\Test\Mock\GameObjectMocker;
 use Rhumsaa\Uuid\Uuid;
 
 class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
 {
-    use GameObjectMocker;
+    use GameObjectMocker, HangmanMocker;
 
     public function tearDown()
     {
@@ -21,7 +22,6 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
     public function testId()
     {
         $name = 'Douglas';
-        $game = $this->getMiniGame($this->getMiniGameId(33));
 
         $player = new HangmanPlayer(null, $name);
 
@@ -39,8 +39,7 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
         $id = $this->getPlayerId(42);
         $name = 'Douglas';
         $lives = 5;
-        $game = \Mockery::mock('\Hangman\Entity\Hangman');
-        $game->shouldReceive('getId')->andReturn($this->getMiniGameId(33));
+        $game = $this->getHangmanMiniGame($this->getMiniGameId(33));
 
         $player = new HangmanPlayer($id, $name, $lives, $game, 'ext');
 

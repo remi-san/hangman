@@ -6,7 +6,6 @@ use Hangman\Event\Util\HangmanErrorEvent;
 use Hangman\Move\Answer;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
-use MiniGame\Exceptions\IllegalMoveException;
 use MiniGame\Move;
 
 class HangmanPlayerProposedInvalidAnswerEvent extends HangmanErrorEvent implements SerializableInterface

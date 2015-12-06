@@ -1,8 +1,6 @@
 <?php
 namespace Hangman\Options;
 
-use MiniGame\Entity\MiniGameId;
-use MiniGame\Entity\Player;
 use MiniGame\Exceptions\IllegalOptionException;
 use MiniGame\GameOptions;
 use MiniGame\Options\AbstractGameOptions;

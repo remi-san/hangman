@@ -1,19 +1,21 @@
 <?php
 namespace Hangman\Test\Mock;
 
+use Hangman\Entity\Hangman;
 use Hangman\Entity\HangmanPlayer;
 use Hangman\Move\Answer;
 use Hangman\Move\Proposition;
 use Hangman\Options\HangmanPlayerOptions;
 use MiniGame\Entity\MiniGame;
+use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
 
 trait HangmanMocker
 {
     /**
      * Returns a hangman mini-game
-     * @param  int $id
-     * @return \Hangman\Entity\Hangman
+     * @param  MiniGameId $id
+     * @return Hangman
      */
     public function getHangmanMiniGame($id)
     {

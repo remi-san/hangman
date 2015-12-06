@@ -17,7 +17,6 @@ use Hangman\Test\Mock\HangmanMocker;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
 use MiniGame\Test\Mock\GameObjectMocker;
-use Mockery\MockInterface;
 
 class HangmanTest extends \PHPUnit_Framework_TestCase
 {
@@ -142,12 +141,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
     {
         $this->hangman->startGame();
 
-        $hangmanPlayerOptions = \Mockery::mock('\Hangman\Options\HangmanPlayerOptions', function (MockInterface $mock) {
-            $mock->shouldReceive('getPlayerId')->andReturn(new PlayerId(42))->byDefault();
-            $mock->shouldReceive('getName')->andReturn('toto')->byDefault();
-            $mock->shouldReceive('getLives')->andReturn(6)->byDefault();
-            $mock->shouldReceive('getExternalReference')->andReturn('ext-ref')->byDefault();
-        });
+        $hangmanPlayerOptions = $this->getHangmanPlayerOptions(new PlayerId(42), 'toto', 6, 'ext-ref');
 
         $result = $this->hangman->addPlayerToGame($hangmanPlayerOptions);
 
@@ -163,8 +157,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException('\Hangman\Exception\HangmanPlayerOptionsException');
 
-        $hangmanPlayerOptions = \Mockery::mock('\MiniGame\PlayerOptions');
-        $hangmanPlayerOptions->shouldReceive('getPlayerId')->andReturn(new PlayerId(42));
+        $hangmanPlayerOptions = $this->getPlayerOptions(new PlayerId(42));
+
         $hangman->addPlayerToGame($hangmanPlayerOptions);
 
     }
@@ -178,12 +172,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(0, count($hangman->getPlayers()));
 
-        $hangmanPlayerOptions = \Mockery::mock('\Hangman\Options\HangmanPlayerOptions', function (MockInterface $mock) {
-            $mock->shouldReceive('getPlayerId')->andReturn(new PlayerId(42))->byDefault();
-            $mock->shouldReceive('getName')->andReturn('toto')->byDefault();
-            $mock->shouldReceive('getLives')->andReturn(6)->byDefault();
-            $mock->shouldReceive('getExternalReference')->andReturn('ext-ref')->byDefault();
-        });
+        $hangmanPlayerOptions = $this->getHangmanPlayerOptions(new PlayerId(42), 'toto', 6, 'ext-ref');
+
         $result = $hangman->addPlayerToGame($hangmanPlayerOptions);
 
         $this->assertTrue($result instanceof HangmanPlayerCreatedEvent);

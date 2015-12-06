@@ -5,7 +5,6 @@ use Broadway\Serializer\SerializableInterface;
 use Hangman\Event\Util\HangmanErrorEvent;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
-use MiniGame\Exceptions\InactiveGameException;
 
 class HangmanPlayerTriedPlayingInactiveGameEvent extends HangmanErrorEvent implements SerializableInterface
 {
