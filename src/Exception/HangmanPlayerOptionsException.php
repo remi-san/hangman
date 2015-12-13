@@ -4,7 +4,7 @@ namespace Hangman\Exception;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
 
-class HangmanPlayerOptionsException
+class HangmanPlayerOptionsException extends \Exception
 {
     /**
      * @var PlayerId
