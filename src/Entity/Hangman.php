@@ -515,17 +515,6 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     }
 
     /**
-     * Saves the letter played by the player and the result
-     *
-     * @param  string   $letter
-     * @return void
-     */
-    private function savePlayedLetterForCurrentPlayer($letter)
-    {
-        $this->currentPlayer->playLetter($letter);
-    }
-
-    /**
      * Returns the list of played letters
      *
      * @param  PlayerId $playerId
@@ -689,26 +678,20 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     /**
      * Apply the bad letter played event
      *
-     * @param  HangmanBadLetterProposedEvent $event
      * @return void
      */
-    protected function applyHangmanBadLetterProposedEvent(HangmanBadLetterProposedEvent $event)
+    protected function applyHangmanBadLetterProposedEvent()
     {
-        $this->savePlayedLetterForCurrentPlayer($event->getLetter());
-
         $this->endCurrentPlayerTurn();
     }
 
     /**
      * Apply the good letter played event
      *
-     * @param  HangmanGoodLetterProposedEvent $event
      * @return void
      */
-    protected function applyHangmanGoodLetterProposedEvent(HangmanGoodLetterProposedEvent $event)
+    protected function applyHangmanGoodLetterProposedEvent()
     {
-        $this->savePlayedLetterForCurrentPlayer($event->getLetter());
-
         $this->endCurrentPlayerTurn();
     }
 

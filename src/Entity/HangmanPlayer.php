@@ -3,6 +3,7 @@ namespace Hangman\Entity;
 
 use Broadway\EventSourcing\EventSourcedEntity;
 use Hangman\Event\HangmanBadLetterProposedEvent;
+use Hangman\Event\HangmanGoodLetterProposedEvent;
 use MiniGame\Entity\MiniGame;
 use MiniGame\Entity\Player;
 use MiniGame\Entity\PlayerId;
@@ -160,6 +161,20 @@ class HangmanPlayer extends EventSourcedEntity implements Player
     {
         if ((string)$event->getPlayerId() === (string)$this->getId()) {
             $this->loseLife($event->getLivesLost());
+            $this->playLetter($event->getLetter());
+        }
+    }
+
+    /**
+     * Apply the bad letter played event
+     *
+     * @param  HangmanGoodLetterProposedEvent $event
+     * @return void
+     */
+    protected function applyHangmanGoodLetterProposedEvent(HangmanGoodLetterProposedEvent $event)
+    {
+        if ((string)$event->getPlayerId() === (string)$this->getId()) {
+            $this->playLetter($event->getLetter());
         }
     }
 }
