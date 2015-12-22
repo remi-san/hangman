@@ -54,17 +54,17 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     /**
      * @var MiniGameId
      */
-    protected $id;
+    private $id;
 
     /**
      * @var string
      */
-    protected $word;
+    private $word;
 
     /**
      * @var Player[]
      **/
-    protected $players;
+    private $players;
 
     /**
      * @var array
@@ -74,12 +74,12 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     /**
      * @var HangmanPlayer
      **/
-    protected $currentPlayer;
+    private $currentPlayer;
 
     /**
      * @var string
      */
-    protected $state;
+    private $state;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -486,32 +486,31 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      */
     private function endCurrentPlayerTurn()
     {
+        if ($this->currentPlayer === null) {
+            return;
+        }
+
         $currentPlayerId = (string)$this->currentPlayer->getId();
-        $nextPlayerId = null;
 
         $stop = false;
         foreach ($this->gameOrder as $pId) {
             if ($stop) {
-                $nextPlayerId = $pId;
-                break;
+                $player = $this->getPlayer(new PlayerId($pId));
+
+                if ($player->getState() === HangmanPlayer::STATE_IN_GAME) {
+                    $this->currentPlayer = $player;
+                    break;
+                } else {
+                    $stop = false;
+                }
             } elseif ($currentPlayerId == $pId) {
                 $stop = true;
             }
-
-            if ($nextPlayerId === null) {
-                $nextPlayerId = $pId;
-            }
         }
 
-        $nextPlayer = null;
-        foreach ($this->players as $player) {
-            if ((string)$player->getId() == $nextPlayerId) {
-                $nextPlayer = $player;
-                break;
-            }
+        if ($this->currentPlayer->getState() !== HangmanPlayer::STATE_IN_GAME) {
+            $this->currentPlayer = null;
         }
-
-        $this->currentPlayer = $nextPlayer;
     }
 
     /**
