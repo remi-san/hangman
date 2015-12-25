@@ -59,6 +59,7 @@ class HangmanGoodLetterProposedEventTest extends \PHPUnit_Framework_TestCase
     {
         $gameId = $this->getMiniGameId(666);
         $playerId = $this->getPlayerId(42);
+        $nextPlayerId = $this->getPlayerId(43);
         $letter = 'A';
         $playedLetters = array('A');
         $remainingLives = 5;
@@ -70,7 +71,8 @@ class HangmanGoodLetterProposedEventTest extends \PHPUnit_Framework_TestCase
             $letter,
             $playedLetters,
             $remainingLives,
-            $wordSoFar
+            $wordSoFar,
+            $nextPlayerId
         );
 
         $this->assertEquals(
@@ -81,7 +83,8 @@ class HangmanGoodLetterProposedEventTest extends \PHPUnit_Framework_TestCase
                 'letter' => $letter,
                 'playedLetters' => $playedLetters,
                 'remainingLives' => $remainingLives,
-                'wordSoFar' => $wordSoFar
+                'wordSoFar' => $wordSoFar,
+                'nextPlayerId' => $nextPlayerId->getId()
             ),
             $event->serialize()
         );
@@ -94,6 +97,7 @@ class HangmanGoodLetterProposedEventTest extends \PHPUnit_Framework_TestCase
     {
         $gameId = 666;
         $playerId = 42;
+        $nextPlayerId = 43;
         $letter = 'A';
         $playedLetters = array('A');
         $remainingLives = 5;
@@ -107,7 +111,8 @@ class HangmanGoodLetterProposedEventTest extends \PHPUnit_Framework_TestCase
                 'letter' => $letter,
                 'playedLetters' => $playedLetters,
                 'remainingLives' => $remainingLives,
-                'wordSoFar' => $wordSoFar
+                'wordSoFar' => $wordSoFar,
+                'nextPlayerId' => $nextPlayerId
             )
         );
 
@@ -117,5 +122,6 @@ class HangmanGoodLetterProposedEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($playedLetters, $unserializedEvent->getPlayedLetters());
         $this->assertEquals($remainingLives, $unserializedEvent->getRemainingLives());
         $this->assertEquals($wordSoFar, $unserializedEvent->getWordSoFar());
+        $this->assertEquals($nextPlayerId, $unserializedEvent->getNextPlayerId()->getId());
     }
 }
