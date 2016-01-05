@@ -524,29 +524,23 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
             return null;
         }
 
+        $nbPlayers = count($this->gameOrder);
         $currentPlayerId = (string)$this->currentPlayer->getId();
+        $nextPlayerPosition = (array_search((string) $currentPlayerId, $this->gameOrder) + 1) % $nbPlayers;
 
-        $stop = false;
-        foreach ($this->gameOrder as $pId) {
-            if ($stop) {
-                $player = $this->getPlayer(new PlayerId($pId));
+        $pos = $nextPlayerPosition;
+        do {
+            $id = new PlayerId($this->gameOrder[$pos]);
+            $player = $this->getPlayer($id);
 
-                if ($player->getState() === HangmanPlayer::STATE_IN_GAME) {
-                    return $player->getId();
-                    break;
-                } else {
-                    $stop = false;
-                }
-            } elseif ($currentPlayerId == $pId) {
-                $stop = true;
+            if ($player->getState() === HangmanPlayer::STATE_IN_GAME) {
+                return $id;
             }
-        }
 
-        if ($this->currentPlayer->getState() !== HangmanPlayer::STATE_IN_GAME) {
-            return null;
-        } else {
-            return $this->currentPlayer->getId();
-        }
+            $pos = ($pos + 1) % $nbPlayers;
+        } while ($pos !== $nextPlayerPosition);
+
+        return null;
     }
 
     /**
@@ -713,7 +707,9 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      */
     protected function applyHangmanBadLetterProposedEvent(HangmanBadLetterProposedEvent $event)
     {
-        $this->currentPlayer = $this->getPlayer($event->getNextPlayerId());
+        if ($event->getRemainingLives() !== 0) {
+            $this->currentPlayer = $this->getPlayer($event->getNextPlayerId());
+        }
     }
 
     /**
@@ -733,9 +729,10 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      */
     protected function applyHangmanPlayerLostEvent(HangmanPlayerLostEvent $event)
     {
-        unset($this->gameOrder[(string) $event->getPlayerId()]);
+        $currentPlayerId = $event->getPlayerId();
         $this->state = self::STATE_OVER;
         $this->currentPlayer = $this->getPlayer($this->getNextPlayerId());
+        unset($this->gameOrder[array_search((string) $currentPlayerId, $this->gameOrder)]);
     }
 
     /**

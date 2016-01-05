@@ -3,6 +3,7 @@ namespace Hangman\Test;
 
 use Hangman\Entity\Hangman;
 use Hangman\Event\HangmanGameFailedStartingEvent;
+use Hangman\Event\HangmanGameLostEvent;
 use Hangman\Event\HangmanGameStartedEvent;
 use Hangman\Event\HangmanPlayerCreatedEvent;
 use Hangman\Event\HangmanPlayerFailedCreatingEvent;
@@ -320,6 +321,32 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($hangman->canPlayerPlay($this->playerOneId));
         $this->assertFalse($hangman->canPlayerPlay($this->playerTwoId));
+    }
+
+    /**
+     * @test
+     */
+    public function testPlayerOneLosesAlone()
+    {
+        $letter = 'Z';
+        $playerId = new PlayerId(42);
+
+        $playerOne = new HangmanPlayerOptions($playerId, $this->hangmanId, self::P1_NAME, 1);
+
+        $hangman = Hangman::createGame($this->hangmanId, self::WORD);
+
+        $hangman->addPlayerToGame($playerOne);
+
+        $hangman->startGame($playerId);
+
+        /* @var $feedback \Hangman\Result\HangmanLost */
+        $feedback = $hangman->play($playerId, $this->getProposition($letter));
+
+        $this->assertInstanceOf(HangmanGameLostEvent::class, $feedback);
+        $this->assertEquals($playerId, $feedback->getPlayerId());
+        $this->assertEquals(self::WORD, $feedback->getSolution());
+
+        $this->assertFalse($hangman->canPlayerPlay($playerId));
     }
 
     /**
