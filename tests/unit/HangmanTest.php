@@ -348,7 +348,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(self::WORD, $feedback->getSolution());
 
         $this->assertFalse($hangman->canPlayerPlay($this->playerOneId));
-        $this->assertFalse($hangman->canPlayerPlay($this->playerTwoId));
+        $this->assertTrue($hangman->canPlayerPlay($this->playerTwoId));
     }
 
     /**
@@ -368,7 +368,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(self::WORD, $feedback->getSolution());
 
         $this->assertFalse($this->hangman->canPlayerPlay($this->playerOneId));
-        $this->assertFalse($this->hangman->canPlayerPlay($this->playerTwoId));
+        $this->assertTrue($this->hangman->canPlayerPlay($this->playerTwoId));
     }
 
     /**
