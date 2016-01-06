@@ -270,7 +270,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      */
     public function leaveGame(PlayerId $playerId)
     {
-        throw new \BadMethodCallException();
+        $this->playerLoses($this->getPlayer($playerId));
     }
 
     /**
@@ -764,7 +764,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * @return array
+     * @return HangmanPlayer[]
      */
     protected function getChildEntities()
     {
@@ -780,8 +780,8 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     /**
      * Create a new instance
      *
-     * @param  MiniGameId             $id
-     * @param  string                 $word
+     * @param  MiniGameId $id
+     * @param  string     $word
      * @return Hangman
      */
     public static function createGame(MiniGameId $id, $word)
