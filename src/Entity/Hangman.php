@@ -403,8 +403,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
             $playedLetters,
             $livesLost,
             $remainingLives,
-            $wordSoFar,
-            $nextPlayerId
+            $wordSoFar
         );
         $this->apply($event);
 
@@ -442,8 +441,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
             $capLetter,
             $playedLetters,
             $remainingLives,
-            $wordSoFar,
-            $nextPlayerId
+            $wordSoFar
         );
         $this->apply($event);
 

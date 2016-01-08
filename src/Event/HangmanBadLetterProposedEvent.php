@@ -30,11 +30,6 @@ class HangmanBadLetterProposedEvent extends HangmanResultEvent implements Hangma
     private $wordSoFar;
 
     /**
-     * @var PlayerId
-     */
-    private $nextPlayerId;
-
-    /**
      * Constructor
      *
      * @param MiniGameId $gameId
@@ -44,7 +39,6 @@ class HangmanBadLetterProposedEvent extends HangmanResultEvent implements Hangma
      * @param int        $livesLost
      * @param int        $remainingLives
      * @param string     $wordSoFar
-     * @param PlayerId   $nextPlayerId
      */
     public function __construct(
         MiniGameId $gameId,
@@ -53,14 +47,12 @@ class HangmanBadLetterProposedEvent extends HangmanResultEvent implements Hangma
         array $playedLetters,
         $livesLost,
         $remainingLives,
-        $wordSoFar,
-        PlayerId $nextPlayerId = null
+        $wordSoFar
     ) {
         parent::__construct(self::NAME, $gameId, $playerId, $playedLetters, $remainingLives);
         $this->letter = $letter;
         $this->livesLost = $livesLost;
         $this->wordSoFar = $wordSoFar;
-        $this->nextPlayerId = $nextPlayerId;
     }
 
     /**
@@ -96,14 +88,6 @@ class HangmanBadLetterProposedEvent extends HangmanResultEvent implements Hangma
     }
 
     /**
-     * @return PlayerId
-     */
-    public function getNextPlayerId()
-    {
-        return $this->nextPlayerId;
-    }
-
-    /**
      * @return string
      */
     public function getAsMessage()
@@ -129,8 +113,7 @@ class HangmanBadLetterProposedEvent extends HangmanResultEvent implements Hangma
             'playedLetters' => $this->getPlayedLetters(),
             'livesLost' => $this->livesLost,
             'remainingLives' => $this->getRemainingLives(),
-            'wordSoFar' => $this->wordSoFar,
-            'nextPlayerId' => $this->getNextPlayerId()->getId()
+            'wordSoFar' => $this->wordSoFar
         );
     }
 
@@ -147,8 +130,7 @@ class HangmanBadLetterProposedEvent extends HangmanResultEvent implements Hangma
             $data['playedLetters'],
             $data['livesLost'],
             $data['remainingLives'],
-            $data['wordSoFar'],
-            new PlayerId($data['nextPlayerId'])
+            $data['wordSoFar']
         );
     }
 }
