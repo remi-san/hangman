@@ -480,8 +480,34 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
             if ((string) $otherPlayer->getId() === (string) $player->getId() || $otherPlayer->hasLost()) {
                 continue;
             }
-            $this->playerLoses($otherPlayer);
+            $this->makePlayerLose($otherPlayer);
         }
+
+        return $event;
+    }
+
+    /**
+     * Just make one player lose
+     *
+     * @param  HangmanPlayer $player
+     * @return HangmanPlayerLostEvent
+     */
+    private function makePlayerLose(HangmanPlayer $player)
+    {
+        $playerId = $player->getId();
+
+        $playedLetters = $this->getPlayedLettersForPlayer($playerId);
+        $remainingLives = $this->getRemainingLives($playerId);
+
+        $event = new HangmanPlayerLostEvent(
+            $this->id,
+            $playerId,
+            $playedLetters,
+            $remainingLives,
+            $this->buildWord($playedLetters),
+            $this->word
+        );
+        $this->apply($event);
 
         return $event;
     }
@@ -494,21 +520,9 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      */
     private function playerLoses(HangmanPlayer $player)
     {
-        $playerId = $player->getId();
-
-        $playedLetters = $this->getPlayedLettersForPlayer($playerId);
-        $remainingLives = $this->getRemainingLives($playerId);
         $nextPlayerId = new PlayerId($this->getNextPlayerId());
 
-        $event = new HangmanPlayerLostEvent(
-            $this->id,
-            $playerId,
-            $playedLetters,
-            $remainingLives,
-            $this->buildWord($playedLetters),
-            $this->word
-        );
-        $this->apply($event);
+        $event = $this->makePlayerLose($player);
 
         if (count($this->gameOrder) > 0) {
             $this->setNextPlayer($nextPlayerId);
@@ -517,7 +531,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
 
         $event = new HangmanGameLostEvent(
             $this->id,
-            $playerId,
+            $player->getId(),
             $this->word
         );
         $this->apply($event);
