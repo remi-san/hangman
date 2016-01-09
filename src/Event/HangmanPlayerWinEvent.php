@@ -6,8 +6,9 @@ use Hangman\Event\Util\HangmanResultEvent;
 use Hangman\Result\HangmanWon;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
+use MiniGame\Result\AllPlayersResult;
 
-class HangmanPlayerWinEvent extends HangmanResultEvent implements HangmanWon, SerializableInterface
+class HangmanPlayerWinEvent extends HangmanResultEvent implements AllPlayersResult, HangmanWon, SerializableInterface
 {
     /**
      * @var string
