@@ -269,7 +269,19 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      */
     public function leaveGame(PlayerId $playerId)
     {
-        $this->playerLoses($this->getPlayer($playerId));
+        switch ($this->state) {
+            case self::STATE_STARTED:
+                return $this->playerLoses($this->getPlayer($playerId));
+                break;
+            case self::STATE_OVER:
+                break;
+            default:
+                if (isset($this->players[(string) $playerId])) {
+                    unset($this->players[(string) $playerId]);
+                }
+                break;
+        }
+        return null;
     }
 
     /**
