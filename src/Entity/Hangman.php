@@ -145,12 +145,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
             return null;
         }
 
-        foreach ($this->players as $player) {
-            if ($player->getId()->equals($playerId)) {
-                return $player;
-            }
-        }
-        return null;
+        return isset($this->players[(string)$playerId]) ? $this->players[(string)$playerId] : null;
     }
 
     /**
@@ -596,8 +591,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      */
     private function getPlayedLettersForPlayer(PlayerId $playerId)
     {
-        $player = $this->getPlayer($playerId);
-        return $player->getPlayedLetters();
+        return $this->getPlayer($playerId)->getPlayedLetters();
     }
 
     /**
@@ -708,9 +702,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
         $this->id = $event->getGameId();
         $this->word = strtoupper($event->getWord());
         $this->players = array();
-
         $this->gameOrder = array();
-
         $this->state = self::STATE_READY;
     }
 
@@ -731,7 +723,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
         );
 
         $this->gameOrder[] = (string)$player->getId();
-        $this->players[] = $player;
+        $this->players[(string)$player->getId()] = $player;
     }
 
     /**
