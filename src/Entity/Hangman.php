@@ -524,7 +524,10 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
 
         $event = $this->makePlayerLose($player);
 
-        if (count($this->gameOrder) > 0) {
+        if (count($this->gameOrder) > 0 &&
+            $this->currentPlayer &&
+            (string)$player->getId() === (string)$this->currentPlayer->getId()
+        ) {
             $this->setNextPlayer($nextPlayerId);
             return $event;
         }
