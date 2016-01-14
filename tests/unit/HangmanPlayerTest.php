@@ -25,7 +25,7 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
 
         $player = new HangmanPlayer(null, $name);
 
-        $this->assertTrue(Uuid::isValid($player->getId()->getId()));
+        $this->assertTrue(Uuid::isValid((string) $player->getId()));
         $this->assertEquals($name, $player->getName());
         $this->assertEquals(6, $player->getRemainingLives());
         $this->assertNull($player->getGame());

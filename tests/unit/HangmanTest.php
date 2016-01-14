@@ -68,8 +68,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
     {
         $this->hangmanId = $this->getMiniGameId(self::ID);
 
-        $this->playerOneId = $this->getPlayerId(self::P1_ID);
-        $this->playerTwoId = $this->getPlayerId(self::P2_ID);
+        $this->playerOneId = new PlayerId(self::P1_ID);
+        $this->playerTwoId = new PlayerId(self::P2_ID);
 
         $this->playerOne = new HangmanPlayerOptions($this->playerOneId, $this->hangmanId, self::P1_NAME, self::CHANCES);
 

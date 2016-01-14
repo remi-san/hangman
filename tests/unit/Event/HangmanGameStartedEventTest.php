@@ -40,8 +40,8 @@ class HangmanGameStartedEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             array(
                 'name' => 'hangman.started',
-                'gameId' => $id->getId(),
-                'playerId' => $playerId->getId()
+                'gameId' => (string) $id,
+                'playerId' => (string) $playerId
             ),
             $event->serialize()
         );
@@ -63,7 +63,7 @@ class HangmanGameStartedEventTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $this->assertEquals($id, $unserializedEvent->getGameId()->getId());
-        $this->assertEquals($playerId, $unserializedEvent->getPlayerId()->getId());
+        $this->assertEquals($id, (string) $unserializedEvent->getGameId());
+        $this->assertEquals($playerId, (string) $unserializedEvent->getPlayerId());
     }
 }

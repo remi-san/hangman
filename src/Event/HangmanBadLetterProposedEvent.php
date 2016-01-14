@@ -107,8 +107,8 @@ class HangmanBadLetterProposedEvent extends HangmanResultEvent implements Hangma
     {
         return array(
             'name' => self::NAME,
-            'gameId' => $this->getGameId()->getId(),
-            'playerId' => $this->getPlayerId()->getId(),
+            'gameId' => (string) $this->getGameId(),
+            'playerId' => (string) $this->getPlayerId(),
             'letter' => $this->letter,
             'playedLetters' => $this->getPlayedLetters(),
             'livesLost' => $this->livesLost,

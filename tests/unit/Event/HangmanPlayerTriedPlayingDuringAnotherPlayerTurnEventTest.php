@@ -47,8 +47,8 @@ class HangmanPlayerTriedPlayingDuringAnotherPlayerTurnEventTest extends \PHPUnit
         $this->assertEquals(
             array(
                 'name' => 'hangman.player.wrong-turn',
-                'gameId' => $gameId->getId(),
-                'playerId' => $playerId->getId()
+                'gameId' => (string) $gameId,
+                'playerId' => (string) $playerId
             ),
             $event->serialize()
         );
@@ -70,7 +70,7 @@ class HangmanPlayerTriedPlayingDuringAnotherPlayerTurnEventTest extends \PHPUnit
             )
         );
 
-        $this->assertEquals($gameId, $unserializedEvent->getGameId()->getId());
-        $this->assertEquals($playerId, $unserializedEvent->getPlayerId()->getId());
+        $this->assertEquals($gameId, (string) $unserializedEvent->getGameId());
+        $this->assertEquals($playerId, (string) $unserializedEvent->getPlayerId());
     }
 }

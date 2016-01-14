@@ -52,7 +52,7 @@ class HangmanGameCreatedEvent extends HangmanBasicResultEvent implements Seriali
     {
         return array(
             'name' => self::NAME,
-            'gameId' => $this->getGameId()->getId(),
+            'gameId' => (string) $this->getGameId(),
             'word' => $this->word
         );
     }

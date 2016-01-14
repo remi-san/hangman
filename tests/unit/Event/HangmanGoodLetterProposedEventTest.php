@@ -76,8 +76,8 @@ class HangmanGoodLetterProposedEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             array(
                 'name' => 'hangman.letter.good',
-                'gameId' => $gameId->getId(),
-                'playerId' => $playerId->getId(),
+                'gameId' => (string) $gameId,
+                'playerId' => (string) $playerId,
                 'letter' => $letter,
                 'playedLetters' => $playedLetters,
                 'remainingLives' => $remainingLives,
@@ -111,8 +111,8 @@ class HangmanGoodLetterProposedEventTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $this->assertEquals($gameId, $unserializedEvent->getGameId()->getId());
-        $this->assertEquals($playerId, $unserializedEvent->getPlayerId()->getId());
+        $this->assertEquals($gameId, (string) $unserializedEvent->getGameId());
+        $this->assertEquals($playerId, (string) $unserializedEvent->getPlayerId());
         $this->assertEquals($letter, $unserializedEvent->getLetter());
         $this->assertEquals($playedLetters, $unserializedEvent->getPlayedLetters());
         $this->assertEquals($remainingLives, $unserializedEvent->getRemainingLives());

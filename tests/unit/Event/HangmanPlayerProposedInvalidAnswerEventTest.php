@@ -53,8 +53,8 @@ class HangmanPlayerProposedInvalidAnswerEventTest extends \PHPUnit_Framework_Tes
         $this->assertEquals(
             array(
                 'name' => 'hangman.player.invalid-answer',
-                'gameId' => $gameId->getId(),
-                'playerId' => $playerId->getId(),
+                'gameId' => (string) $gameId,
+                'playerId' => (string) $playerId,
                 'answer' => $answer->getText()
             ),
             $event->serialize()
@@ -79,8 +79,8 @@ class HangmanPlayerProposedInvalidAnswerEventTest extends \PHPUnit_Framework_Tes
             )
         );
 
-        $this->assertEquals($gameId, $unserializedEvent->getGameId()->getId());
-        $this->assertEquals($playerId, $unserializedEvent->getPlayerId()->getId());
+        $this->assertEquals($gameId, (string) $unserializedEvent->getGameId());
+        $this->assertEquals($playerId, (string) $unserializedEvent->getPlayerId());
         $this->assertEquals($answer, $unserializedEvent->getAnswer()->getText());
     }
 }

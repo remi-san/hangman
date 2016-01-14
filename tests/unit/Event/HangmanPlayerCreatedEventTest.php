@@ -46,8 +46,8 @@ class HangmanPlayerCreatedEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             array(
                 'name' => 'hangman.player.created',
-                'gameId' => $gameId->getId(),
-                'playerId' => $playerId->getId(),
+                'gameId' => (string) $gameId,
+                'playerId' => (string) $playerId,
                 'playerName' => 'name',
                 'lives' => $lives,
                 'externalReference' => 'ext'
@@ -76,8 +76,8 @@ class HangmanPlayerCreatedEventTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $this->assertEquals($gameId, $unserializedEvent->getGameId()->getId());
-        $this->assertEquals($playerId, $unserializedEvent->getPlayerId()->getId());
+        $this->assertEquals($gameId, (string) $unserializedEvent->getGameId());
+        $this->assertEquals($playerId, (string) $unserializedEvent->getPlayerId());
         $this->assertEquals('name', $unserializedEvent->getPlayerName());
         $this->assertEquals($lives, $unserializedEvent->getLives());
         $this->assertEquals('ext', $unserializedEvent->getExternalReference());

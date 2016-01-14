@@ -71,8 +71,8 @@ class HangmanPlayerWinEvent extends HangmanResultEvent implements AllPlayersResu
     {
         return array(
             'name' => self::NAME,
-            'gameId' => $this->getGameId()->getId(),
-            'playerId' => $this->getPlayerId()->getId(),
+            'gameId' => (string) $this->getGameId(),
+            'playerId' => (string) $this->getPlayerId(),
             'playedLetters' => $this->getPlayedLetters(),
             'remainingLives' => $this->getRemainingLives(),
             'word' => $this->word

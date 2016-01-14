@@ -39,8 +39,8 @@ class HangmanPlayerTriedPlayingInactiveGameEvent extends HangmanErrorEvent imple
     {
         return array(
             'name' => self::NAME,
-            'gameId' => (string)$this->getGameId()->getId(),
-            'playerId' => (string)$this->getPlayerId()->getId()
+            'gameId' => (string) $this->getGameId(),
+            'playerId' => (string) $this->getPlayerId()
         );
     }
 

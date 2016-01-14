@@ -54,8 +54,8 @@ class HangmanPlayerFailedCreatingEvent extends HangmanErrorEvent implements Seri
     {
         return array(
             'name' => self::NAME,
-            'gameId' => (string)$this->getGameId()->getId(),
-            'playerId' => (string)$this->getPlayerId()->getId(),
+            'gameId' => (string) $this->getGameId(),
+            'playerId' => (string) $this->getPlayerId(),
             'externalReference' => $this->externalReference
         );
     }

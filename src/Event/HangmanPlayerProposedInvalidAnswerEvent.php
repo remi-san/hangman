@@ -56,9 +56,9 @@ class HangmanPlayerProposedInvalidAnswerEvent extends HangmanErrorEvent implemen
     {
         return array(
             'name' => self::NAME,
-            'gameId' => (string)$this->getGameId()->getId(),
-            'playerId' => (string)$this->getPlayerId()->getId(),
-            'answer' => (string)$this->answer->getText()
+            'gameId' => (string) $this->getGameId(),
+            'playerId' => (string) $this->getPlayerId(),
+            'answer' => (string) $this->answer->getText()
         );
     }
 

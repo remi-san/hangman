@@ -85,8 +85,8 @@ class HangmanPlayerCreatedEvent extends HangmanBasicResultEvent implements Seria
     {
         return array(
             'name' => self::NAME,
-            'gameId' => (string)$this->getGameId()->getId(),
-            'playerId' => (string)$this->getPlayerId()->getId(),
+            'gameId' => (string) $this->getGameId(),
+            'playerId' => (string) $this->getPlayerId(),
             'playerName' => $this->playerName,
             'lives' => $this->lives,
             'externalReference' => $this->externalReference

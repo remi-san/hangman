@@ -100,8 +100,8 @@ class HangmanGameFailedStartingEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             array(
                 'name' => HangmanGameFailedStartingEvent::NAME,
-                'gameId' => $gameId->getId(),
-                'playerId' => $playerId->getId(),
+                'gameId' => (string) $gameId,
+                'playerId' => (string) $playerId,
                 'reason' => $reason
             ),
             $event->serialize()
@@ -126,8 +126,8 @@ class HangmanGameFailedStartingEventTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $this->assertEquals($gameId, $event->getGameId()->getId());
-        $this->assertEquals($playerId, $event->getPlayerId()->getId());
+        $this->assertEquals($gameId, (string) $event->getGameId());
+        $this->assertEquals($playerId, (string) $event->getPlayerId());
         $this->assertEquals(
             "You can't start a game that's already started or is over.",
             $event->getAsMessage()

@@ -60,8 +60,8 @@ class HangmanGameFailedStartingEvent extends HangmanErrorEvent implements Serial
     {
         return array(
             'name' => self::NAME,
-            'gameId' => $this->getGameId()->getId(),
-            'playerId' => ($this->getPlayerId()) ? $this->getPlayerId()->getId() : null,
+            'gameId' => (string) $this->getGameId(),
+            'playerId' => ($this->getPlayerId()) ? (string) $this->getPlayerId() : null,
             'reason' => $this->reason
         );
     }
