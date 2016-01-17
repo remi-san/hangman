@@ -29,13 +29,14 @@ use MiniGame\Entity\MiniGame;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\Player;
 use MiniGame\Entity\PlayerId;
-use MiniGame\Exceptions\IllegalMoveException;
+use MiniGame\Entity\PlayTrait;
 use MiniGame\GameResult;
-use MiniGame\Move;
 use MiniGame\PlayerOptions;
 
 class Hangman extends EventSourcedAggregateRoot implements MiniGame
 {
+    use PlayTrait;
+    
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////   CONSTANTS   ///////////////////////////////////////////////////
@@ -169,6 +170,16 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     }
 
     /**
+     * Is game started?
+     *
+     * @return bool
+     */
+    public function isGameStarted()
+    {
+        return $this->state === self::STATE_STARTED;
+    }
+
+    /**
      * Is it the player's turn?
      *
      * @param  PlayerId $playerId
@@ -285,49 +296,46 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     }
 
     /**
-     * Allows the player to play the game
+     * Player proposes a letter
      *
      * @param  PlayerId $playerId
-     * @param  Move     $move
+     * @param  Proposition $move
      * @return GameResult
-     * @throws \Exception
      */
-    public function play(PlayerId $playerId, Move $move)
+    public function playProposition(PlayerId $playerId, Proposition $move)
     {
-        if ($this->state !== self::STATE_STARTED) {
-            $event = new HangmanPlayerTriedPlayingInactiveGameEvent(
+        if ($errorEvent = $this->ensurePlayerCanPlay($playerId)) {
+            $this->apply($errorEvent);
+            return $errorEvent;
+        }
+
+        return $this->currentPlayerProposeLetter($move->getText());
+    }
+
+    /**
+     * Player tries an answer
+     *
+     * @param  PlayerId $playerId
+     * @param  Answer $move
+     * @return GameResult
+     */
+    public function playAnswer(PlayerId $playerId, Answer $move)
+    {
+        if ($errorEvent = $this->ensurePlayerCanPlay($playerId)) {
+            $this->apply($errorEvent);
+            return $errorEvent;
+        }
+
+        try {
+            return $this->currentPlayerProposeAnswer($move->getText());
+        } catch (HangmanException $e) {
+            $event = new HangmanPlayerProposedInvalidAnswerEvent(
                 $this->getId(),
-                $playerId
+                $playerId,
+                $move
             );
             $this->apply($event);
             return $event;
-        }
-
-        if (!$this->canPlayerPlay($playerId)) {
-            $event = new HangmanPlayerTriedPlayingDuringAnotherPlayerTurnEvent(
-                $this->getId(),
-                $playerId
-            );
-            $this->apply($event);
-            return $event;
-        }
-
-        if ($move instanceof Proposition) {
-            return $this->currentPlayerProposeLetter($move->getText());
-        } elseif ($move instanceof Answer) {
-            try {
-                return $this->currentPlayerProposeAnswer($move->getText());
-            } catch (HangmanException $e) {
-                $event = new HangmanPlayerProposedInvalidAnswerEvent(
-                    $this->getId(),
-                    $playerId,
-                    $move
-                );
-                $this->apply($event);
-                return $event;
-            }
-        } else {
-            throw new IllegalMoveException($move, 'Error');
         }
     }
 
@@ -346,6 +354,33 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     private function initialize(MiniGameId $id, $word)
     {
         $this->apply(new HangmanGameCreatedEvent($id, $word));
+    }
+
+    /**
+     * Returns an error event if player cannot play
+     *
+     * @param  PlayerId $playerId
+     * @return GameResult
+     */
+    private function ensurePlayerCanPlay(PlayerId $playerId)
+    {
+        if (!$this->isGameStarted()) {
+            $event = new HangmanPlayerTriedPlayingInactiveGameEvent(
+                $this->getId(),
+                $playerId
+            );
+            return $event;
+        }
+
+        if (!$this->canPlayerPlay($playerId)) {
+            $event = new HangmanPlayerTriedPlayingDuringAnotherPlayerTurnEvent(
+                $this->getId(),
+                $playerId
+            );
+            return $event;
+        }
+
+        return null;
     }
 
     /**
