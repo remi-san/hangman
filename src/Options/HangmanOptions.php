@@ -35,32 +35,9 @@ class HangmanOptions extends AbstractGameOptions implements GameOptions
 
     /**
      * Constructor
-     *
-     * @param  string           $word
-     * @param  string           $language
-     * @param  int              $length
-     * @param  int              $level
-     * @param  int              $lives
-     * @param  PlayerOptions[]  $players
-     * @throws IllegalOptionException
      */
-    public function __construct(
-        $word = null,
-        $language = 'en',
-        $length = null,
-        $level = null,
-        $lives = 6,
-        array $players = array()
-    ) {
-        parent::__construct($players);
-
-        $this->lives = $lives;
-        $this->word = $word;
-        $this->language = $language;
-        $this->length = $length;
-        $this->level = $level;
-
-        $this->checkOptions();
+    public function __construct()
+    {
     }
 
     /**
@@ -125,5 +102,41 @@ class HangmanOptions extends AbstractGameOptions implements GameOptions
                 $this->level
             );
         }
+    }
+
+    /**
+     * Static Constructor.
+     *
+     * @param  string           $word
+     * @param  string           $language
+     * @param  int              $length
+     * @param  int              $level
+     * @param  int              $lives
+     * @param  PlayerOptions[]  $players
+     *
+     * @throws IllegalOptionException
+     *
+     * @return HangmanOptions
+     */
+    public static function create(
+        $word = null,
+        $language = 'en',
+        $length = null,
+        $level = null,
+        $lives = 6,
+        array $players = array()
+    ) {
+        $obj = new self();
+
+        $obj->init($players);
+        $obj->lives = $lives;
+        $obj->word = $word;
+        $obj->language = $language;
+        $obj->length = $length;
+        $obj->level = $level;
+
+        $obj->checkOptions();
+
+        return $obj;
     }
 }
