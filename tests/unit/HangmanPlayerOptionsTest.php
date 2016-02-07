@@ -22,7 +22,7 @@ class HangmanPlayerOptionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testHangmanOptionsWithWord()
     {
-        $options = new HangmanPlayerOptions(
+        $options = HangmanPlayerOptions::create(
             $this->getPlayerId(42),
             $this->getMiniGameId(666),
             'toto',

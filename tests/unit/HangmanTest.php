@@ -71,9 +71,9 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
         $this->playerOneId = PlayerId::create(self::P1_ID);
         $this->playerTwoId = PlayerId::create(self::P2_ID);
 
-        $this->playerOne = new HangmanPlayerOptions($this->playerOneId, $this->hangmanId, self::P1_NAME, self::CHANCES);
+        $this->playerOne = HangmanPlayerOptions::create($this->playerOneId, $this->hangmanId, self::P1_NAME, self::CHANCES);
 
-        $this->playerTwo = new HangmanPlayerOptions($this->playerTwoId, $this->hangmanId, self::P2_NAME, self::CHANCES);
+        $this->playerTwo = HangmanPlayerOptions::create($this->playerTwoId, $this->hangmanId, self::P2_NAME, self::CHANCES);
 
         $this->hangman = Hangman::createGame(
             $this->hangmanId,
@@ -331,7 +331,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
         $letter = 'Z';
         $playerId = PlayerId::create(42);
 
-        $playerOne = new HangmanPlayerOptions($playerId, $this->hangmanId, self::P1_NAME, 1);
+        $playerOne = HangmanPlayerOptions::create($playerId, $this->hangmanId, self::P1_NAME, 1);
 
         $hangman = Hangman::createGame($this->hangmanId, self::WORD);
 
@@ -356,7 +356,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
     {
         $letter = 'Z';
 
-        $playerOne = new HangmanPlayerOptions($this->playerOneId, $this->hangmanId, self::P1_NAME, 1);
+        $playerOne = HangmanPlayerOptions::create($this->playerOneId, $this->hangmanId, self::P1_NAME, 1);
 
         $hangman = Hangman::createGame($this->hangmanId, self::WORD);
 

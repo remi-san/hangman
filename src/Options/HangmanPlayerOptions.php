@@ -19,19 +19,10 @@ class HangmanPlayerOptions extends AbstractPlayerOptions implements PlayerOption
     private $externalReference;
 
     /**
-     * Constructor
-     *
-     * @param PlayerId   $playerId
-     * @param MiniGameId $gameId
-     * @param string     $name
-     * @param string     $lives
-     * @param string     $externalReference
+     * Constructor.
      */
-    public function __construct(PlayerId $playerId, MiniGameId $gameId, $name, $lives, $externalReference = null)
+    public function __construct()
     {
-        parent::__construct($playerId, $gameId, $name);
-        $this->lives = $lives;
-        $this->externalReference = $externalReference;
     }
 
     /**
@@ -48,5 +39,27 @@ class HangmanPlayerOptions extends AbstractPlayerOptions implements PlayerOption
     public function getExternalReference()
     {
         return $this->externalReference;
+    }
+
+    /**
+     * Constructor
+     *
+     * @param PlayerId   $playerId
+     * @param MiniGameId $gameId
+     * @param string     $name
+     * @param string     $lives
+     * @param string     $externalReference
+     *
+     * @return HangmanPlayerOptions
+     */
+    public static function create(PlayerId $playerId, MiniGameId $gameId, $name, $lives, $externalReference = null)
+    {
+        $obj = new self();
+
+        $obj->init($playerId, $gameId, $name);
+        $obj->lives = $lives;
+        $obj->externalReference = $externalReference;
+
+        return $obj;
     }
 }
