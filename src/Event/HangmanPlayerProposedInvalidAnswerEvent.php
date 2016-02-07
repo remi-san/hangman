@@ -71,7 +71,7 @@ class HangmanPlayerProposedInvalidAnswerEvent extends HangmanErrorEvent implemen
         return new self(
             MiniGameId::create($data['gameId']),
             PlayerId::create($data['playerId']),
-            new Answer($data['answer'])
+            Answer::create($data['answer'])
         );
     }
 }

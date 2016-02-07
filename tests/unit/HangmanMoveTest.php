@@ -17,7 +17,7 @@ class HangmanMoveTest extends \PHPUnit_Framework_TestCase
     public function testProposition()
     {
         $text = 'text';
-        $move = new Proposition($text);
+        $move = Proposition::create($text);
 
         $this->assertEquals($text, $move->getText());
     }
@@ -28,7 +28,7 @@ class HangmanMoveTest extends \PHPUnit_Framework_TestCase
     public function testAnswer()
     {
         $text = 'text';
-        $move = new Answer($text);
+        $move = Answer::create($text);
 
         $this->assertEquals($text, $move->getText());
     }

@@ -11,11 +11,10 @@ class Proposition implements Move
     private $text;
 
     /**
-     * @param string $text
+     * Constructor
      */
-    public function __construct($text)
+    public function __construct()
     {
-        $this->text = $text;
     }
 
     /**
@@ -24,5 +23,21 @@ class Proposition implements Move
     public function getText()
     {
         return $this->text;
+    }
+
+    /**
+     * Static constructor.
+     *
+     * @param $text
+     *
+     * @return Proposition
+     */
+    public static function create($text)
+    {
+        $obj = new self();
+
+        $obj->text = $text;
+
+        return $obj;
     }
 }
