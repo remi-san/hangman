@@ -107,8 +107,8 @@ class HangmanGoodLetterProposedEvent extends HangmanResultEvent implements Hangm
     public static function deserialize(array $data)
     {
         return new self(
-            new MiniGameId($data['gameId']),
-            new PlayerId($data['playerId']),
+            MiniGameId::create($data['gameId']),
+            PlayerId::create($data['playerId']),
             $data['letter'],
             $data['playedLetters'],
             $data['remainingLives'],

@@ -86,7 +86,7 @@ class HangmanPlayer extends EventSourcedEntity implements Player
         Hangman $game = null,
         $externalReference = null
     ) {
-        $this->id = ($id !== null) ? $id : new PlayerId(Uuid::uuid4()->toString());
+        $this->id = ($id !== null) ? $id : PlayerId::create(Uuid::uuid4()->toString());
         $this->name = $name;
         $this->lives = $lives;
         $this->playedLetters = array();

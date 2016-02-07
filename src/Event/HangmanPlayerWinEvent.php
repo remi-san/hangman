@@ -86,8 +86,8 @@ class HangmanPlayerWinEvent extends HangmanResultEvent implements AllPlayersResu
     public static function deserialize(array $data)
     {
         return new self(
-            new MiniGameId($data['gameId']),
-            new PlayerId($data['playerId']),
+            MiniGameId::create($data['gameId']),
+            PlayerId::create($data['playerId']),
             $data['playedLetters'],
             $data['remainingLives'],
             $data['word']

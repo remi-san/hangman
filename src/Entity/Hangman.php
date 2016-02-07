@@ -436,7 +436,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
         $wordSoFar = $this->buildWord($playedLetters);
         $livesLost = 1;
         $remainingLives = $this->getRemainingLives($playerId) - $livesLost;
-        $nextPlayerId = new PlayerId($this->getNextPlayerId());
+        $nextPlayerId = PlayerId::create($this->getNextPlayerId());
 
         $event = new HangmanBadLetterProposedEvent(
             $this->id,
@@ -475,7 +475,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
         $playedLetters[$capLetter] = $capLetter;
         $wordSoFar = $this->buildWord($playedLetters);
         $remainingLives = $this->getRemainingLives($playerId);
-        $nextPlayerId = new PlayerId($this->getNextPlayerId());
+        $nextPlayerId = PlayerId::create($this->getNextPlayerId());
 
         $event = new HangmanGoodLetterProposedEvent(
             $this->id,
@@ -562,7 +562,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      */
     private function playerLoses(HangmanPlayer $player)
     {
-        $nextPlayerId = new PlayerId($this->getNextPlayerId());
+        $nextPlayerId = PlayerId::create($this->getNextPlayerId());
 
         $event = $this->makePlayerLose($player);
 
@@ -617,7 +617,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
 
         $pos = $nextPlayerPosition;
         do {
-            $id = new PlayerId($this->gameOrder[$pos]);
+            $id = PlayerId::create($this->gameOrder[$pos]);
             $player = $this->getPlayer($id);
 
             if ($player->getState() === HangmanPlayer::STATE_IN_GAME) {

@@ -91,8 +91,8 @@ class HangmanGameLostEvent extends HangmanBasicResultEvent implements AllPlayers
     public static function deserialize(array $data)
     {
         return new self(
-            new MiniGameId($data['gameId']),
-            new PlayerId($data['playerId']),
+            MiniGameId::create($data['gameId']),
+            PlayerId::create($data['playerId']),
             $data['word']
         );
     }

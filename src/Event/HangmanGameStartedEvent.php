@@ -52,8 +52,8 @@ class HangmanGameStartedEvent extends HangmanBasicResultEvent implements AllPlay
     public static function deserialize(array $data)
     {
         return new self(
-            new MiniGameId($data['gameId']),
-            isset($data['playerId']) ? new PlayerId($data['playerId']) : null
+            MiniGameId::create($data['gameId']),
+            isset($data['playerId']) ? PlayerId::create($data['playerId']) : null
         );
     }
 }

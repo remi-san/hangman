@@ -68,8 +68,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
     {
         $this->hangmanId = $this->getMiniGameId(self::ID);
 
-        $this->playerOneId = new PlayerId(self::P1_ID);
-        $this->playerTwoId = new PlayerId(self::P2_ID);
+        $this->playerOneId = PlayerId::create(self::P1_ID);
+        $this->playerTwoId = PlayerId::create(self::P2_ID);
 
         $this->playerOne = new HangmanPlayerOptions($this->playerOneId, $this->hangmanId, self::P1_NAME, self::CHANCES);
 
@@ -142,7 +142,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
     {
         $this->hangman->startGame($this->playerOneId);
 
-        $hangmanPlayerOptions = $this->getHangmanPlayerOptions(new PlayerId(42), 'toto', 6, 'ext-ref');
+        $hangmanPlayerOptions = $this->getHangmanPlayerOptions(PlayerId::create(42), 'toto', 6, 'ext-ref');
 
         $result = $this->hangman->addPlayerToGame($hangmanPlayerOptions);
 
@@ -158,7 +158,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException('\Hangman\Exception\HangmanPlayerOptionsException');
 
-        $hangmanPlayerOptions = $this->getPlayerOptions(new PlayerId(42));
+        $hangmanPlayerOptions = $this->getPlayerOptions(PlayerId::create(42));
 
         $hangman->addPlayerToGame($hangmanPlayerOptions);
 
@@ -173,7 +173,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(0, count($hangman->getPlayers()));
 
-        $hangmanPlayerOptions = $this->getHangmanPlayerOptions(new PlayerId(42), 'toto', 6, 'ext-ref');
+        $hangmanPlayerOptions = $this->getHangmanPlayerOptions(PlayerId::create(42), 'toto', 6, 'ext-ref');
 
         $result = $hangman->addPlayerToGame($hangmanPlayerOptions);
 
@@ -329,7 +329,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
     public function testPlayerOneLosesAlone()
     {
         $letter = 'Z';
-        $playerId = new PlayerId(42);
+        $playerId = PlayerId::create(42);
 
         $playerOne = new HangmanPlayerOptions($playerId, $this->hangmanId, self::P1_NAME, 1);
 

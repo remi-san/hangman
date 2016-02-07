@@ -100,8 +100,8 @@ class HangmanPlayerCreatedEvent extends HangmanBasicResultEvent implements Seria
     public static function deserialize(array $data)
     {
         return new self(
-            new MiniGameId($data['gameId']),
-            new PlayerId($data['playerId']),
+            MiniGameId::create($data['gameId']),
+            PlayerId::create($data['playerId']),
             $data['playerName'],
             $data['lives'],
             $data['externalReference']

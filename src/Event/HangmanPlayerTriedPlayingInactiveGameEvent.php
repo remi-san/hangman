@@ -51,8 +51,8 @@ class HangmanPlayerTriedPlayingInactiveGameEvent extends HangmanErrorEvent imple
     public static function deserialize(array $data)
     {
         return new self(
-            new MiniGameId($data['gameId']),
-            new PlayerId($data['playerId'])
+            MiniGameId::create($data['gameId']),
+            PlayerId::create($data['playerId'])
         );
     }
 }

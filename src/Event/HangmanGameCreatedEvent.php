@@ -64,7 +64,7 @@ class HangmanGameCreatedEvent extends HangmanBasicResultEvent implements Seriali
     public static function deserialize(array $data)
     {
         return new self(
-            new MiniGameId($data['gameId']),
+            MiniGameId::create($data['gameId']),
             $data['word']
         );
     }
