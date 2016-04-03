@@ -5,6 +5,7 @@ use MiniGame\Exceptions\IllegalOptionException;
 use MiniGame\GameOptions;
 use MiniGame\Options\AbstractGameOptions;
 use MiniGame\PlayerOptions;
+use WordSelector\Entity\Word;
 
 class HangmanOptions extends AbstractGameOptions implements GameOptions
 {
@@ -24,7 +25,7 @@ class HangmanOptions extends AbstractGameOptions implements GameOptions
     private $level;
 
     /**
-     * @var string
+     * @var Word
      */
     private $word;
 
@@ -107,19 +108,19 @@ class HangmanOptions extends AbstractGameOptions implements GameOptions
     /**
      * Static Constructor.
      *
-     * @param  string           $word
-     * @param  string           $language
-     * @param  int              $length
-     * @param  int              $level
-     * @param  int              $lives
-     * @param  PlayerOptions[]  $players
+     * @param  Word            $word
+     * @param  string          $language
+     * @param  int             $length
+     * @param  int             $level
+     * @param  int             $lives
+     * @param  PlayerOptions[] $players
      *
      * @throws IllegalOptionException
      *
      * @return HangmanOptions
      */
     public static function create(
-        $word = null,
+        Word $word = null,
         $language = 'en',
         $length = null,
         $level = null,

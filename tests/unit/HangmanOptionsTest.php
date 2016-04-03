@@ -3,6 +3,7 @@ namespace Hangman\Test;
 
 use Hangman\Options\HangmanOptions;
 use MiniGame\Test\Mock\GameObjectMocker;
+use WordSelector\Entity\Word;
 
 class HangmanOptionsTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,8 +32,8 @@ class HangmanOptionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testHangmanOptionsWithWord()
     {
-        $word    = 'word';
-        $lang = 'en';
+        $word    = \Mockery::mock(Word::class);
+        $lang    = 'en';
         $options = HangmanOptions::create($word, $lang, null, null, $this->lives, $this->players);
 
         $this->assertEquals($word, $options->getWord());
@@ -79,7 +80,7 @@ class HangmanOptionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testHangmanOptionsWithWordAndLength()
     {
-        $word    = 'word';
+        $word    = \Mockery::mock(Word::class);
         $length  = 5;
 
         $this->setExpectedException('\\MiniGame\\Exceptions\\IllegalOptionException');
@@ -92,7 +93,7 @@ class HangmanOptionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testHangmanOptionsWithWordAndLevel()
     {
-        $word    = 'word';
+        $word    = \Mockery::mock(Word::class);
         $level   = 5;
 
         $this->setExpectedException('\\MiniGame\\Exceptions\\IllegalOptionException');
@@ -105,7 +106,7 @@ class HangmanOptionsTest extends \PHPUnit_Framework_TestCase
      */
     public function testHangmanOptionsWithWordLengthAndLevel()
     {
-        $word    = 'word';
+        $word    = \Mockery::mock(Word::class);
         $length  = 5;
         $level   = 5;
 
