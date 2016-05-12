@@ -82,6 +82,46 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function testWin()
+    {
+        $id = $this->getPlayerId(42);
+        $name = 'Douglas';
+        $lives = 5;
+        $game = \Mockery::mock('\Hangman\Entity\Hangman');
+        $game->shouldReceive('getId')->andReturn($this->getMiniGameId(33));
+
+        $player = new HangmanPlayer($id, $name, $lives, $game);
+
+        $this->assertFalse($player->hasLost());
+        $this->assertFalse($player->hasWon());
+
+        $player->win();
+        $this->assertTrue($player->hasWon());
+    }
+
+    /**
+     * @test
+     */
+    public function testLose()
+    {
+        $id = $this->getPlayerId(42);
+        $name = 'Douglas';
+        $lives = 5;
+        $game = \Mockery::mock('\Hangman\Entity\Hangman');
+        $game->shouldReceive('getId')->andReturn($this->getMiniGameId(33));
+
+        $player = new HangmanPlayer($id, $name, $lives, $game);
+
+        $this->assertFalse($player->hasLost());
+        $this->assertFalse($player->hasWon());
+
+        $player->lose();
+        $this->assertTrue($player->hasLost());
+    }
+
+    /**
+     * @test
+     */
     public function testHandleHangmanBadLetterProposedEventForOtherPlayer()
     {
         $id = $this->getPlayerId(42);

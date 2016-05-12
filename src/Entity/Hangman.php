@@ -295,6 +295,23 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
         return null;
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////   PRIVATE METHODS   /////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Initialize the game
+     *
+     * @param MiniGameId             $id
+     * @param string                 $word
+     */
+    private function initialize(MiniGameId $id, $word)
+    {
+        $this->apply(new HangmanGameCreatedEvent($id, $word));
+    }
+
     /**
      * Player proposes a letter
      *
@@ -302,7 +319,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      * @param  Proposition $move
      * @return GameResult
      */
-    public function playProposition(PlayerId $playerId, Proposition $move)
+    private function playProposition(PlayerId $playerId, Proposition $move)
     {
         if ($errorEvent = $this->ensurePlayerCanPlay($playerId)) {
             $this->apply($errorEvent);
@@ -319,7 +336,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      * @param  Answer $move
      * @return GameResult
      */
-    public function playAnswer(PlayerId $playerId, Answer $move)
+    private function playAnswer(PlayerId $playerId, Answer $move)
     {
         if ($errorEvent = $this->ensurePlayerCanPlay($playerId)) {
             $this->apply($errorEvent);
@@ -337,23 +354,6 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
             $this->apply($event);
             return $event;
         }
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////   PRIVATE METHODS   /////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Initialize the game
-     *
-     * @param MiniGameId             $id
-     * @param string                 $word
-     */
-    private function initialize(MiniGameId $id, $word)
-    {
-        $this->apply(new HangmanGameCreatedEvent($id, $word));
     }
 
     /**

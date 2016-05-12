@@ -7,9 +7,11 @@ use Hangman\Event\HangmanGameLostEvent;
 use Hangman\Event\HangmanGameStartedEvent;
 use Hangman\Event\HangmanPlayerCreatedEvent;
 use Hangman\Event\HangmanPlayerFailedCreatingEvent;
+use Hangman\Event\HangmanPlayerLostEvent;
 use Hangman\Event\HangmanPlayerProposedInvalidAnswerEvent;
 use Hangman\Event\HangmanPlayerTriedPlayingDuringAnotherPlayerTurnEvent;
 use Hangman\Event\HangmanPlayerTriedPlayingInactiveGameEvent;
+use Hangman\Move\Answer;
 use Hangman\Options\HangmanPlayerOptions;
 use Hangman\Result\HangmanBadProposition;
 use Hangman\Result\HangmanGoodProposition;
@@ -97,6 +99,41 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->hangmanId, $this->hangman->getAggregateRootId());
         $this->assertEquals($this->hangmanId, $this->hangman->getId());
         $this->assertNull($this->hangman->getCurrentPlayer());
+        $this->assertNull($this->hangman->getPlayer(null));
+    }
+
+    /**
+     * @test
+     */
+    public function testLeaveWhenNotStarted()
+    {
+        $return = $this->hangman->leaveGame($this->playerOneId);
+
+        $this->assertNull($this->hangman->getPlayer($this->playerOneId));
+        $this->assertNull($return);
+    }
+
+    /**
+     * @test
+     */
+    public function testLeaveWhenStarted()
+    {
+        $this->hangman->startGame($this->playerOneId);
+        $return = $this->hangman->leaveGame($this->playerOneId);
+
+        $this->assertInstanceOf(HangmanPlayerLostEvent::class, $return);
+    }
+
+    /**
+     * @test
+     */
+    public function testLeaveWhenOver()
+    {
+        $this->hangman->startGame($this->playerOneId);
+        $this->hangman->play($this->playerOneId, Answer::create('ASS--KICKER'));
+        $return = $this->hangman->leaveGame($this->playerOneId);
+
+        $this->assertNull($return);
     }
 
     /**
@@ -406,6 +443,19 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
         $this->hangman->startGame($this->playerOneId);
 
         $result = $this->hangman->play($this->playerTwoId, $this->getProposition('A'));
+
+        $this->assertTrue($result instanceof HangmanPlayerTriedPlayingDuringAnotherPlayerTurnEvent);
+        $this->assertTrue($this->hangman->canPlayerPlay($this->playerOneId));
+    }
+
+    /**
+     * @test
+     */
+    public function testPlayerTwoPlaysAnswerWhenNotHisTurn()
+    {
+        $this->hangman->startGame($this->playerOneId);
+
+        $result = $this->hangman->play($this->playerTwoId, $this->getAnswer('A'));
 
         $this->assertTrue($result instanceof HangmanPlayerTriedPlayingDuringAnotherPlayerTurnEvent);
         $this->assertTrue($this->hangman->canPlayerPlay($this->playerOneId));
