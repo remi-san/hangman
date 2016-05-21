@@ -1,4 +1,5 @@
 <?php
+
 namespace Hangman\Options;
 
 use MiniGame\Exceptions\IllegalOptionException;
@@ -125,7 +126,7 @@ class HangmanOptions extends AbstractGameOptions implements GameOptions
         $length = null,
         $level = null,
         $lives = 6,
-        array $players = array()
+        array $players = []
     ) {
         $obj = new self();
 

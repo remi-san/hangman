@@ -1,4 +1,5 @@
 <?php
+
 namespace Hangman\Options;
 
 use MiniGame\Entity\MiniGameId;

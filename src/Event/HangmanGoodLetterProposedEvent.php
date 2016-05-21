@@ -1,4 +1,5 @@
 <?php
+
 namespace Hangman\Event;
 
 use Broadway\Serializer\SerializableInterface;
@@ -89,7 +90,7 @@ class HangmanGoodLetterProposedEvent extends HangmanResultEvent implements Hangm
      */
     public function serialize()
     {
-        return array(
+        return [
             'name' => self::NAME,
             'gameId' => (string) $this->getGameId(),
             'playerId' => (string) $this->getPlayerId(),
@@ -97,7 +98,7 @@ class HangmanGoodLetterProposedEvent extends HangmanResultEvent implements Hangm
             'playedLetters' => $this->getPlayedLetters(),
             'remainingLives' => $this->getRemainingLives(),
             'wordSoFar' => $this->wordSoFar
-        );
+        ];
     }
 
     /**

@@ -1,4 +1,5 @@
 <?php
+
 namespace Hangman\Entity;
 
 use Broadway\EventSourcing\EventSourcedEntity;
@@ -89,7 +90,7 @@ class HangmanPlayer extends EventSourcedEntity implements Player
         $this->id = ($id !== null) ? $id : PlayerId::create(Uuid::uuid4()->toString());
         $this->name = $name;
         $this->lives = $lives;
-        $this->playedLetters = array();
+        $this->playedLetters = [];
         $this->game = $game;
         $this->externalReference = $externalReference;
         $this->state = self::STATE_IN_GAME;

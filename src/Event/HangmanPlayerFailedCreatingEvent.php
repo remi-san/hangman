@@ -1,4 +1,5 @@
 <?php
+
 namespace Hangman\Event;
 
 use Broadway\Serializer\SerializableInterface;
@@ -52,12 +53,12 @@ class HangmanPlayerFailedCreatingEvent extends HangmanErrorEvent implements Seri
      */
     public function serialize()
     {
-        return array(
+        return [
             'name' => self::NAME,
             'gameId' => (string) $this->getGameId(),
             'playerId' => (string) $this->getPlayerId(),
             'externalReference' => $this->externalReference
-        );
+        ];
     }
 
     /**

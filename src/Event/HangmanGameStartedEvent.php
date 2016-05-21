@@ -1,4 +1,5 @@
 <?php
+
 namespace Hangman\Event;
 
 use Broadway\Serializer\SerializableInterface;
@@ -38,11 +39,11 @@ class HangmanGameStartedEvent extends HangmanBasicResultEvent implements AllPlay
      */
     public function serialize()
     {
-        return array(
+        return [
             'name' => self::NAME,
             'gameId' => (string) $this->getGameId(),
             'playerId' => ($this->getPlayerId()) ? (string) $this->getPlayerId() : null
-        );
+        ];
     }
 
     /**

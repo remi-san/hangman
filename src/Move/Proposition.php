@@ -1,4 +1,5 @@
 <?php
+
 namespace Hangman\Move;
 
 use MiniGame\Move;

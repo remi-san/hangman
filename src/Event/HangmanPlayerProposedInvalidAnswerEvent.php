@@ -1,4 +1,5 @@
 <?php
+
 namespace Hangman\Event;
 
 use Broadway\Serializer\SerializableInterface;
@@ -54,12 +55,12 @@ class HangmanPlayerProposedInvalidAnswerEvent extends HangmanErrorEvent implemen
      */
     public function serialize()
     {
-        return array(
+        return [
             'name' => self::NAME,
             'gameId' => (string) $this->getGameId(),
             'playerId' => (string) $this->getPlayerId(),
             'answer' => (string) $this->answer->getText()
-        );
+        ];
     }
 
     /**

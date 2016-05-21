@@ -1,4 +1,5 @@
 <?php
+
 namespace Hangman\Entity;
 
 use Broadway\EventSourcing\EventSourcedAggregateRoot;
@@ -237,9 +238,9 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      * Adds a player to the game
      *
      * @param  PlayerOptions $playerOptions
-     * @return GameResult
      * @throws HangmanPlayerOptionsException
      * @throws HangmanException
+     * @return GameResult
      */
     public function addPlayerToGame(PlayerOptions $playerOptions)
     {
@@ -748,8 +749,8 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     {
         $this->id = $event->getGameId();
         $this->word = strtoupper($event->getWord());
-        $this->players = array();
-        $this->gameOrder = array();
+        $this->players = [];
+        $this->gameOrder = [];
         $this->state = self::STATE_READY;
     }
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace Hangman\Event\Util;
 
 use MiniGame\Result\Error;

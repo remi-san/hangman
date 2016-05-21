@@ -1,4 +1,5 @@
 <?php
+
 namespace Hangman\Event\Util;
 
 use League\Event\Event;

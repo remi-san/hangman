@@ -1,9 +1,10 @@
 {
     "name": "remi-san/hangman",
     "description" : "A hangman game using library of text mini-games",
+    "license": "MIT",
     "keywords": [
-        "Twitter",
-        "API"
+        "MiniGame",
+        "Hangman"
     ],
     "authors": [
         {
@@ -21,12 +22,19 @@
     },
     "require-dev": {
         "phpunit/phpunit": "~4.5",
-        "Mockery/Mockery": "~0.9"
+        "Mockery/Mockery": "~0.9",
+        "fabpot/php-cs-fixer": "^1.10",
+        "squizlabs/php_codesniffer": "~2.0"
     },
     "autoload": {
         "psr-4": {
             "Hangman\\": "src/",
             "Hangman\\Test\\" : "tests/unit/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.1.x-dev"
         }
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Hangman\Event;
 
 use Broadway\Serializer\SerializableInterface;
@@ -42,11 +43,11 @@ class HangmanPlayerTurnEvent extends HangmanBasicResultEvent implements GameResu
      */
     public function serialize()
     {
-        return array(
+        return [
             'name' => self::NAME,
             'gameId' => (string) $this->getGameId(),
             'playerId' => (string) $this->getPlayerId()
-        );
+        ];
     }
 
     /**

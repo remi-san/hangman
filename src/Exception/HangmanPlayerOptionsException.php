@@ -1,4 +1,5 @@
 <?php
+
 namespace Hangman\Exception;
 
 use MiniGame\Entity\MiniGameId;
