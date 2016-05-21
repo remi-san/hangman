@@ -13,12 +13,6 @@
             "role": "Developer"
         }
     ],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "git@bitbucket.org:remi-san/mini-game.git"
-        }
-    ],
     "require": {
         "ramsey/uuid" : "~2.8",
         "remi-san/mini-game" : "dev-master",
