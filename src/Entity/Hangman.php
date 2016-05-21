@@ -283,8 +283,8 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     {
         switch ($this->state) {
             case self::STATE_STARTED:
-                return $this->playerLoses($this->getPlayer($playerId));
-                break;
+                $player = $this->getPlayer($playerId);
+                return $player ? $this->playerLoses($player) : null;
             case self::STATE_OVER:
                 break;
             default:
@@ -437,7 +437,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
         $wordSoFar = $this->buildWord($playedLetters);
         $livesLost = 1;
         $remainingLives = $this->getRemainingLives($playerId) - $livesLost;
-        $nextPlayerId = PlayerId::create($this->getNextPlayerId());
+        $nextPlayerId = $this->getNextPlayerId();
 
         $event = new HangmanBadLetterProposedEvent(
             $this->id,
@@ -476,7 +476,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
         $playedLetters[$capLetter] = $capLetter;
         $wordSoFar = $this->buildWord($playedLetters);
         $remainingLives = $this->getRemainingLives($playerId);
-        $nextPlayerId = PlayerId::create($this->getNextPlayerId());
+        $nextPlayerId = $this->getNextPlayerId();
 
         $event = new HangmanGoodLetterProposedEvent(
             $this->id,
@@ -563,7 +563,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      */
     private function playerLoses(HangmanPlayer $player)
     {
-        $nextPlayerId = PlayerId::create($this->getNextPlayerId());
+        $nextPlayerId = $this->getNextPlayerId();
 
         $event = $this->makePlayerLose($player);
 

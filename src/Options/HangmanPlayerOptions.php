@@ -48,7 +48,7 @@ class HangmanPlayerOptions extends AbstractPlayerOptions implements PlayerOption
      * @param PlayerId   $playerId
      * @param MiniGameId $gameId
      * @param string     $name
-     * @param string     $lives
+     * @param int        $lives
      * @param string     $externalReference
      *
      * @return HangmanPlayerOptions

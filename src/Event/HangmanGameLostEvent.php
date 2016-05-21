@@ -17,11 +17,6 @@ class HangmanGameLostEvent extends HangmanBasicResultEvent implements AllPlayers
     const NAME = 'hangman.lost';
 
     /**
-     * @var PlayerId
-     */
-    private $playerId;
-
-    /**
      * @var string
      */
     private $word;
@@ -35,17 +30,8 @@ class HangmanGameLostEvent extends HangmanBasicResultEvent implements AllPlayers
      */
     public function __construct(MiniGameId $gameId, PlayerId $playerId, $word)
     {
-        parent::__construct(self::NAME, $gameId);
-        $this->playerId = $playerId;
+        parent::__construct(self::NAME, $gameId, $playerId);
         $this->word = $word;
-    }
-
-    /**
-     * @return PlayerId
-     */
-    public function getPlayerId()
-    {
-        return $this->playerId;
     }
 
     /**
@@ -80,7 +66,7 @@ class HangmanGameLostEvent extends HangmanBasicResultEvent implements AllPlayers
         return [
             'name' => self::NAME,
             'gameId' => (string) $this->getGameId(),
-            'playerId' => (string) $this->playerId,
+            'playerId' => (string) $this->getPlayerId(),
             'word' => $this->word
         ];
     }
