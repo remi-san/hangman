@@ -29,49 +29,4 @@ class HangmanGameLostEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($word, $event->getWord());
         $this->assertEquals('Game lost', $event->getAsMessage());
     }
-
-    /**
-     * @test
-     */
-    public function testSerialize()
-    {
-        $id = $this->getMiniGameId(666);
-        $playerId = $this->getPlayerId(42);
-        $word = 'word';
-
-        $event = new HangmanGameLostEvent($id, $playerId, $word);
-
-        $this->assertEquals(
-            array(
-                'name' => 'hangman.lost',
-                'gameId' => (string) $id,
-                'playerId' => (string) $playerId,
-                'word' => $word
-            ),
-            $event->serialize()
-        );
-    }
-
-    /**
-     * @test
-     */
-    public function testUnserialize()
-    {
-        $id = 666;
-        $playerId = 42;
-        $word = 'word';
-
-        $unserializedEvent = HangmanGameLostEvent::deserialize(
-            array(
-                'name' => 'hangman.lost',
-                'gameId' => $id,
-                'playerId' => $playerId,
-                'word' => $word
-            )
-        );
-
-        $this->assertEquals($id, (string) $unserializedEvent->getGameId());
-        $this->assertEquals($playerId, (string) $unserializedEvent->getPlayerId());
-        $this->assertEquals($word, $unserializedEvent->getWord());
-    }
 }

@@ -2,13 +2,12 @@
 
 namespace Hangman\Event;
 
-use Broadway\Serializer\SerializableInterface;
 use Hangman\Event\Util\HangmanBasicResultEvent;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
 use MiniGame\Result\AllPlayersResult;
 
-class HangmanGameStartedEvent extends HangmanBasicResultEvent implements AllPlayersResult, SerializableInterface
+class HangmanGameStartedEvent extends HangmanBasicResultEvent implements AllPlayersResult
 {
     /**
      * @var string
@@ -32,29 +31,5 @@ class HangmanGameStartedEvent extends HangmanBasicResultEvent implements AllPlay
     public function getAsMessage()
     {
         return 'Game started';
-    }
-
-    /**
-     * @return array
-     */
-    public function serialize()
-    {
-        return [
-            'name' => self::NAME,
-            'gameId' => (string) $this->getGameId(),
-            'playerId' => ($this->getPlayerId()) ? (string) $this->getPlayerId() : null
-        ];
-    }
-
-    /**
-     * @param  array $data
-     * @return HangmanGameStartedEvent
-     */
-    public static function deserialize(array $data)
-    {
-        return new self(
-            MiniGameId::create($data['gameId']),
-            isset($data['playerId']) ? PlayerId::create($data['playerId']) : null
-        );
     }
 }

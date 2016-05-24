@@ -2,13 +2,12 @@
 
 namespace Hangman\Event;
 
-use Broadway\Serializer\SerializableInterface;
 use Hangman\Event\Util\HangmanResultEvent;
 use Hangman\Result\HangmanGoodProposition;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
 
-class HangmanGoodLetterProposedEvent extends HangmanResultEvent implements HangmanGoodProposition, SerializableInterface
+class HangmanGoodLetterProposedEvent extends HangmanResultEvent implements HangmanGoodProposition
 {
     /**
      * @var string
@@ -82,38 +81,6 @@ class HangmanGoodLetterProposedEvent extends HangmanResultEvent implements Hangm
             $this->getFeedBack(),
             implode(', ', $this->getPlayedLetters()),
             $this->getRemainingLives()
-        );
-    }
-
-    /**
-     * @return array
-     */
-    public function serialize()
-    {
-        return [
-            'name' => self::NAME,
-            'gameId' => (string) $this->getGameId(),
-            'playerId' => (string) $this->getPlayerId(),
-            'letter' => $this->letter,
-            'playedLetters' => $this->getPlayedLetters(),
-            'remainingLives' => $this->getRemainingLives(),
-            'wordSoFar' => $this->wordSoFar
-        ];
-    }
-
-    /**
-     * @param  array $data
-     * @return HangmanGoodLetterProposedEvent
-     */
-    public static function deserialize(array $data)
-    {
-        return new self(
-            MiniGameId::create($data['gameId']),
-            PlayerId::create($data['playerId']),
-            $data['letter'],
-            $data['playedLetters'],
-            $data['remainingLives'],
-            $data['wordSoFar']
         );
     }
 }

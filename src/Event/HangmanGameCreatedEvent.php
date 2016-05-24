@@ -2,11 +2,10 @@
 
 namespace Hangman\Event;
 
-use Broadway\Serializer\SerializableInterface;
 use Hangman\Event\Util\HangmanBasicResultEvent;
 use MiniGame\Entity\MiniGameId;
 
-class HangmanGameCreatedEvent extends HangmanBasicResultEvent implements SerializableInterface
+class HangmanGameCreatedEvent extends HangmanBasicResultEvent
 {
     /**
      * @var string
@@ -44,29 +43,5 @@ class HangmanGameCreatedEvent extends HangmanBasicResultEvent implements Seriali
     public function getAsMessage()
     {
         return 'Game created';
-    }
-
-    /**
-     * @return array
-     */
-    public function serialize()
-    {
-        return [
-            'name' => self::NAME,
-            'gameId' => (string) $this->getGameId(),
-            'word' => $this->word
-        ];
-    }
-
-    /**
-     * @param  array $data
-     * @return HangmanGameCreatedEvent
-     */
-    public static function deserialize(array $data)
-    {
-        return new self(
-            MiniGameId::create($data['gameId']),
-            $data['word']
-        );
     }
 }

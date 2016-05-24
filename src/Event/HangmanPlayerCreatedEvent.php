@@ -2,12 +2,11 @@
 
 namespace Hangman\Event;
 
-use Broadway\Serializer\SerializableInterface;
 use Hangman\Event\Util\HangmanBasicResultEvent;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
 
-class HangmanPlayerCreatedEvent extends HangmanBasicResultEvent implements SerializableInterface
+class HangmanPlayerCreatedEvent extends HangmanBasicResultEvent
 {
     /**
      * @var string
@@ -76,36 +75,5 @@ class HangmanPlayerCreatedEvent extends HangmanBasicResultEvent implements Seria
     public function getExternalReference()
     {
         return $this->externalReference;
-    }
-
-
-    /**
-     * @return array
-     */
-    public function serialize()
-    {
-        return [
-            'name' => self::NAME,
-            'gameId' => (string) $this->getGameId(),
-            'playerId' => (string) $this->getPlayerId(),
-            'playerName' => $this->playerName,
-            'lives' => $this->lives,
-            'externalReference' => $this->externalReference
-        ];
-    }
-
-    /**
-     * @param  array $data
-     * @return HangmanPlayerCreatedEvent
-     */
-    public static function deserialize(array $data)
-    {
-        return new self(
-            MiniGameId::create($data['gameId']),
-            PlayerId::create($data['playerId']),
-            $data['playerName'],
-            $data['lives'],
-            $data['externalReference']
-        );
     }
 }

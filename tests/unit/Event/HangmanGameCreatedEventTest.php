@@ -27,44 +27,4 @@ class HangmanGameCreatedEventEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($word, $event->getWord());
         $this->assertEquals('Game created', $event->getAsMessage());
     }
-
-    /**
-     * @test
-     */
-    public function testSerialize()
-    {
-        $id = $this->getMiniGameId(666);
-        $word = 'TEST';
-
-        $event = new HangmanGameCreatedEvent($id, $word);
-
-        $this->assertEquals(
-            array(
-                'name' => 'hangman.created',
-                'gameId' => (string) $id,
-                'word' => $word
-            ),
-            $event->serialize()
-        );
-    }
-
-    /**
-     * @test
-     */
-    public function testDeserialize()
-    {
-        $id = 666;
-        $word = 'TEST';
-
-        $unserializedEvent = HangmanGameCreatedEvent::deserialize(
-            array(
-                'name' => 'hangman.created',
-                'gameId' => $id,
-                'word' => $word
-            )
-        );
-
-        $this->assertEquals($id, (string) $unserializedEvent->getGameId());
-        $this->assertEquals($word, $unserializedEvent->getWord());
-    }
 }

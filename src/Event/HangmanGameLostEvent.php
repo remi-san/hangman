@@ -2,14 +2,13 @@
 
 namespace Hangman\Event;
 
-use Broadway\Serializer\SerializableInterface;
 use Hangman\Event\Util\HangmanBasicResultEvent;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
 use MiniGame\Result\AllPlayersResult;
 use MiniGame\Result\GameLost;
 
-class HangmanGameLostEvent extends HangmanBasicResultEvent implements AllPlayersResult, SerializableInterface, GameLost
+class HangmanGameLostEvent extends HangmanBasicResultEvent implements AllPlayersResult, GameLost
 {
     /**
      * @var string
@@ -56,31 +55,5 @@ class HangmanGameLostEvent extends HangmanBasicResultEvent implements AllPlayers
     public function getSolution()
     {
         return $this->word;
-    }
-
-    /**
-     * @return array
-     */
-    public function serialize()
-    {
-        return [
-            'name' => self::NAME,
-            'gameId' => (string) $this->getGameId(),
-            'playerId' => (string) $this->getPlayerId(),
-            'word' => $this->word
-        ];
-    }
-
-    /**
-     * @param  array $data
-     * @return HangmanGameLostEvent
-     */
-    public static function deserialize(array $data)
-    {
-        return new self(
-            MiniGameId::create($data['gameId']),
-            PlayerId::create($data['playerId']),
-            $data['word']
-        );
     }
 }

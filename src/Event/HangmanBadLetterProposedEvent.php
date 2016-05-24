@@ -2,13 +2,12 @@
 
 namespace Hangman\Event;
 
-use Broadway\Serializer\SerializableInterface;
 use Hangman\Event\Util\HangmanResultEvent;
 use Hangman\Result\HangmanBadProposition;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
 
-class HangmanBadLetterProposedEvent extends HangmanResultEvent implements HangmanBadProposition, SerializableInterface
+class HangmanBadLetterProposedEvent extends HangmanResultEvent implements HangmanBadProposition
 {
     /**
      * @var string
@@ -98,40 +97,6 @@ class HangmanBadLetterProposedEvent extends HangmanResultEvent implements Hangma
             $this->getWordSoFar(),
             implode(', ', $this->getPlayedLetters()),
             $this->getRemainingLives()
-        );
-    }
-
-    /**
-     * @return array
-     */
-    public function serialize()
-    {
-        return [
-            'name' => self::NAME,
-            'gameId' => (string) $this->getGameId(),
-            'playerId' => (string) $this->getPlayerId(),
-            'letter' => $this->letter,
-            'playedLetters' => $this->getPlayedLetters(),
-            'livesLost' => $this->livesLost,
-            'remainingLives' => $this->getRemainingLives(),
-            'wordSoFar' => $this->wordSoFar
-        ];
-    }
-
-    /**
-     * @param  array $data
-     * @return HangmanBadLetterProposedEvent
-     */
-    public static function deserialize(array $data)
-    {
-        return new self(
-            MiniGameId::create($data['gameId']),
-            PlayerId::create($data['playerId']),
-            $data['letter'],
-            $data['playedLetters'],
-            $data['livesLost'],
-            $data['remainingLives'],
-            $data['wordSoFar']
         );
     }
 }

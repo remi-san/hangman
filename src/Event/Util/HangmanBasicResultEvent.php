@@ -12,12 +12,12 @@ abstract class HangmanBasicResultEvent extends Event implements GameResult
     /**
      * @var MiniGameId
      */
-    private $gameId;
+    protected $gameId;
 
     /**
      * @var PlayerId
      */
-    private $playerId;
+    protected $playerId;
 
     /**
      * Constructor

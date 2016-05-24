@@ -11,12 +11,12 @@ abstract class HangmanResultEvent extends HangmanBasicResultEvent implements Han
     /**
      * @var string[]
      */
-    private $playedLetters;
+    protected $playedLetters;
 
     /**
      * @var int
      */
-    private $remainingLives;
+    protected $remainingLives;
 
     /**
      * Constructor

@@ -2,12 +2,11 @@
 
 namespace Hangman\Event;
 
-use Broadway\Serializer\SerializableInterface;
 use Hangman\Event\Util\HangmanErrorEvent;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
 
-class HangmanGameFailedStartingEvent extends HangmanErrorEvent implements SerializableInterface
+class HangmanGameFailedStartingEvent extends HangmanErrorEvent
 {
     /**
      * @var string
@@ -52,31 +51,5 @@ class HangmanGameFailedStartingEvent extends HangmanErrorEvent implements Serial
             default:
                 return "Game failed starting for unknown reasons";
         }
-    }
-
-    /**
-     * @return array
-     */
-    public function serialize()
-    {
-        return [
-            'name' => self::NAME,
-            'gameId' => (string) $this->getGameId(),
-            'playerId' => ($this->getPlayerId()) ? (string) $this->getPlayerId() : null,
-            'reason' => $this->reason
-        ];
-    }
-
-    /**
-     * @param  array $data
-     * @return HangmanGameStartedEvent
-     */
-    public static function deserialize(array $data)
-    {
-        return new self(
-            MiniGameId::create($data['gameId']),
-            isset($data['playerId']) ? PlayerId::create($data['playerId']) : null,
-            $data['reason']
-        );
     }
 }

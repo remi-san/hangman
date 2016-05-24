@@ -2,14 +2,13 @@
 
 namespace Hangman\Event;
 
-use Broadway\Serializer\SerializableInterface;
 use Hangman\Event\Util\HangmanErrorEvent;
 use Hangman\Move\Answer;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
 use MiniGame\Move;
 
-class HangmanPlayerProposedInvalidAnswerEvent extends HangmanErrorEvent implements SerializableInterface
+class HangmanPlayerProposedInvalidAnswerEvent extends HangmanErrorEvent
 {
     /**
      * @var string
@@ -48,31 +47,5 @@ class HangmanPlayerProposedInvalidAnswerEvent extends HangmanErrorEvent implemen
     public function getAsMessage()
     {
         return 'Invalid answer';
-    }
-
-    /**
-     * @return array
-     */
-    public function serialize()
-    {
-        return [
-            'name' => self::NAME,
-            'gameId' => (string) $this->getGameId(),
-            'playerId' => (string) $this->getPlayerId(),
-            'answer' => (string) $this->answer->getText()
-        ];
-    }
-
-    /**
-     * @param  array $data
-     * @return HangmanPlayerProposedInvalidAnswerEvent
-     */
-    public static function deserialize(array $data)
-    {
-        return new self(
-            MiniGameId::create($data['gameId']),
-            PlayerId::create($data['playerId']),
-            Answer::create($data['answer'])
-        );
     }
 }

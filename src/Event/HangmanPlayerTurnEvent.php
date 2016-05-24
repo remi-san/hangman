@@ -2,13 +2,12 @@
 
 namespace Hangman\Event;
 
-use Broadway\Serializer\SerializableInterface;
 use Hangman\Event\Util\HangmanBasicResultEvent;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
 use MiniGame\GameResult;
 
-class HangmanPlayerTurnEvent extends HangmanBasicResultEvent implements GameResult, SerializableInterface
+class HangmanPlayerTurnEvent extends HangmanBasicResultEvent implements GameResult
 {
     /**
      * @var string
@@ -34,29 +33,5 @@ class HangmanPlayerTurnEvent extends HangmanBasicResultEvent implements GameResu
     public function getAsMessage()
     {
         return sprintf('It is your turn to play');
-    }
-
-    /**
-     * @return array
-     */
-    public function serialize()
-    {
-        return [
-            'name' => self::NAME,
-            'gameId' => (string) $this->getGameId(),
-            'playerId' => (string) $this->getPlayerId()
-        ];
-    }
-
-    /**
-     * @param  array $data
-     * @return HangmanPlayerLostEvent
-     */
-    public static function deserialize(array $data)
-    {
-        return new self(
-            MiniGameId::create($data['gameId']),
-            PlayerId::create($data['playerId'])
-        );
     }
 }

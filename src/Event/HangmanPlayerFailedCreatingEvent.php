@@ -2,12 +2,11 @@
 
 namespace Hangman\Event;
 
-use Broadway\Serializer\SerializableInterface;
 use Hangman\Event\Util\HangmanErrorEvent;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
 
-class HangmanPlayerFailedCreatingEvent extends HangmanErrorEvent implements SerializableInterface
+class HangmanPlayerFailedCreatingEvent extends HangmanErrorEvent
 {
     /**
      * @var string
@@ -46,31 +45,5 @@ class HangmanPlayerFailedCreatingEvent extends HangmanErrorEvent implements Seri
     public function getAsMessage()
     {
         return 'You cannot add a player to a game that has already started.';
-    }
-
-    /**
-     * @return array
-     */
-    public function serialize()
-    {
-        return [
-            'name' => self::NAME,
-            'gameId' => (string) $this->getGameId(),
-            'playerId' => (string) $this->getPlayerId(),
-            'externalReference' => $this->externalReference
-        ];
-    }
-
-    /**
-     * @param  array $data
-     * @return HangmanPlayerFailedCreatingEvent
-     */
-    public static function deserialize(array $data)
-    {
-        return new self(
-            MiniGameId::create($data['gameId']),
-            PlayerId::create($data['playerId']),
-            $data['externalReference']
-        );
     }
 }
