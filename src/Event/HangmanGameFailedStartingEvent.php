@@ -41,15 +41,11 @@ class HangmanGameFailedStartingEvent extends HangmanErrorEvent
         $this->reason = $reason;
     }
 
-    public function getAsMessage()
+    /**
+     * @return string
+     */
+    public function getReason()
     {
-        switch ($this->reason) {
-            case self::BAD_STATE:
-                return "You can't start a game that's already started or is over.";
-            case self::NO_PLAYER:
-                return "You can't start a game that has no player.";
-            default:
-                return "Game failed starting for unknown reasons";
-        }
+        return $this->reason;
     }
 }

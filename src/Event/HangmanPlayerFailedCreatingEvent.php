@@ -38,12 +38,4 @@ class HangmanPlayerFailedCreatingEvent extends HangmanErrorEvent
     {
         return $this->externalReference;
     }
-
-    /**
-     * @return string
-     */
-    public function getAsMessage()
-    {
-        return 'You cannot add a player to a game that has already started.';
-    }
 }

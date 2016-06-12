@@ -55,12 +55,4 @@ class HangmanPlayerWinEvent extends HangmanResultEvent implements AllPlayersResu
     {
         return $this->word;
     }
-
-    /**
-     * @return string
-     */
-    public function getAsMessage()
-    {
-        return sprintf('Congratulations! The word was %s.', $this->getWord());
-    }
 }

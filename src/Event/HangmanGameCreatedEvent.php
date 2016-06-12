@@ -36,12 +36,4 @@ class HangmanGameCreatedEvent extends HangmanBasicResultEvent
     {
         return $this->word;
     }
-
-    /**
-     * @return string
-     */
-    public function getAsMessage()
-    {
-        return 'Game created';
-    }
 }

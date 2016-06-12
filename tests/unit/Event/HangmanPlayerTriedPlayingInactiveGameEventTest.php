@@ -28,6 +28,5 @@ class HangmanPlayerTriedPlayingInactiveGameEventTest extends \PHPUnit_Framework_
 
         $this->assertEquals($gameId, $event->getGameId());
         $this->assertEquals($playerId, $event->getPlayerId());
-        $this->assertEquals('You cannot play.', $event->getAsMessage());
     }
 }

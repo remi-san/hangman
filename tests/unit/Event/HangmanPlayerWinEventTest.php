@@ -37,6 +37,5 @@ class HangmanPlayerWinEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($playedLetters, $event->getPlayedLetters());
         $this->assertEquals($remainingLives, $event->getRemainingLives());
         $this->assertEquals($word, $event->getWord());
-        $this->assertEquals(sprintf('Congratulations! The word was %s.', $event->getWord()), $event->getAsMessage());
     }
 }

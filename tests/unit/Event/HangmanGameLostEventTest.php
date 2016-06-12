@@ -27,6 +27,5 @@ class HangmanGameLostEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($id, $event->getGameId());
         $this->assertEquals($playerId, $event->getPlayerId());
         $this->assertEquals($word, $event->getWord());
-        $this->assertEquals('Game lost', $event->getAsMessage());
     }
 }

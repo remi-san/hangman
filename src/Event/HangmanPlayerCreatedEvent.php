@@ -64,14 +64,6 @@ class HangmanPlayerCreatedEvent extends HangmanBasicResultEvent
     /**
      * @return string
      */
-    public function getAsMessage()
-    {
-        return 'Player created';
-    }
-
-    /**
-     * @return string
-     */
     public function getExternalReference()
     {
         return $this->externalReference;

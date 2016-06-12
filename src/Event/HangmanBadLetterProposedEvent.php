@@ -86,17 +86,4 @@ class HangmanBadLetterProposedEvent extends HangmanResultEvent implements Hangma
     {
         return $this->wordSoFar;
     }
-
-    /**
-     * @return string
-     */
-    public function getAsMessage()
-    {
-        return sprintf(
-            'Too bad... %s (letters played: %s) - Remaining chances: %d',
-            $this->getWordSoFar(),
-            implode(', ', $this->getPlayedLetters()),
-            $this->getRemainingLives()
-        );
-    }
 }

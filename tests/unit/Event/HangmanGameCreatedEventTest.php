@@ -25,6 +25,5 @@ class HangmanGameCreatedEventEventTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($id, $event->getGameId());
         $this->assertEquals($word, $event->getWord());
-        $this->assertEquals('Game created', $event->getAsMessage());
     }
 }

@@ -40,6 +40,5 @@ class HangmanPlayerLostEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($remainingLives, $event->getRemainingLives());
         $this->assertEquals($wordSoFar, $event->getWordFound());
         $this->assertEquals($word, $event->getWord());
-        $this->assertEquals(sprintf('You lose... The word was %s.', $event->getWord()), $event->getAsMessage());
     }
 }

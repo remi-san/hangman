@@ -48,9 +48,4 @@ abstract class HangmanBasicResultEvent extends Event implements GameResult
     {
         return $this->playerId;
     }
-
-    /**
-     * @return string
-     */
-    abstract public function getAsMessage();
 }

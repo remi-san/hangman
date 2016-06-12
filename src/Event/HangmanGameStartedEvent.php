@@ -24,12 +24,4 @@ class HangmanGameStartedEvent extends HangmanBasicResultEvent implements AllPlay
     {
         parent::__construct(self::NAME, $gameId, $playerId);
     }
-
-    /**
-     * @return string
-     */
-    public function getAsMessage()
-    {
-        return 'Game started';
-    }
 }

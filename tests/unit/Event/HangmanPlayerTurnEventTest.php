@@ -28,6 +28,5 @@ class HangmanPlayerTurnEventTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($gameId, $event->getGameId());
         $this->assertEquals($playerId, $event->getPlayerId());
-        $this->assertEquals('It is your turn to play', $event->getAsMessage());
     }
 }

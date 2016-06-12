@@ -70,12 +70,4 @@ class HangmanPlayerLostEvent extends HangmanResultEvent implements HangmanLost
     {
         return $this->word;
     }
-
-    /**
-     * @return string
-     */
-    public function getAsMessage()
-    {
-        return sprintf('You lose... The word was %s.', $this->getWord());
-    }
 }

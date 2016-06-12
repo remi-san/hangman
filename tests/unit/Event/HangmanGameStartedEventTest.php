@@ -24,6 +24,5 @@ class HangmanGameStartedEventTest extends \PHPUnit_Framework_TestCase
         $event = new HangmanGameStartedEvent($id, $playerId);
 
         $this->assertEquals($id, $event->getGameId());
-        $this->assertEquals('Game started', $event->getAsMessage());
     }
 }

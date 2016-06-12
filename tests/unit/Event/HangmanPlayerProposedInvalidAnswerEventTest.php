@@ -32,6 +32,5 @@ class HangmanPlayerProposedInvalidAnswerEventTest extends \PHPUnit_Framework_Tes
         $this->assertEquals($gameId, $event->getGameId());
         $this->assertEquals($playerId, $event->getPlayerId());
         $this->assertEquals($answer, $event->getAnswer());
-        $this->assertEquals('Invalid answer', $event->getAsMessage());
     }
 }

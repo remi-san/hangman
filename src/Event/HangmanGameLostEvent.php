@@ -44,14 +44,6 @@ class HangmanGameLostEvent extends HangmanBasicResultEvent implements AllPlayers
     /**
      * @return string
      */
-    public function getAsMessage()
-    {
-        return 'Game lost';
-    }
-
-    /**
-     * @return string
-     */
     public function getSolution()
     {
         return $this->word;

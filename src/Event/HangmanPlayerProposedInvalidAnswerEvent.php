@@ -40,12 +40,4 @@ class HangmanPlayerProposedInvalidAnswerEvent extends HangmanErrorEvent
     {
         return $this->answer;
     }
-
-    /**
-     * @return string
-     */
-    public function getAsMessage()
-    {
-        return 'Invalid answer';
-    }
 }

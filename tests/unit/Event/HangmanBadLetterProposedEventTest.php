@@ -44,14 +44,5 @@ class HangmanBadLetterProposedEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($remainingLives, $event->getRemainingLives());
         $this->assertEquals($wordSoFar, $event->getWordSoFar());
         $this->assertEquals($wordSoFar, $event->getFeedback());
-        $this->assertEquals(
-            sprintf(
-                'Too bad... %s (letters played: %s) - Remaining chances: %d',
-                $wordSoFar,
-                implode(', ', $event->getPlayedLetters()),
-                $event->getRemainingLives()
-            ),
-            $event->getAsMessage()
-        );
     }
 }

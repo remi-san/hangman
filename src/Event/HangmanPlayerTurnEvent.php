@@ -26,12 +26,4 @@ class HangmanPlayerTurnEvent extends HangmanBasicResultEvent implements GameResu
     ) {
         parent::__construct(self::NAME, $gameId, $playerId);
     }
-
-    /**
-     * @return string
-     */
-    public function getAsMessage()
-    {
-        return sprintf('It is your turn to play');
-    }
 }

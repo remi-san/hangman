@@ -23,12 +23,4 @@ class HangmanPlayerTriedPlayingDuringAnotherPlayerTurnEvent extends HangmanError
     {
         parent::__construct(self::NAME, $gameId, $playerId);
     }
-
-    /**
-     * @return string
-     */
-    public function getAsMessage()
-    {
-        return 'You cannot play.';
-    }
 }

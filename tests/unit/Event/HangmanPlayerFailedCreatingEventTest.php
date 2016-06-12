@@ -31,9 +31,5 @@ class HangmanPlayerFailedCreatingEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($gameId, $event->getGameId());
         $this->assertEquals($playerId, $event->getPlayerId());
         $this->assertEquals($extRef, $event->getExternalReference());
-        $this->assertEquals(
-            'You cannot add a player to a game that has already started.',
-            $event->getAsMessage()
-        );
     }
 }

@@ -29,6 +29,5 @@ class HangmanPlayerCreatedEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('name', $event->getPlayerName());
         $this->assertEquals($lives, $event->getLives());
         $this->assertEquals('ext', $event->getExternalReference());
-        $this->assertEquals('Player created', $event->getAsMessage());
     }
 }

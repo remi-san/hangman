@@ -70,17 +70,4 @@ class HangmanGoodLetterProposedEvent extends HangmanResultEvent implements Hangm
     {
         return $this->wordSoFar;
     }
-
-    /**
-     * @return string
-     */
-    public function getAsMessage()
-    {
-        return sprintf(
-            'Well played! %s (letters played: %s) - Remaining chances: %d',
-            $this->getFeedBack(),
-            implode(', ', $this->getPlayedLetters()),
-            $this->getRemainingLives()
-        );
-    }
 }

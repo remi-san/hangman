@@ -30,10 +30,7 @@ class HangmanGameFailedStartingEventTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($gameId, $event->getGameId());
         $this->assertEquals($playerId, $event->getPlayerId());
-        $this->assertEquals(
-            "You can't start a game that has no player.",
-            $event->getAsMessage()
-        );
+        $this->assertEquals($reason, $event->getReason());
     }
 
     /**
@@ -53,10 +50,7 @@ class HangmanGameFailedStartingEventTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($gameId, $event->getGameId());
         $this->assertEquals($playerId, $event->getPlayerId());
-        $this->assertEquals(
-            "You can't start a game that's already started or is over.",
-            $event->getAsMessage()
-        );
+        $this->assertEquals($reason, $event->getReason());
     }
 
     /**
@@ -76,9 +70,6 @@ class HangmanGameFailedStartingEventTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($gameId, $event->getGameId());
         $this->assertEquals($playerId, $event->getPlayerId());
-        $this->assertEquals(
-            "Game failed starting for unknown reasons",
-            $event->getAsMessage()
-        );
+        $this->assertEquals($reason, $event->getReason());
     }
 }
