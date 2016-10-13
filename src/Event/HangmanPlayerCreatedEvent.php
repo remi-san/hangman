@@ -5,8 +5,9 @@ namespace Hangman\Event;
 use Hangman\Event\Util\HangmanBasicResultEvent;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
+use MiniGame\Event\PlayerCreatedEvent;
 
-class HangmanPlayerCreatedEvent extends HangmanBasicResultEvent
+class HangmanPlayerCreatedEvent extends HangmanBasicResultEvent implements PlayerCreatedEvent
 {
     /**
      * @var string
