@@ -104,6 +104,10 @@ class HangmanOptions extends AbstractGameOptions implements GameOptions
                 $this->level
             );
         }
+
+        if ($this->word === null && $this->level === null && $this->length === null) {
+            throw new \InvalidArgumentException('You have to provide at least one option (word/length/level)!');
+        }
     }
 
     /**
