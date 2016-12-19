@@ -1,5 +1,5 @@
 <?php
-namespace Hangman\Test;
+namespace Hangman\Test\Entity;
 
 use Hangman\Entity\Hangman;
 use Hangman\Event\HangmanGameFailedStartingEvent;

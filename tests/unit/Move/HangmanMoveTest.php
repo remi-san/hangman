@@ -1,5 +1,5 @@
 <?php
-namespace Hangman\Test;
+namespace Hangman\Test\Move;
 
 use Hangman\Move\Answer;
 use Hangman\Move\Proposition;

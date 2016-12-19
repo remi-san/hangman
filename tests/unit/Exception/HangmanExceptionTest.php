@@ -1,5 +1,5 @@
 <?php
-namespace Hangman\Test;
+namespace Hangman\Test\Exception;
 
 use Hangman\Exception\HangmanPlayerOptionsException;
 use MiniGame\Test\Mock\GameObjectMocker;

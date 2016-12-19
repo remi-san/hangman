@@ -1,5 +1,5 @@
 <?php
-namespace Hangman\Test;
+namespace Hangman\Test\Options;
 
 use Hangman\Options\HangmanOptions;
 use MiniGame\Test\Mock\GameObjectMocker;
