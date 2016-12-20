@@ -254,10 +254,8 @@ class HangmanPlayer extends EventSourcedEntity implements Player
      */
     protected function applyHangmanBadLetterProposedEvent(HangmanBadLetterProposedEvent $event)
     {
-        if ((string)$event->getPlayerId() === (string)$this->getId()) {
-            $this->loseLife($event->getLivesLost());
-            $this->playLetter($event->getLetter());
-        }
+        $this->loseLife($event->getLivesLost());
+        $this->playLetter($event->getLetter());
     }
 
     /**
@@ -268,9 +266,7 @@ class HangmanPlayer extends EventSourcedEntity implements Player
      */
     protected function applyHangmanGoodLetterProposedEvent(HangmanGoodLetterProposedEvent $event)
     {
-        if ((string)$event->getPlayerId() === (string)$this->getId()) {
-            $this->playLetter($event->getLetter());
-        }
+        $this->playLetter($event->getLetter());
     }
 
     /**
@@ -280,9 +276,7 @@ class HangmanPlayer extends EventSourcedEntity implements Player
      */
     protected function applyHangmanPlayerLostEvent(HangmanPlayerLostEvent $event)
     {
-        if ((string)$event->getPlayerId() === (string)$this->getId()) {
-            $this->lose();
-        }
+        $this->lose();
     }
 
     /**
@@ -292,9 +286,7 @@ class HangmanPlayer extends EventSourcedEntity implements Player
      */
     protected function applyHangmanPlayerWinEvent(HangmanPlayerWinEvent $event)
     {
-        if ((string)$event->getPlayerId() === (string)$this->getId()) {
-            $this->win();
-        }
+        $this->win();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
