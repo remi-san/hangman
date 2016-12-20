@@ -2,11 +2,26 @@
 namespace Hangman\Test\Event;
 
 use Hangman\Event\HangmanGameLostEvent;
-use MiniGame\Test\Mock\GameObjectMocker;
+use MiniGame\Entity\MiniGameId;
+use MiniGame\Entity\PlayerId;
 
 class HangmanGameLostEventTest extends \PHPUnit_Framework_TestCase
 {
-    use GameObjectMocker;
+    /** @var MiniGameId */
+    private $gameId;
+
+    /** @var PlayerId */
+    private $playerId;
+
+    /** @var string */
+    private $word;
+
+    public function setUp()
+    {
+        $this->gameId = MiniGameId::create(666);
+        $this->playerId = PlayerId::create(42);
+        $this->word = 'word';
+    }
 
     public function tearDown()
     {
@@ -16,16 +31,12 @@ class HangmanGameLostEventTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function testHangmanStarted()
+    public function itShouldBuildHangmanStartedEvent()
     {
-        $id = $this->getMiniGameId(666);
-        $playerId = $this->getPlayerId(42);
-        $word = 'word';
+        $event = new HangmanGameLostEvent($this->gameId, $this->playerId, $this->word);
 
-        $event = new HangmanGameLostEvent($id, $playerId, $word);
-
-        $this->assertEquals($id, $event->getGameId());
-        $this->assertEquals($playerId, $event->getPlayerId());
-        $this->assertEquals($word, $event->getWord());
+        $this->assertEquals($this->gameId, $event->getGameId());
+        $this->assertEquals($this->playerId, $event->getPlayerId());
+        $this->assertEquals($this->word, $event->getWord());
     }
 }

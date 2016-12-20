@@ -2,11 +2,34 @@
 namespace Hangman\Test\Event;
 
 use Hangman\Event\HangmanPlayerCreatedEvent;
-use MiniGame\Test\Mock\GameObjectMocker;
+use MiniGame\Entity\MiniGameId;
+use MiniGame\Entity\PlayerId;
 
 class HangmanPlayerCreatedEventTest extends \PHPUnit_Framework_TestCase
 {
-    use GameObjectMocker;
+    /** @var MiniGameId */
+    private $gameId;
+
+    /** @var PlayerId */
+    private $playerId;
+
+    /** @var int */
+    private $lives;
+
+    /** @var string */
+    private $name;
+
+    /** @var string */
+    private $externalReference;
+
+    public function setUp()
+    {
+        $this->gameId = MiniGameId::create(666);
+        $this->playerId = PlayerId::create(42);
+        $this->lives = 6;
+        $this->name = 'name';
+        $this->externalReference = 'extReference';
+    }
 
     public function tearDown()
     {
@@ -16,18 +39,20 @@ class HangmanPlayerCreatedEventTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function testPlayerCreated()
+    public function itShouldBuildPlayerCreatedEvent()
     {
-        $gameId = $this->getMiniGameId(666);
-        $playerId = $this->getPlayerId(42);
-        $lives = 6;
+        $event = new HangmanPlayerCreatedEvent(
+            $this->gameId,
+            $this->playerId,
+            $this->name,
+            $this->lives,
+            $this->externalReference
+        );
 
-        $event = new HangmanPlayerCreatedEvent($gameId, $playerId, 'name', $lives, 'ext');
-
-        $this->assertEquals($gameId, $event->getGameId());
-        $this->assertEquals($playerId, $event->getPlayerId());
-        $this->assertEquals('name', $event->getPlayerName());
-        $this->assertEquals($lives, $event->getLives());
-        $this->assertEquals('ext', $event->getExternalReference());
+        $this->assertEquals($this->gameId, $event->getGameId());
+        $this->assertEquals($this->playerId, $event->getPlayerId());
+        $this->assertEquals($this->name, $event->getPlayerName());
+        $this->assertEquals($this->lives, $event->getLives());
+        $this->assertEquals($this->externalReference, $event->getExternalReference());
     }
 }

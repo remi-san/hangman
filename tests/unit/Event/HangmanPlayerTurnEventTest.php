@@ -2,11 +2,22 @@
 namespace Hangman\Test\Event;
 
 use Hangman\Event\HangmanPlayerTurnEvent;
-use MiniGame\Test\Mock\GameObjectMocker;
+use MiniGame\Entity\MiniGameId;
+use MiniGame\Entity\PlayerId;
 
 class HangmanPlayerTurnEventTest extends \PHPUnit_Framework_TestCase
 {
-    use GameObjectMocker;
+    /** @var MiniGameId */
+    private $gameId;
+
+    /** @var PlayerId */
+    private $playerId;
+
+    public function setUp()
+    {
+        $this->gameId = MiniGameId::create(666);
+        $this->playerId = PlayerId::create(42);
+    }
 
     public function tearDown()
     {
@@ -16,17 +27,14 @@ class HangmanPlayerTurnEventTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function testPlayerTurn()
+    public function itShouldBuildPlayerTurnEvent()
     {
-        $gameId = $this->getMiniGameId(666);
-        $playerId = $this->getPlayerId(42);
-
         $event = new HangmanPlayerTurnEvent(
-            $gameId,
-            $playerId
+            $this->gameId,
+            $this->playerId
         );
 
-        $this->assertEquals($gameId, $event->getGameId());
-        $this->assertEquals($playerId, $event->getPlayerId());
+        $this->assertEquals($this->gameId, $event->getGameId());
+        $this->assertEquals($this->playerId, $event->getPlayerId());
     }
 }

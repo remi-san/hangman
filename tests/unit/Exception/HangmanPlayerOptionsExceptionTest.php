@@ -2,21 +2,21 @@
 namespace Hangman\Test\Exception;
 
 use Hangman\Exception\HangmanPlayerOptionsException;
-use MiniGame\Test\Mock\GameObjectMocker;
+use MiniGame\Entity\MiniGameId;
+use MiniGame\Entity\PlayerId;
 
-class HangmanExceptionTest extends \PHPUnit_Framework_TestCase
+class HangmanPlayerOptionsExceptionTest extends \PHPUnit_Framework_TestCase
 {
-    use GameObjectMocker;
-
+    /** @var MiniGameId */
     private $gameId;
 
+    /** @var PlayerId */
     private $playerId;
 
     public function setUp()
     {
-        $this->gameId = $this->getMiniGameId(666);
-
-        $this->playerId = $this->getPlayerId(42);
+        $this->gameId = MiniGameId::create(666);
+        $this->playerId = PlayerId::create(42);
     }
 
     public function tearDown()
@@ -27,7 +27,7 @@ class HangmanExceptionTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function testHangmanOptionsWithWord()
+    public function itShouldBuildHangmanOptionsWithWordException()
     {
         $event = new HangmanPlayerOptionsException($this->playerId, $this->gameId);
 

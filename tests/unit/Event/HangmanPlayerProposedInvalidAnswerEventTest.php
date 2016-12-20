@@ -2,12 +2,29 @@
 namespace Hangman\Test\Event;
 
 use Hangman\Event\HangmanPlayerProposedInvalidAnswerEvent;
+use Hangman\Move\Answer;
 use Hangman\Test\Mock\HangmanMocker;
+use MiniGame\Entity\MiniGameId;
+use MiniGame\Entity\PlayerId;
 use MiniGame\Test\Mock\GameObjectMocker;
 
 class HangmanPlayerProposedInvalidAnswerEventTest extends \PHPUnit_Framework_TestCase
 {
-    use GameObjectMocker, HangmanMocker;
+    /** @var MiniGameId */
+    private $gameId;
+
+    /** @var PlayerId */
+    private $playerId;
+
+    /** @var Answer */
+    private $answer;
+
+    public function setUp()
+    {
+        $this->gameId = MiniGameId::create(666);
+        $this->playerId = PlayerId::create(42);
+        $this->answer = \Mockery::mock(Answer::class);
+    }
 
     public function tearDown()
     {
@@ -17,20 +34,16 @@ class HangmanPlayerProposedInvalidAnswerEventTest extends \PHPUnit_Framework_Tes
     /**
      * @test
      */
-    public function test()
+    public function itShouldBuildHangmanPlayerProposedInvalidAnswerEvent()
     {
-        $gameId = $this->getMiniGameId(666);
-        $playerId = $this->getPlayerId(42);
-        $answer = $this->getAnswer('answer');
-
         $event = new HangmanPlayerProposedInvalidAnswerEvent(
-            $gameId,
-            $playerId,
-            $answer
+            $this->gameId,
+            $this->playerId,
+            $this->answer
         );
 
-        $this->assertEquals($gameId, $event->getGameId());
-        $this->assertEquals($playerId, $event->getPlayerId());
-        $this->assertEquals($answer, $event->getAnswer());
+        $this->assertEquals($this->gameId, $event->getGameId());
+        $this->assertEquals($this->playerId, $event->getPlayerId());
+        $this->assertEquals($this->answer, $event->getAnswer());
     }
 }

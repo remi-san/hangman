@@ -1,16 +1,15 @@
 <?php
 namespace Hangman\Test\Entity;
 
+use Hangman\Entity\Hangman;
 use Hangman\Entity\HangmanPlayer;
 use Hangman\Event\HangmanBadLetterProposedEvent;
-use Hangman\Test\Mock\HangmanMocker;
-use MiniGame\Test\Mock\GameObjectMocker;
+use MiniGame\Entity\MiniGameId;
+use MiniGame\Entity\PlayerId;
 use Rhumsaa\Uuid\Uuid;
 
 class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
 {
-    use GameObjectMocker, HangmanMocker;
-
     public function tearDown()
     {
         \Mockery::close();
@@ -36,10 +35,10 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetters()
     {
-        $id = $this->getPlayerId(42);
+        $id = PlayerId::create(42);
         $name = 'Douglas';
         $lives = 5;
-        $game = $this->getHangmanMiniGame($this->getMiniGameId(33));
+        $game = Hangman::createGame(MiniGameId::create(33), 'word');
 
         $player = new HangmanPlayer($id, $name, $lives, $game, 'ext');
 
@@ -55,11 +54,10 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
      */
     public function testDomainMethods()
     {
-        $id = $this->getPlayerId(42);
+        $id = PlayerId::create(42);
         $name = 'Douglas';
         $lives = 5;
-        $game = \Mockery::mock('\Hangman\Entity\Hangman');
-        $game->shouldReceive('getId')->andReturn($this->getMiniGameId(33));
+        $game = Hangman::createGame(MiniGameId::create(33), 'word');
 
         $a = 'a';
         $b = 'b';
@@ -84,11 +82,10 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
      */
     public function testWin()
     {
-        $id = $this->getPlayerId(42);
+        $id = PlayerId::create(42);
         $name = 'Douglas';
         $lives = 5;
-        $game = \Mockery::mock('\Hangman\Entity\Hangman');
-        $game->shouldReceive('getId')->andReturn($this->getMiniGameId(33));
+        $game = Hangman::createGame(MiniGameId::create(33), 'word');
 
         $player = new HangmanPlayer($id, $name, $lives, $game);
 
@@ -104,11 +101,10 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
      */
     public function testLose()
     {
-        $id = $this->getPlayerId(42);
+        $id = PlayerId::create(42);
         $name = 'Douglas';
         $lives = 5;
-        $game = \Mockery::mock('\Hangman\Entity\Hangman');
-        $game->shouldReceive('getId')->andReturn($this->getMiniGameId(33));
+        $game = Hangman::createGame(MiniGameId::create(33), 'word');
 
         $player = new HangmanPlayer($id, $name, $lives, $game);
 
@@ -124,17 +120,17 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
      */
     public function testHandleHangmanBadLetterProposedEventForOtherPlayer()
     {
-        $id = $this->getPlayerId(42);
+        $id = PlayerId::create(42);
         $name = 'Douglas';
         $lives = 5;
-        $game = \Mockery::mock('\Hangman\Entity\Hangman');
+        $game = Hangman::createGame(MiniGameId::create(33), 'word');
 
         $player = new HangmanPlayer($id, $name, $lives, $game);
 
         $player->handleRecursively(
             new HangmanBadLetterProposedEvent(
-                $this->getMiniGameId(33),
-                $this->getPlayerId(25),
+                MiniGameId::create(33),
+                PlayerId::create(25),
                 'A',
                 array(),
                 1,
@@ -151,16 +147,16 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
      */
     public function testHandleHangmanBadLetterProposedEventForPlayer()
     {
-        $id = $this->getPlayerId(42);
+        $id = PlayerId::create(42);
         $name = 'Douglas';
         $lives = 5;
-        $game = \Mockery::mock('\Hangman\Entity\Hangman');
+        $game = Hangman::createGame(MiniGameId::create(33), 'word');
 
         $player = new HangmanPlayer($id, $name, $lives, $game);
 
         $player->handleRecursively(
             new HangmanBadLetterProposedEvent(
-                $this->getMiniGameId(33),
+                MiniGameId::create(33),
                 $id,
                 'A',
                 array(),

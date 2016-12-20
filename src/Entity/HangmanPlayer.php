@@ -10,6 +10,7 @@ use Hangman\Event\HangmanPlayerWinEvent;
 use MiniGame\Entity\MiniGame;
 use MiniGame\Entity\Player;
 use MiniGame\Entity\PlayerId;
+use MiniGame\GameResult;
 use Rhumsaa\Uuid\Uuid;
 
 class HangmanPlayer extends EventSourcedEntity implements Player
@@ -294,5 +295,38 @@ class HangmanPlayer extends EventSourcedEntity implements Player
         if ((string)$event->getPlayerId() === (string)$this->getId()) {
             $this->win();
         }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////   APPLY RESTRICTIONS   ///////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    /**
+     * @param mixed $event
+     */
+    public function handleRecursively($event)
+    {
+        if (! $this->isSupportedEvent($event)) {
+            return;
+        }
+
+        parent::handleRecursively($event);
+    }
+
+    /**
+     * @param mixed $event
+     *
+     * @return bool
+     */
+    private function isSupportedEvent($event)
+    {
+        return (
+            $event instanceof GameResult &&
+            $this->id == $event->getPlayerId() &&
+            $this->game->getId() == $event->getGameId()
+        );
     }
 }

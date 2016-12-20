@@ -832,7 +832,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * @return HangmanPlayer[]
+     * @return Player[]
      */
     protected function getChildEntities()
     {
@@ -874,5 +874,37 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     public static function instantiateForReconstitution()
     {
         return new self();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////   APPLY RESTRICTIONS   ///////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    /**
+     * @param mixed $event
+     */
+    public function handleRecursively($event)
+    {
+        if (! $this->isSupportedEvent($event)) {
+            return;
+        }
+
+        parent::handleRecursively($event);
+    }
+
+    /**
+     * @param mixed $event
+     *
+     * @return bool
+     */
+    private function isSupportedEvent($event)
+    {
+        return (
+            $event instanceof GameResult &&
+            ($this->id === null || $this->id == $event->getGameId())
+        );
     }
 }

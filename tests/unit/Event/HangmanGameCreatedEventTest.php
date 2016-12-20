@@ -2,11 +2,21 @@
 namespace Hangman\Test\Event;
 
 use Hangman\Event\HangmanGameCreatedEvent;
-use MiniGame\Test\Mock\GameObjectMocker;
+use MiniGame\Entity\MiniGameId;
 
 class HangmanGameCreatedEventEventTest extends \PHPUnit_Framework_TestCase
 {
-    use GameObjectMocker;
+    /** @var MiniGameId */
+    private $id;
+
+    /** @var string */
+    private $word;
+
+    public function setUp()
+    {
+        $this->id = MiniGameId::create(666);
+        $this->word = 'TEST';
+    }
 
     public function tearDown()
     {
@@ -16,14 +26,11 @@ class HangmanGameCreatedEventEventTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function testHangmanCreated()
+    public function itShouldBuildHangmanCreatedEvent()
     {
-        $id = $this->getMiniGameId(666);
-        $word = 'TEST';
+        $event = new HangmanGameCreatedEvent($this->id, $this->word);
 
-        $event = new HangmanGameCreatedEvent($id, $word);
-
-        $this->assertEquals($id, $event->getGameId());
-        $this->assertEquals($word, $event->getWord());
+        $this->assertEquals($this->id, $event->getGameId());
+        $this->assertEquals($this->word, $event->getWord());
     }
 }

@@ -2,11 +2,26 @@
 namespace Hangman\Test\Event;
 
 use Hangman\Event\HangmanPlayerFailedCreatingEvent;
-use MiniGame\Test\Mock\GameObjectMocker;
+use MiniGame\Entity\MiniGameId;
+use MiniGame\Entity\PlayerId;
 
 class HangmanPlayerFailedCreatingEventTest extends \PHPUnit_Framework_TestCase
 {
-    use GameObjectMocker;
+    /** @var MiniGameId */
+    private $gameId;
+
+    /** @var PlayerId */
+    private $playerId;
+
+    /** @var string */
+    private $externalReference;
+
+    public function setUp()
+    {
+        $this->gameId = MiniGameId::create(666);
+        $this->playerId = PlayerId::create(42);
+        $this->externalReference = 'extReference';
+    }
 
     public function tearDown()
     {
@@ -16,20 +31,16 @@ class HangmanPlayerFailedCreatingEventTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function test()
+    public function itShouldBuildHangmanPlayerFailedCreatingEvent()
     {
-        $gameId = $this->getMiniGameId(666);
-        $playerId = $this->getPlayerId(42);
-        $extRef = 'ext-ref';
-
         $event = new HangmanPlayerFailedCreatingEvent(
-            $gameId,
-            $playerId,
-            $extRef
+            $this->gameId,
+            $this->playerId,
+            $this->externalReference
         );
 
-        $this->assertEquals($gameId, $event->getGameId());
-        $this->assertEquals($playerId, $event->getPlayerId());
-        $this->assertEquals($extRef, $event->getExternalReference());
+        $this->assertEquals($this->gameId, $event->getGameId());
+        $this->assertEquals($this->playerId, $event->getPlayerId());
+        $this->assertEquals($this->externalReference, $event->getExternalReference());
     }
 }

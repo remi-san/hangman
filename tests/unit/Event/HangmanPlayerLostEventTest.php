@@ -2,11 +2,42 @@
 namespace Hangman\Test\Event;
 
 use Hangman\Event\HangmanPlayerLostEvent;
-use MiniGame\Test\Mock\GameObjectMocker;
+use MiniGame\Entity\MiniGameId;
+use MiniGame\Entity\PlayerId;
 
 class HangmanPlayerLostEventTest extends \PHPUnit_Framework_TestCase
 {
-    use GameObjectMocker;
+    /** @var MiniGameId */
+    private $gameId;
+
+    /** @var PlayerId */
+    private $playerId;
+
+    /** @var string[] */
+    private $playedLetters;
+
+    /** @var int */
+    private $livesLost;
+
+    /** @var int */
+    private $remainingLives;
+
+    /** @var string */
+    private $wordSoFar;
+
+    /** @var string */
+    private $word;
+
+    public function setUp()
+    {
+        $this->gameId = MiniGameId::create(666);
+        $this->playerId = PlayerId::create(42);
+        $this->playedLetters = ['A'];
+        $this->livesLost = 1;
+        $this->remainingLives = 5;
+        $this->wordSoFar = 'A _ _';
+        $this->word = 'ABC';
+    }
 
     public function tearDown()
     {
@@ -16,29 +47,22 @@ class HangmanPlayerLostEventTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function testPlayerLost()
+    public function itShouldBuildPlayerLostEvent()
     {
-        $gameId = $this->getMiniGameId(666);
-        $playerId = $this->getPlayerId(42);
-        $playedLetters = array('A');
-        $remainingLives = 5;
-        $wordSoFar = 'A _ _';
-        $word = 'ABC';
-
         $event = new HangmanPlayerLostEvent(
-            $gameId,
-            $playerId,
-            $playedLetters,
-            $remainingLives,
-            $wordSoFar,
-            $word
+            $this->gameId,
+            $this->playerId,
+            $this->playedLetters,
+            $this->remainingLives,
+            $this->wordSoFar,
+            $this->word
         );
 
-        $this->assertEquals($gameId, $event->getGameId());
-        $this->assertEquals($playerId, $event->getPlayerId());
-        $this->assertEquals($playedLetters, $event->getPlayedLetters());
-        $this->assertEquals($remainingLives, $event->getRemainingLives());
-        $this->assertEquals($wordSoFar, $event->getWordFound());
-        $this->assertEquals($word, $event->getWord());
+        $this->assertEquals($this->gameId, $event->getGameId());
+        $this->assertEquals($this->playerId, $event->getPlayerId());
+        $this->assertEquals($this->playedLetters, $event->getPlayedLetters());
+        $this->assertEquals($this->remainingLives, $event->getRemainingLives());
+        $this->assertEquals($this->wordSoFar, $event->getWordFound());
+        $this->assertEquals($this->word, $event->getWord());
     }
 }

@@ -2,11 +2,42 @@
 namespace Hangman\Test\Event;
 
 use Hangman\Event\HangmanBadLetterProposedEvent;
-use MiniGame\Test\Mock\GameObjectMocker;
+use MiniGame\Entity\MiniGameId;
+use MiniGame\Entity\PlayerId;
 
 class HangmanBadLetterProposedEventTest extends \PHPUnit_Framework_TestCase
 {
-    use GameObjectMocker;
+    /** @var MiniGameId */
+    private $gameId;
+
+    /** @var PlayerId */
+    private $playerId;
+
+    /** @var string */
+    private $letter;
+
+    /** @var string[] */
+    private $playedLetters;
+
+    /** @var int */
+    private $livesLost;
+
+    /** @var int */
+    private $remainingLives;
+
+    /** @var string */
+    private $wordSoFar;
+
+    public function setUp()
+    {
+        $this->gameId = MiniGameId::create(666);
+        $this->playerId = PlayerId::create(42);
+        $this->letter = 'A';
+        $this->playedLetters = ['A'];
+        $this->livesLost = 1;
+        $this->remainingLives = 5;
+        $this->wordSoFar = 'A _ _';
+    }
 
     public function tearDown()
     {
@@ -16,33 +47,25 @@ class HangmanBadLetterProposedEventTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function testBadLetterProposed()
+    public function itShouldBuildBadLetterProposedEvent()
     {
-        $gameId = $this->getMiniGameId(666);
-        $playerId = $this->getPlayerId(42);
-        $letter = 'A';
-        $playedLetters = array('A');
-        $livesLost = 1;
-        $remainingLives = 5;
-        $wordSoFar = 'A _ _';
-
         $event = new HangmanBadLetterProposedEvent(
-            $gameId,
-            $playerId,
-            $letter,
-            $playedLetters,
-            $livesLost,
-            $remainingLives,
-            $wordSoFar
+            $this->gameId,
+            $this->playerId,
+            $this->letter,
+            $this->playedLetters,
+            $this->livesLost,
+            $this->remainingLives,
+            $this->wordSoFar
         );
 
-        $this->assertEquals($gameId, $event->getGameId());
-        $this->assertEquals($playerId, $event->getPlayerId());
-        $this->assertEquals($letter, $event->getLetter());
-        $this->assertEquals($playedLetters, $event->getPlayedLetters());
-        $this->assertEquals($livesLost, $event->getLivesLost());
-        $this->assertEquals($remainingLives, $event->getRemainingLives());
-        $this->assertEquals($wordSoFar, $event->getWordSoFar());
-        $this->assertEquals($wordSoFar, $event->getFeedback());
+        $this->assertEquals($this->gameId, $event->getGameId());
+        $this->assertEquals($this->playerId, $event->getPlayerId());
+        $this->assertEquals($this->letter, $event->getLetter());
+        $this->assertEquals($this->playedLetters, $event->getPlayedLetters());
+        $this->assertEquals($this->livesLost, $event->getLivesLost());
+        $this->assertEquals($this->remainingLives, $event->getRemainingLives());
+        $this->assertEquals($this->wordSoFar, $event->getWordSoFar());
+        $this->assertEquals($this->wordSoFar, $event->getFeedback());
     }
 }

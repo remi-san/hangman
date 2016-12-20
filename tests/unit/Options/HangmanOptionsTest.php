@@ -2,24 +2,40 @@
 namespace Hangman\Test\Options;
 
 use Hangman\Options\HangmanOptions;
-use MiniGame\Test\Mock\GameObjectMocker;
+use Hangman\Options\HangmanPlayerOptions;
+use MiniGame\Entity\Player;
+use MiniGame\Exceptions\IllegalOptionException;
 use WordSelector\Entity\Word;
 
 class HangmanOptionsTest extends \PHPUnit_Framework_TestCase
 {
-    use GameObjectMocker;
+    /** @var Word */
+    private $word;
 
-    private $players;
+    /** @var string */
+    private $lang;
 
+    /** @var int */
+    private $length;
+
+    /** @var int */
+    private $level;
+
+    /** @var int */
     private $lives;
 
-    private $id;
+    /** @var Player[] */
+    private $players;
 
     public function setUp()
     {
-        $this->id = $this->getMiniGameId(666);
-        $this->players = array(42=>$this->getPlayer(42, 'Douglas'));
+        $this->word    = \Mockery::mock(Word::class);
+        $this->lang    = 'en';
+        $this->length  = 5;
+        $this->level   = 5;
         $this->lives = 5;
+
+        $this->players = [ \Mockery::mock(HangmanPlayerOptions::class) ];
     }
 
     public function tearDown()
@@ -30,30 +46,27 @@ class HangmanOptionsTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function testHangmanOptionsWithWord()
+    public function itShouldCreateHangmanOptionsWithWord()
     {
-        $word    = \Mockery::mock(Word::class);
-        $lang    = 'en';
-        $options = HangmanOptions::create($word, $lang, null, null, $this->lives, $this->players);
+        $options = HangmanOptions::create($this->word, $this->lang, null, null, $this->lives, $this->players);
 
-        $this->assertEquals($word, $options->getWord());
+        $this->assertEquals($this->word, $options->getWord());
         $this->assertNull($options->getLength());
         $this->assertNull($options->getLevel());
         $this->assertEquals($this->lives, $options->getLives());
         $this->assertEquals($this->players, $options->getPlayerOptions());
-        $this->assertEquals($lang, $options->getLanguage());
+        $this->assertEquals($this->lang, $options->getLanguage());
     }
 
     /**
      * @test
      */
-    public function testHangmanOptionsWithLength()
+    public function itShouldCreateHangmanOptionsWithLength()
     {
-        $length  = 5;
-        $options = HangmanOptions::create(null, 'en', $length, null, $this->lives, $this->players);
+        $options = HangmanOptions::create(null, $this->lang, $this->length, null, $this->lives, $this->players);
 
         $this->assertNull($options->getWord());
-        $this->assertEquals($length, $options->getLength());
+        $this->assertEquals($this->length, $options->getLength());
         $this->assertNull($options->getLevel());
         $this->assertEquals($this->lives, $options->getLives());
         $this->assertEquals($this->players, $options->getPlayerOptions());
@@ -62,15 +75,13 @@ class HangmanOptionsTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function testHangmanOptionsWithLengthAndLevel()
+    public function itShouldCreateHangmanOptionsWithLengthAndLevel()
     {
-        $length  = 5;
-        $level   = 5;
-        $options = HangmanOptions::create(null, 'en', $length, $level, $this->lives, $this->players);
+        $options = HangmanOptions::create(null, $this->lang, $this->length, $this->level, $this->lives, $this->players);
 
         $this->assertNull($options->getWord());
-        $this->assertEquals($length, $options->getLength());
-        $this->assertEquals($level, $options->getLevel());
+        $this->assertEquals($this->length, $options->getLength());
+        $this->assertEquals($this->level, $options->getLevel());
         $this->assertEquals($this->lives, $options->getLives());
         $this->assertEquals($this->players, $options->getPlayerOptions());
     }
@@ -78,40 +89,40 @@ class HangmanOptionsTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function testHangmanOptionsWithWordAndLength()
+    public function itShouldFailCreatingHangmanOptionsWithWordAndLength()
     {
-        $word    = \Mockery::mock(Word::class);
-        $length  = 5;
+        $this->setExpectedException(IllegalOptionException::class);
 
-        $this->setExpectedException('\\MiniGame\\Exceptions\\IllegalOptionException');
-
-        HangmanOptions::create($word, 'en', $length, null, $this->lives, $this->players);
+        HangmanOptions::create($this->word, $this->lang, $this->length, null, $this->lives, $this->players);
     }
 
     /**
      * @test
      */
-    public function testHangmanOptionsWithWordAndLevel()
+    public function itShouldFailCreatingHangmanOptionsWithWordAndLevel()
     {
-        $word    = \Mockery::mock(Word::class);
-        $level   = 5;
+        $this->setExpectedException(IllegalOptionException::class);
 
-        $this->setExpectedException('\\MiniGame\\Exceptions\\IllegalOptionException');
-
-        HangmanOptions::create($word, 'en', null, $level, $this->lives, $this->players);
+        HangmanOptions::create($this->word, $this->lang, null, $this->level, $this->lives, $this->players);
     }
 
     /**
      * @test
      */
-    public function testHangmanOptionsWithWordLengthAndLevel()
+    public function itShouldFailCreatingHangmanOptionsWithWordLengthAndLevel()
     {
-        $word    = \Mockery::mock(Word::class);
-        $length  = 5;
-        $level   = 5;
+        $this->setExpectedException(IllegalOptionException::class);
 
-        $this->setExpectedException('\\MiniGame\\Exceptions\\IllegalOptionException');
+        HangmanOptions::create($this->word, $this->lang, $this->length, $this->level, $this->lives, $this->players);
+    }
 
-        HangmanOptions::create($word, 'en', $length, $level, $this->lives, $this->players);
+    /**
+     * @test
+     */
+    public function itShouldFailCreatingHangmanOptionsWithoutWordLengthAndLevel()
+    {
+        $this->setExpectedException(\InvalidArgumentException::class);
+
+        HangmanOptions::create(null, $this->lang, null, null, $this->lives, $this->players);
     }
 }
