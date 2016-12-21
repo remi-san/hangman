@@ -216,7 +216,7 @@ class HangmanPlayer extends EventSourcedEntity implements Player
      *
      * @return HangmanBadLetterProposedEvent
      */
-    public function badLetter($letter, $livesLost)
+    public function playBadLetter($letter, $livesLost)
     {
         $playedLetters = $this->getPlayedLetters();
         $playedLetters[] = strtoupper($letter);
@@ -241,7 +241,7 @@ class HangmanPlayer extends EventSourcedEntity implements Player
      *
      * @return HangmanGoodLetterProposedEvent
      */
-    public function goodLetter($letter)
+    public function playGoodLetter($letter)
     {
         $playedLetters = $this->getPlayedLetters();
         $playedLetters[] = strtoupper($letter);

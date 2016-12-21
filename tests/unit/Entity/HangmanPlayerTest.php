@@ -112,7 +112,7 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldNotLoseLifeWhenPlayingGoodLetter()
     {
-        $this->player->goodLetter($this->firstLetter);
+        $this->player->playGoodLetter($this->firstLetter);
         $this->assertEquals($this->lives, $this->player->getRemainingLives());
     }
 
@@ -121,7 +121,7 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldLoseLifeWhenPlayingBadLetter()
     {
-        $this->player->badLetter($this->firstLetter, 1);
+        $this->player->playBadLetter($this->firstLetter, 1);
         $this->assertEquals($this->lives-1, $this->player->getRemainingLives());
     }
 
@@ -130,10 +130,10 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldUpperPlayedLetters()
     {
-        $this->player->goodLetter($this->firstLetter);
+        $this->player->playGoodLetter($this->firstLetter);
         $this->assertEquals([strtoupper($this->firstLetter)], $this->player->getPlayedLetters());
 
-        $this->player->badLetter($this->secondLetter, 1);
+        $this->player->playBadLetter($this->secondLetter, 1);
         $this->assertEquals(
             [strtoupper($this->firstLetter), strtoupper($this->secondLetter)],
             $this->player->getPlayedLetters()
@@ -145,10 +145,10 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldReturnOnlyOnceEachPlayedLetter()
     {
-        $this->player->goodLetter($this->firstLetter);
+        $this->player->playGoodLetter($this->firstLetter);
         $this->assertEquals([strtoupper($this->firstLetter)], $this->player->getPlayedLetters());
 
-        $this->player->goodLetter($this->firstLetter);
+        $this->player->playGoodLetter($this->firstLetter);
         $this->assertEquals([strtoupper($this->firstLetter)], $this->player->getPlayedLetters());
     }
 
