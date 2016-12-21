@@ -4,6 +4,10 @@ namespace Hangman\Test\Entity;
 use Hangman\Entity\Hangman;
 use Hangman\Entity\HangmanPlayer;
 use Hangman\Event\HangmanBadLetterProposedEvent;
+use Hangman\Event\HangmanGoodLetterProposedEvent;
+use Hangman\Event\HangmanPlayerLostEvent;
+use Hangman\Event\HangmanPlayerWinEvent;
+use Hangman\Test\Mock\TestableHangmanPlayer;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
 use Rhumsaa\Uuid\Uuid;
@@ -12,6 +16,7 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var PlayerId */
     private $playerId;
+
     /** @var PlayerId */
     private $otherPlayerId;
 
@@ -57,7 +62,7 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
 
         $this->livesLost = 1;
 
-        $this->player = new HangmanPlayer(
+        $this->player = new TestableHangmanPlayer(
             $this->playerId,
             $this->name,
             $this->lives,
@@ -105,12 +110,30 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function itShouldNotLoseLifeWhenPlayingGoodLetter()
+    {
+        $this->player->goodLetter($this->firstLetter);
+        $this->assertEquals($this->lives, $this->player->getRemainingLives());
+    }
+
+    /**
+     * @test
+     */
+    public function itShouldLoseLifeWhenPlayingBadLetter()
+    {
+        $this->player->badLetter($this->firstLetter, 1);
+        $this->assertEquals($this->lives-1, $this->player->getRemainingLives());
+    }
+
+    /**
+     * @test
+     */
     public function itShouldUpperPlayedLetters()
     {
-        $this->player->playLetter($this->firstLetter);
+        $this->player->goodLetter($this->firstLetter);
         $this->assertEquals([strtoupper($this->firstLetter)], $this->player->getPlayedLetters());
 
-        $this->player->playLetter($this->secondLetter);
+        $this->player->badLetter($this->secondLetter, 1);
         $this->assertEquals(
             [strtoupper($this->firstLetter), strtoupper($this->secondLetter)],
             $this->player->getPlayedLetters()
@@ -122,20 +145,11 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldReturnOnlyOnceEachPlayedLetter()
     {
-        $this->player->playLetter($this->firstLetter);
+        $this->player->goodLetter($this->firstLetter);
         $this->assertEquals([strtoupper($this->firstLetter)], $this->player->getPlayedLetters());
 
-        $this->player->playLetter($this->firstLetter);
+        $this->player->goodLetter($this->firstLetter);
         $this->assertEquals([strtoupper($this->firstLetter)], $this->player->getPlayedLetters());
-    }
-
-    /**
-     * @test
-     */
-    public function itShouldLoseLife()
-    {
-        $this->player->loseLife();
-        $this->assertEquals(--$this->lives, $this->player->getRemainingLives());
     }
 
     /**
@@ -143,7 +157,7 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldWin()
     {
-        $this->player->win();
+        $this->player->win('word');
         $this->assertTrue($this->player->hasWon());
     }
 
@@ -152,20 +166,8 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldLose()
     {
-        $this->player->lose();
+        $this->player->lose('word');
         $this->assertTrue($this->player->hasLost());
-    }
-
-    /**
-     * @test
-     */
-    public function itShouldChangeRemainingLivesWhenHandlingHangmanBadLetterProposedEventForPlayer()
-    {
-        $this->player->handleRecursively(
-            $this->getBadLetterEvent($this->playerId)
-        );
-
-        $this->assertEquals($this->lives - $this->livesLost, $this->player->getRemainingLives());
     }
 
     /**
@@ -174,27 +176,85 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
     public function itShouldChangeNothingWhenHandlingHangmanBadLetterProposedEventForOtherPlayer()
     {
         $this->player->handleRecursively(
-            $this->getBadLetterEvent($this->otherPlayerId)
+            new HangmanBadLetterProposedEvent(
+                $this->gameId,
+                $this->otherPlayerId,
+                strtoupper($this->firstLetter),
+                [],
+                $this->livesLost,
+                $this->lives - 1,
+                ''
+            )
         );
 
+        $this->assertFalse($this->player->hasLost());
+        $this->assertFalse($this->player->hasWon());
         $this->assertEquals($this->lives, $this->player->getRemainingLives());
+        $this->assertEquals([], $this->player->getPlayedLetters());
     }
 
     /**
-     * @param PlayerId $playerId
-     *
-     * @return HangmanBadLetterProposedEvent
+     * @test
      */
-    private function getBadLetterEvent(PlayerId $playerId)
+    public function itShouldChangeNothingWhenHandlingHangmanGoodLetterProposedEventForOtherPlayer()
     {
-        return new HangmanBadLetterProposedEvent(
-            $this->gameId,
-            $playerId,
-            strtoupper($this->firstLetter),
-            [],
-            $this->livesLost,
-            $this->lives - 1,
-            ''
+        $this->player->handleRecursively(
+            new HangmanGoodLetterProposedEvent(
+                $this->gameId,
+                $this->otherPlayerId,
+                strtoupper($this->firstLetter),
+                [],
+                $this->lives,
+                ''
+            )
         );
+
+        $this->assertFalse($this->player->hasLost());
+        $this->assertFalse($this->player->hasWon());
+        $this->assertEquals($this->lives, $this->player->getRemainingLives());
+        $this->assertEquals([], $this->player->getPlayedLetters());
+    }
+
+    /**
+     * @test
+     */
+    public function itShouldChangeNothingWhenHandlingHangmanPlayerLostEventForOtherPlayer()
+    {
+        $this->player->handleRecursively(
+            new HangmanPlayerLostEvent(
+                $this->gameId,
+                $this->otherPlayerId,
+                [],
+                0,
+                '',
+                ''
+            )
+        );
+
+        $this->assertFalse($this->player->hasLost());
+        $this->assertFalse($this->player->hasWon());
+        $this->assertEquals($this->lives, $this->player->getRemainingLives());
+        $this->assertEquals([], $this->player->getPlayedLetters());
+    }
+
+    /**
+     * @test
+     */
+    public function itShouldChangeNothingWhenHandlingHangmanPlayerWinEventForOtherPlayer()
+    {
+        $this->player->handleRecursively(
+            new HangmanPlayerWinEvent(
+                $this->gameId,
+                $this->otherPlayerId,
+                [],
+                $this->lives,
+                ''
+            )
+        );
+
+        $this->assertFalse($this->player->hasLost());
+        $this->assertFalse($this->player->hasWon());
+        $this->assertEquals($this->lives, $this->player->getRemainingLives());
+        $this->assertEquals([], $this->player->getPlayedLetters());
     }
 }

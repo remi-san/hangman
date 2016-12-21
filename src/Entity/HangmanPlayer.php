@@ -97,6 +97,10 @@ class HangmanPlayer extends EventSourcedEntity implements Player
         $this->game = $game;
         $this->externalReference = $externalReference;
         $this->state = self::STATE_IN_GAME;
+
+        if ($game !== null) {
+            $this->registerAggregateRoot($game);
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -207,39 +211,120 @@ class HangmanPlayer extends EventSourcedEntity implements Player
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Player loses a life
+     * @param string $letter
+     * @param int    $livesLost
      *
-     * @param int $nbLives
+     * @return HangmanBadLetterProposedEvent
      */
-    public function loseLife($nbLives = 1)
+    public function badLetter($letter, $livesLost)
     {
-        $this->lives -= $nbLives;
+        $playedLetters = $this->getPlayedLetters();
+        $playedLetters[] = strtoupper($letter);
+
+        $event = new HangmanBadLetterProposedEvent(
+            $this->game->getId(),
+            $this->id,
+            strtoupper($letter),
+            $playedLetters,
+            $livesLost,
+            $this->getRemainingLives()-$livesLost,
+            $this->game->buildWord($playedLetters)
+        );
+
+        $this->apply($event);
+
+        return $event;
     }
+
+    /**
+     * @param string $letter
+     *
+     * @return HangmanGoodLetterProposedEvent
+     */
+    public function goodLetter($letter)
+    {
+        $playedLetters = $this->getPlayedLetters();
+        $playedLetters[] = strtoupper($letter);
+
+        $event = new HangmanGoodLetterProposedEvent(
+            $this->game->getId(),
+            $this->id,
+            strtoupper($letter),
+            $playedLetters,
+            $this->getRemainingLives(),
+            $this->game->buildWord($playedLetters)
+        );
+
+        $this->apply($event);
+
+        return $event;
+    }
+
+    /**
+     * @param string $word
+     *
+     * @return HangmanPlayerWinEvent
+     */
+    public function win($word)
+    {
+        $event = new HangmanPlayerWinEvent(
+            $this->game->getId(),
+            $this->getId(),
+            $this->getPlayedLetters(),
+            $this->getRemainingLives(),
+            $word
+        );
+        $this->apply($event);
+
+        return $event;
+    }
+
+    /**
+     * @param string $word
+     *
+     * @return HangmanPlayerLostEvent
+     */
+    public function lose($word)
+    {
+        $playedLetters = $this->getPlayedLetters();
+
+        $event = new HangmanPlayerLostEvent(
+            $this->game->getId(),
+            $this->getId(),
+            $playedLetters,
+            $this->getRemainingLives(),
+            $this->game->buildWord($playedLetters),
+            $word
+        );
+        $this->apply($event);
+
+        return $event;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////   UTIL METHODS   //////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Players played a letter
      *
      * @param string $letter
      */
-    public function playLetter($letter)
+    private function playedLetter($letter)
     {
         $this->playedLetters[strtoupper($letter)] = strtoupper($letter);
     }
 
     /**
-     * @return void
+     * Player loses a life
+     *
+     * @param int $nbLives
      */
-    public function win()
+    private function lifeLost($nbLives = 1)
     {
-        $this->state = self::STATE_WON;
-    }
-
-    /**
-     * @return void
-     */
-    public function lose()
-    {
-        $this->state = self::STATE_LOST;
+        $this->lives -= $nbLives;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -256,8 +341,8 @@ class HangmanPlayer extends EventSourcedEntity implements Player
      */
     protected function applyHangmanBadLetterProposedEvent(HangmanBadLetterProposedEvent $event)
     {
-        $this->loseLife($event->getLivesLost());
-        $this->playLetter($event->getLetter());
+        $this->lifeLost($event->getLivesLost());
+        $this->playedLetter($event->getLetter());
     }
 
     /**
@@ -268,7 +353,7 @@ class HangmanPlayer extends EventSourcedEntity implements Player
      */
     protected function applyHangmanGoodLetterProposedEvent(HangmanGoodLetterProposedEvent $event)
     {
-        $this->playLetter($event->getLetter());
+        $this->playedLetter($event->getLetter());
     }
 
     /**
@@ -278,7 +363,7 @@ class HangmanPlayer extends EventSourcedEntity implements Player
      */
     protected function applyHangmanPlayerLostEvent(HangmanPlayerLostEvent $event)
     {
-        $this->lose();
+        $this->state = self::STATE_LOST;
     }
 
     /**
@@ -288,7 +373,7 @@ class HangmanPlayer extends EventSourcedEntity implements Player
      */
     protected function applyHangmanPlayerWinEvent(HangmanPlayerWinEvent $event)
     {
-        $this->win();
+        $this->state = self::STATE_WON;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
