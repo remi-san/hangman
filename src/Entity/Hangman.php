@@ -433,7 +433,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
         $playerId = $player->getId();
 
         $playedLetters = $this->getPlayedLettersForPlayer($playerId);
-        $playedLetters[$capLetter] = $capLetter;
+        $playedLetters[] = $capLetter; // TODO prevent double
         $wordSoFar = $this->buildWord($playedLetters);
         $livesLost = 1;
         $remainingLives = $this->getRemainingLives($playerId) - $livesLost;
@@ -473,7 +473,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
         $playerId = $player->getId();
 
         $playedLetters = $this->getPlayedLettersForPlayer($playerId);
-        $playedLetters[$capLetter] = $capLetter;
+        $playedLetters[] = $capLetter; // TODO prevent double
         $wordSoFar = $this->buildWord($playedLetters);
         $remainingLives = $this->getRemainingLives($playerId);
         $nextPlayerId = $this->getNextPlayerId();
@@ -886,13 +886,13 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     /**
      * @param mixed $event
      */
-    public function handleRecursively($event)
+    public function apply($event)
     {
         if (! $this->isSupportedEvent($event)) {
             return;
         }
 
-        parent::handleRecursively($event);
+        parent::apply($event);
     }
 
     /**

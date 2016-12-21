@@ -10,6 +10,62 @@ use Rhumsaa\Uuid\Uuid;
 
 class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var PlayerId */
+    private $playerId;
+    /** @var PlayerId */
+    private $otherPlayerId;
+
+    /** @var string */
+    private $name;
+
+    /** @var int */
+    private $lives;
+
+    /** @var  MiniGameId */
+    private $gameId;
+
+    /** @var Hangman */
+    private $game;
+
+    /** @var string */
+    private $externalReference;
+
+    /** @var HangmanPlayer */
+    private $player;
+
+    /** @var string */
+    private $firstLetter;
+
+    /** @var string */
+    private $secondLetter;
+
+    /** @var int */
+    private $livesLost;
+
+    public function setUp()
+    {
+        $this->playerId = PlayerId::create(42);
+        $this->otherPlayerId = PlayerId::create(43);
+        $this->name = 'Douglas';
+        $this->lives = 5;
+        $this->gameId = MiniGameId::create(33);
+        $this->game = Hangman::createGame($this->gameId, 'word');
+        $this->externalReference = 'ext';
+
+        $this->firstLetter = 'a';
+        $this->secondLetter = 'b';
+
+        $this->livesLost = 1;
+
+        $this->player = new HangmanPlayer(
+            $this->playerId,
+            $this->name,
+            $this->lives,
+            $this->game,
+            $this->externalReference
+        );
+    }
+
     public function tearDown()
     {
         \Mockery::close();
@@ -18,154 +74,127 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function testId()
+    public function itShouldSetDefaultParameters()
     {
-        $name = 'Douglas';
+        $this->player = new HangmanPlayer();
 
-        $player = new HangmanPlayer(null, $name);
+        $this->assertTrue(Uuid::isValid((string) $this->player->getId()));
+        $this->assertNull($this->player->getName());
+        $this->assertEquals(HangmanPlayer::DEFAULT_LIVES, $this->player->getRemainingLives());
+        $this->assertNull($this->player->getGame());
 
-        $this->assertTrue(Uuid::isValid((string) $player->getId()));
-        $this->assertEquals($name, $player->getName());
-        $this->assertEquals(6, $player->getRemainingLives());
-        $this->assertNull($player->getGame());
+        $this->assertFalse($this->player->hasLost());
+        $this->assertFalse($this->player->hasWon());
     }
 
     /**
      * @test
      */
-    public function testGetters()
+    public function itShouldAcceptParameters()
     {
-        $id = PlayerId::create(42);
-        $name = 'Douglas';
-        $lives = 5;
-        $game = Hangman::createGame(MiniGameId::create(33), 'word');
+        $this->assertEquals($this->playerId, $this->player->getId());
+        $this->assertEquals($this->name, $this->player->getName());
+        $this->assertEquals($this->lives, $this->player->getRemainingLives());
+        $this->assertEquals($this->game, $this->player->getGame());
+        $this->assertEquals($this->externalReference, $this->player->getExternalReference());
 
-        $player = new HangmanPlayer($id, $name, $lives, $game, 'ext');
-
-        $this->assertEquals($id, $player->getId());
-        $this->assertEquals($name, $player->getName());
-        $this->assertEquals($lives, $player->getRemainingLives());
-        $this->assertEquals($game, $player->getGame());
-        $this->assertEquals('ext', $player->getExternalReference());
+        $this->assertFalse($this->player->hasLost());
+        $this->assertFalse($this->player->hasWon());
     }
 
     /**
      * @test
      */
-    public function testDomainMethods()
+    public function itShouldUpperPlayedLetters()
     {
-        $id = PlayerId::create(42);
-        $name = 'Douglas';
-        $lives = 5;
-        $game = Hangman::createGame(MiniGameId::create(33), 'word');
+        $this->player->playLetter($this->firstLetter);
+        $this->assertEquals([strtoupper($this->firstLetter)], $this->player->getPlayedLetters());
 
-        $a = 'a';
-        $b = 'b';
-
-        $player = new HangmanPlayer($id, $name, $lives, $game);
-
-        $player->loseLife();
-        $this->assertEquals(--$lives, $player->getRemainingLives());
-
-        $player->playLetter($a);
-        $this->assertEquals(array ('A'=>'A'), $player->getPlayedLetters());
-
-        $player->playLetter($a);
-        $this->assertEquals(array ('A'=>'A'), $player->getPlayedLetters());
-
-        $player->playLetter($b);
-        $this->assertEquals(array ('A'=>'A', 'B'=>'B'), $player->getPlayedLetters());
+        $this->player->playLetter($this->secondLetter);
+        $this->assertEquals(
+            [strtoupper($this->firstLetter), strtoupper($this->secondLetter)],
+            $this->player->getPlayedLetters()
+        );
     }
 
     /**
      * @test
      */
-    public function testWin()
+    public function itShouldReturnOnlyOnceEachPlayedLetter()
     {
-        $id = PlayerId::create(42);
-        $name = 'Douglas';
-        $lives = 5;
-        $game = Hangman::createGame(MiniGameId::create(33), 'word');
+        $this->player->playLetter($this->firstLetter);
+        $this->assertEquals([strtoupper($this->firstLetter)], $this->player->getPlayedLetters());
 
-        $player = new HangmanPlayer($id, $name, $lives, $game);
-
-        $this->assertFalse($player->hasLost());
-        $this->assertFalse($player->hasWon());
-
-        $player->win();
-        $this->assertTrue($player->hasWon());
+        $this->player->playLetter($this->firstLetter);
+        $this->assertEquals([strtoupper($this->firstLetter)], $this->player->getPlayedLetters());
     }
 
     /**
      * @test
      */
-    public function testLose()
+    public function itShouldLoseLife()
     {
-        $id = PlayerId::create(42);
-        $name = 'Douglas';
-        $lives = 5;
-        $game = Hangman::createGame(MiniGameId::create(33), 'word');
-
-        $player = new HangmanPlayer($id, $name, $lives, $game);
-
-        $this->assertFalse($player->hasLost());
-        $this->assertFalse($player->hasWon());
-
-        $player->lose();
-        $this->assertTrue($player->hasLost());
+        $this->player->loseLife();
+        $this->assertEquals(--$this->lives, $this->player->getRemainingLives());
     }
 
     /**
      * @test
      */
-    public function testHandleHangmanBadLetterProposedEventForOtherPlayer()
+    public function itShouldWin()
     {
-        $id = PlayerId::create(42);
-        $name = 'Douglas';
-        $lives = 5;
-        $game = Hangman::createGame(MiniGameId::create(33), 'word');
+        $this->player->win();
+        $this->assertTrue($this->player->hasWon());
+    }
 
-        $player = new HangmanPlayer($id, $name, $lives, $game);
+    /**
+     * @test
+     */
+    public function itShouldLose()
+    {
+        $this->player->lose();
+        $this->assertTrue($this->player->hasLost());
+    }
 
-        $player->handleRecursively(
-            new HangmanBadLetterProposedEvent(
-                MiniGameId::create(33),
-                PlayerId::create(25),
-                'A',
-                array(),
-                1,
-                $lives-1,
-                ''
-            )
+    /**
+     * @test
+     */
+    public function itShouldChangeRemainingLivesWhenHandlingHangmanBadLetterProposedEventForPlayer()
+    {
+        $this->player->handleRecursively(
+            $this->getBadLetterEvent($this->playerId)
         );
 
-        $this->assertEquals($lives, $player->getRemainingLives());
+        $this->assertEquals($this->lives - $this->livesLost, $this->player->getRemainingLives());
     }
 
     /**
      * @test
      */
-    public function testHandleHangmanBadLetterProposedEventForPlayer()
+    public function itShouldChangeNothingWhenHandlingHangmanBadLetterProposedEventForOtherPlayer()
     {
-        $id = PlayerId::create(42);
-        $name = 'Douglas';
-        $lives = 5;
-        $game = Hangman::createGame(MiniGameId::create(33), 'word');
-
-        $player = new HangmanPlayer($id, $name, $lives, $game);
-
-        $player->handleRecursively(
-            new HangmanBadLetterProposedEvent(
-                MiniGameId::create(33),
-                $id,
-                'A',
-                array(),
-                1,
-                $lives-1,
-                ''
-            )
+        $this->player->handleRecursively(
+            $this->getBadLetterEvent($this->otherPlayerId)
         );
 
-        $this->assertEquals($lives-1, $player->getRemainingLives());
+        $this->assertEquals($this->lives, $this->player->getRemainingLives());
+    }
+
+    /**
+     * @param PlayerId $playerId
+     *
+     * @return HangmanBadLetterProposedEvent
+     */
+    private function getBadLetterEvent(PlayerId $playerId)
+    {
+        return new HangmanBadLetterProposedEvent(
+            $this->gameId,
+            $playerId,
+            strtoupper($this->firstLetter),
+            [],
+            $this->livesLost,
+            $this->lives - 1,
+            ''
+        );
     }
 }

@@ -25,6 +25,8 @@ class HangmanPlayer extends EventSourcedEntity implements Player
     const STATE_LOST = 'lost';
     const STATE_WON = 'won';
 
+    const DEFAULT_LIVES = 6;
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////   PROPERTIES   ///////////////////////////////////////////////////
@@ -84,7 +86,7 @@ class HangmanPlayer extends EventSourcedEntity implements Player
     public function __construct(
         PlayerId $id = null,
         $name = null,
-        $lives = 6,
+        $lives = self::DEFAULT_LIVES,
         Hangman $game = null,
         $externalReference = null
     ) {
@@ -150,7 +152,7 @@ class HangmanPlayer extends EventSourcedEntity implements Player
      */
     public function getPlayedLetters()
     {
-        return $this->playedLetters;
+        return array_values($this->playedLetters);
     }
 
     /**
