@@ -57,13 +57,13 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
     private $playerThreeId;
 
     /** @var HangmanPlayerOptions */
-    protected $playerOne;
+    protected $playerOneOptions;
 
     /** @var HangmanPlayerOptions */
-    protected $playerTwo;
+    protected $playerTwoOptions;
 
     /** @var HangmanPlayerOptions */
-    private $playerThree;
+    private $playerThreeOptions;
 
     /** @var PlayerOptions | Mock */
     private $invalidPlayerOptions;
@@ -84,19 +84,19 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
         $this->invalidPlayerOptions->shouldReceive('getGameId')->andReturn($this->hangmanId);
         $this->invalidPlayerOptions->shouldReceive('getName')->andReturn(self::P3_NAME);
 
-        $this->playerOne = HangmanPlayerOptions::create(
+        $this->playerOneOptions = HangmanPlayerOptions::create(
             $this->playerOneId,
             $this->hangmanId,
             self::P1_NAME,
             self::CHANCES
         );
-        $this->playerTwo = HangmanPlayerOptions::create(
+        $this->playerTwoOptions = HangmanPlayerOptions::create(
             $this->playerTwoId,
             $this->hangmanId,
             self::P2_NAME,
             self::CHANCES
         );
-        $this->playerThree = HangmanPlayerOptions::create(
+        $this->playerThreeOptions = HangmanPlayerOptions::create(
             $this->playerThreeId,
             $this->hangmanId,
             self::P3_NAME,
@@ -109,8 +109,6 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
             $this->hangmanId,
             self::WORD
         );
-        $this->hangman->addPlayerToGame($this->playerOne);
-        $this->hangman->addPlayerToGame($this->playerTwo);
     }
 
     public function tearDown()
@@ -133,8 +131,34 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function itShouldReturnPlayers()
+    {
+        $this->givenTheGameHasTwoPlayers();
+
+        $retrievedPlayers = $this->hangman->getPlayers();
+
+        $this->assertEquals(2, count($retrievedPlayers));
+    }
+
+    /**
+     * @test
+     */
+    public function itShouldReturnPlayer()
+    {
+        $this->givenTheGameHasTwoPlayers();
+
+        $this->assertNotNull($this->playerOneOptions, $this->hangman->getPlayer($this->playerOneId));
+        $this->assertNotNull($this->playerTwoOptions, $this->hangman->getPlayer($this->playerTwoId));
+        $this->assertNull($this->hangman->getPlayer($this->playerThreeId));
+    }
+
+    /**
+     * @test
+     */
     public function itShouldBeAbleForAPlayerToLeaveWhenGameHasNotStarted()
     {
+        $this->givenTheGameHasTwoPlayers();
+
         $return = $this->hangman->leaveGame($this->playerOneId);
 
         $this->assertNull($this->hangman->getPlayer($this->playerOneId));
@@ -146,7 +170,9 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldMakePlayerLoseIfLeavingWhenGameHasStarted()
     {
-        $this->hangman->startGame($this->playerOneId);
+        $this->givenTheGameHasTwoPlayers();
+        $this->givenPlayerOneStartedTheGame();
+
         $return = $this->hangman->leaveGame($this->playerOneId);
 
         $this->assertInstanceOf(HangmanPlayerLostEvent::class, $return);
@@ -155,10 +181,12 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function tShouldBeAbleForAPlayerToLeaveWhenGameIsOver()
+    public function itShouldBeAbleForAPlayerToLeaveWhenGameIsOver()
     {
-        $this->hangman->startGame($this->playerOneId);
-        $this->hangman->play($this->playerOneId, Answer::create('ASS--KICKER'));
+        $this->givenTheGameHasTwoPlayers();
+        $this->givenPlayerOneStartedTheGame();
+        $this->givenPlayerOneHasLost();
+
         $return = $this->hangman->leaveGame($this->playerOneId);
 
         $this->assertNull($return);
@@ -167,19 +195,9 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function itShouldBePossibleToBuildTheGameForReconstitution()
-    {
-        $this->assertTrue(Hangman::instantiateForReconstitution() instanceof Hangman);
-    }
-
-    /**
-     * @test
-     */
     public function itShouldNotBePossibleToStartAGameWithNoPlayer()
     {
-        $hangman = Hangman::createGame($this->hangmanId, self::WORD);
-
-        $result = $hangman->startGame($this->playerOneId);
+        $result = $this->hangman->startGame($this->playerOneId);
 
         $this->assertTrue($result instanceof HangmanGameFailedStartingEvent);
     }
@@ -189,14 +207,15 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldNotBePossibleToStartAGameTwice()
     {
-        $hangman = Hangman::createGame($this->hangmanId, self::WORD);
-        $hangman->addPlayerToGame($this->playerOne);
-        $result = $hangman->startGame($this->playerOneId);
+        $this->givenTheGameHasTwoPlayers();
 
+        $result = $this->hangman->startGame($this->playerOneId);
         $this->assertTrue($result instanceof HangmanGameStartedEvent);
 
-        $result = $hangman->startGame($this->playerOneId);
+        $result = $this->hangman->startGame($this->playerOneId);
+        $this->assertTrue($result instanceof HangmanGameFailedStartingEvent);
 
+        $result = $this->hangman->startGame($this->playerTwoId);
         $this->assertTrue($result instanceof HangmanGameFailedStartingEvent);
     }
 
@@ -205,10 +224,10 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldNotBePossibleToAddAPlayerOnceGameHasStarted()
     {
-        $this->hangman->startGame($this->playerOneId);
+        $this->givenTheGameHasTwoPlayers();
+        $this->givenPlayerOneStartedTheGame();
 
-        $result = $this->hangman->addPlayerToGame($this->playerThree);
-
+        $result = $this->hangman->addPlayerToGame($this->playerThreeOptions);
         $this->assertTrue($result instanceof HangmanPlayerFailedCreatingEvent);
     }
 
@@ -217,12 +236,9 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldNotBePossibleToAddAPlayerWithIllegalOptions()
     {
-        $hangman = Hangman::createGame($this->hangmanId, self::WORD);
-
         $this->setExpectedException(HangmanPlayerOptionsException::class);
 
-        $hangman->addPlayerToGame($this->invalidPlayerOptions);
-
+        $this->hangman->addPlayerToGame($this->invalidPlayerOptions);
     }
 
     /**
@@ -230,14 +246,10 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldAddAPlayer()
     {
-        $hangman = Hangman::createGame($this->hangmanId, self::WORD);
-
-        $this->assertEquals(0, count($hangman->getPlayers()));
-
-        $result = $hangman->addPlayerToGame($this->playerOne);
+        $result = $this->hangman->addPlayerToGame($this->playerOneOptions);
 
         $this->assertTrue($result instanceof HangmanPlayerCreatedEvent);
-        $this->assertEquals(1, count($hangman->getPlayers()));
+        $this->assertEquals(1, count($this->hangman->getPlayers()));
     }
 
     /**
@@ -245,6 +257,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldNotBePossibleToPlayBeforeGameHasStarted()
     {
+        $this->givenTheGameHasTwoPlayers();
+
         $result = $this->hangman->play($this->playerOneId, Proposition::create('A'));
 
         $this->assertTrue($result instanceof HangmanPlayerTriedPlayingInactiveGameEvent);
@@ -253,9 +267,12 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function itShouldPlay()
+    public function itShouldSetTheForstPlayerToTheOneThatStartedTheGame()
     {
-        $this->hangman->startGame($this->playerOneId);
+        $this->givenTheGameHasTwoPlayers();
+
+        $result = $this->hangman->startGame($this->playerOneId);
+        $this->assertInstanceOf(HangmanGameStartedEvent::class, $result);
 
         $this->assertTrue($this->hangman->canPlayerPlay($this->playerOneId));
         $this->assertFalse($this->hangman->canPlayerPlay($this->playerTwoId));
@@ -266,9 +283,11 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldNotBePossibleToPlayWithUnknownMove()
     {
+        $this->givenTheGameHasTwoPlayers();
+        $this->givenPlayerOneStartedTheGame();
+
         $this->setExpectedException(IllegalMoveException::class);
 
-        $this->hangman->startGame($this->playerOneId);
         $this->hangman->play($this->playerOneId, $this->move);
     }
 
@@ -277,16 +296,17 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldPlayOneGoodLetter()
     {
-        $letter = 'H';
+        $presentLetter = 'H';
 
-        $this->hangman->startGame($this->playerOneId);
+        $this->givenTheGameHasTwoPlayers();
+        $this->givenPlayerOneStartedTheGame();
 
         /* @var HangmanGoodProposition $feedback */
-        $feedback = $this->hangman->play($this->playerOneId, Proposition::create($letter));
+        $feedback = $this->hangman->play($this->playerOneId, Proposition::create($presentLetter));
 
         $this->assertInstanceOf(HangmanGoodProposition::class, $feedback);
         $this->assertEquals($this->playerOneId, $feedback->getPlayerId());
-        $this->assertEquals(['H'], $feedback->getPlayedLetters());
+        $this->assertEquals([$presentLetter], $feedback->getPlayedLetters());
         $this->assertEquals(self::CHANCES, $feedback->getRemainingLives());
         $this->assertEquals('H _ _ _ H H _ _ _ _ _', $feedback->getFeedBack());
 
@@ -299,16 +319,17 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldPlayOneBadLetter()
     {
-        $letter = 'Z';
+        $absentLetter = 'Z';
 
-        $this->hangman->startGame($this->playerOneId);
+        $this->givenTheGameHasTwoPlayers();
+        $this->givenPlayerOneStartedTheGame();
 
         /* @var HangmanBadProposition $feedback */
-        $feedback = $this->hangman->play($this->playerOneId, Proposition::create($letter));
+        $feedback = $this->hangman->play($this->playerOneId, Proposition::create($absentLetter));
 
         $this->assertInstanceOf(HangmanBadProposition::class, $feedback);
         $this->assertEquals($this->playerOneId, $feedback->getPlayerId());
-        $this->assertEquals(['Z'], $feedback->getPlayedLetters());
+        $this->assertEquals([$absentLetter], $feedback->getPlayedLetters());
         $this->assertEquals(self::CHANCES-1, $feedback->getRemainingLives());
         $this->assertEquals('_ _ _ _ _ _ _ _ _ _ _', $feedback->getFeedBack());
 
@@ -321,11 +342,12 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldNotBePossibleToPlayIllegalAnswer()
     {
-        $move = Answer::create('ABCD');
+        $illegalAnswer = Answer::create('ABCD');
 
-        $this->hangman->startGame($this->playerOneId);
+        $this->givenTheGameHasTwoPlayers();
+        $this->givenPlayerOneStartedTheGame();
 
-        $result = $this->hangman->play($this->playerOneId, $move);
+        $result = $this->hangman->play($this->playerOneId, $illegalAnswer);
 
         $this->assertTrue($result instanceof HangmanPlayerProposedInvalidAnswerEvent);
         $this->assertTrue($this->hangman->canPlayerPlay($this->playerOneId));
@@ -337,7 +359,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldFindSolution()
     {
-        $this->hangman->startGame($this->playerOneId);
+        $this->givenTheGameHasTwoPlayers();
+        $this->givenPlayerOneStartedTheGame();
 
         /* @var HangmanWon $feedback */
         $feedback = $this->hangman->play($this->playerOneId, Answer::create(self::WORD));
@@ -357,27 +380,23 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldFindLastLetter()
     {
-        $word = 'AAAA';
         $letter = 'A';
 
+        $this->givenAGameWithTheSameFourLettersWord($letter);
+        $this->givenTheGameHasTwoPlayers();
+        $this->givenPlayerOneStartedTheGame();
+
         /* @var HangmanWon $feedback */
-        $hangman = Hangman::createGame($this->hangmanId, $word);
-
-        $hangman->addPlayerToGame($this->playerOne);
-        $hangman->addPlayerToGame($this->playerTwo);
-
-        $hangman->startGame($this->playerOneId);
-
-        $feedback = $hangman->play($this->playerOneId, Proposition::create($letter));
+        $feedback = $this->hangman->play($this->playerOneId, Proposition::create($letter));
 
         $this->assertInstanceOf(HangmanWon::class, $feedback);
         $this->assertEquals($this->playerOneId, $feedback->getPlayerId());
-        $this->assertEquals(['A'], $feedback->getPlayedLetters());
+        $this->assertEquals([$letter], $feedback->getPlayedLetters());
         $this->assertEquals(self::CHANCES, $feedback->getRemainingLives());
-        $this->assertEquals($word, $feedback->getSolution());
+        $this->assertEquals($letter . $letter . $letter . $letter, $feedback->getSolution());
 
-        $this->assertFalse($hangman->canPlayerPlay($this->playerOneId));
-        $this->assertFalse($hangman->canPlayerPlay($this->playerTwoId));
+        $this->assertFalse($this->hangman->canPlayerPlay($this->playerOneId));
+        $this->assertFalse($this->hangman->canPlayerPlay($this->playerTwoId));
     }
 
     /**
@@ -385,25 +404,18 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldLetPlayerOneLoseAlone()
     {
-        $letter = 'Z';
-        $playerId = PlayerId::create(42);
-
-        $playerOne = HangmanPlayerOptions::create($playerId, $this->hangmanId, self::P1_NAME, 1);
-
-        $hangman = Hangman::createGame($this->hangmanId, self::WORD);
-
-        $hangman->addPlayerToGame($playerOne);
-
-        $hangman->startGame($playerId);
+        $badLetter = 'Z';
+        $this->givenTheGameHasAPlayerWithOneLifeLeft();
+        $this->givenPlayerOneStartedTheGame();
 
         /* @var HangmanGameLostEvent $feedback */
-        $feedback = $hangman->play($playerId, Proposition::create($letter));
+        $feedback = $this->hangman->play($this->playerOneId, Proposition::create($badLetter));
 
         $this->assertInstanceOf(HangmanGameLostEvent::class, $feedback);
-        $this->assertEquals($playerId, $feedback->getPlayerId());
+        $this->assertEquals($this->playerOneId, $feedback->getPlayerId());
         $this->assertEquals(self::WORD, $feedback->getSolution());
 
-        $this->assertFalse($hangman->canPlayerPlay($playerId));
+        $this->assertFalse($this->hangman->canPlayerPlay($this->playerOneId));
     }
 
     /**
@@ -412,18 +424,12 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
     public function itShouldLetPlayerOneLose()
     {
         $letter = 'Z';
-
-        $playerOne = HangmanPlayerOptions::create($this->playerOneId, $this->hangmanId, self::P1_NAME, 1);
-
-        $hangman = Hangman::createGame($this->hangmanId, self::WORD);
-
-        $hangman->addPlayerToGame($playerOne);
-        $hangman->addPlayerToGame($this->playerTwo);
-
-        $hangman->startGame($this->playerOneId);
+        $this->givenTheGameHasAPlayerWithOneLifeLeft();
+        $this->givenTheGameHasASecondPlayer();
+        $this->givenPlayerOneStartedTheGame();
 
         /* @var HangmanLost $feedback */
-        $feedback = $hangman->play($this->playerOneId, Proposition::create($letter));
+        $feedback = $this->hangman->play($this->playerOneId, Proposition::create($letter));
 
         $this->assertInstanceOf(HangmanLost::class, $feedback);
         $this->assertEquals($this->playerOneId, $feedback->getPlayerId());
@@ -431,8 +437,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $feedback->getRemainingLives());
         $this->assertEquals(self::WORD, $feedback->getSolution());
 
-        $this->assertFalse($hangman->canPlayerPlay($this->playerOneId));
-        $this->assertTrue($hangman->canPlayerPlay($this->playerTwoId));
+        $this->assertFalse($this->hangman->canPlayerPlay($this->playerOneId));
+        $this->assertTrue($this->hangman->canPlayerPlay($this->playerTwoId));
     }
 
     /**
@@ -440,7 +446,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldLetPlayerOneLoseProvidingBadSolution()
     {
-        $this->hangman->startGame($this->playerOneId);
+        $this->givenTheGameHasTwoPlayers();
+        $this->givenPlayerOneStartedTheGame();
 
         /* @var HangmanLost $feedback */
         $feedback = $this->hangman->play($this->playerOneId, Answer::create('HHHHHHHHHHH'));
@@ -460,7 +467,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldNotBePossibleForPlayerToPlayPropositionWhenNotHisTurn()
     {
-        $this->hangman->startGame($this->playerOneId);
+        $this->givenTheGameHasTwoPlayers();
+        $this->givenPlayerOneStartedTheGame();
 
         $result = $this->hangman->play($this->playerTwoId, Proposition::create('A'));
 
@@ -473,7 +481,8 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldNotBePossibleForPlayerToPlayAnswerWhenNotHisTurn()
     {
-        $this->hangman->startGame($this->playerOneId);
+        $this->givenTheGameHasTwoPlayers();
+        $this->givenPlayerOneStartedTheGame();
 
         $result = $this->hangman->play($this->playerTwoId, Answer::create('A'));
 
@@ -484,23 +493,52 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function itShouldReturnPlayers()
+    public function itShouldBePossibleToBuildTheGameForReconstitution()
     {
-        $hangman = Hangman::createGame($this->hangmanId, 'word');
-        $hangman->addPlayerToGame($this->playerOne);
-        $hangman->addPlayerToGame($this->playerTwo);
-        $retrievedPlayers = $hangman->getPlayers();
-        $this->assertEquals(2, count($retrievedPlayers));
+        $this->assertTrue(Hangman::instantiateForReconstitution() instanceof Hangman);
+    }
+
+    private function givenTheGameHasTwoPlayers()
+    {
+        $this->givenTheGameHasAFirstPlayer();
+        $this->givenTheGameHasASecondPlayer();
+    }
+
+    private function givenTheGameHasAFirstPlayer()
+    {
+        $this->hangman->addPlayerToGame($this->playerOneOptions);
+    }
+
+    private function givenTheGameHasASecondPlayer()
+    {
+        $this->hangman->addPlayerToGame($this->playerTwoOptions);
+    }
+
+    private function givenPlayerOneStartedTheGame()
+    {
+        $this->hangman->startGame($this->playerOneId);
+    }
+
+    private function givenPlayerOneHasLost()
+    {
+        $this->hangman->play($this->playerOneId, Answer::create('ASS--KICKER'));
+    }
+
+    private function givenTheGameHasAPlayerWithOneLifeLeft()
+    {
+        $this->playerOneOptions = HangmanPlayerOptions::create($this->playerOneId, $this->hangmanId, self::P1_NAME, 1);
+        $this->hangman->addPlayerToGame($this->playerOneOptions);
     }
 
     /**
-     * @test
+     * @param string $letter
+     *
+     * @return string
      */
-    public function itShouldReturnPlayer()
+    private function givenAGameWithTheSameFourLettersWord($letter)
     {
-        $hangman = Hangman::createGame($this->hangmanId, 'word');
-        $hangman->addPlayerToGame($this->playerOne);
-        $hangman->addPlayerToGame($this->playerTwo);
-        $this->assertNull($hangman->getPlayer(PlayerId::create(999)));
+        $word = $letter . $letter . $letter . $letter;
+        $this->hangman = Hangman::createGame($this->hangmanId, $word);
+        return $word;
     }
 }
