@@ -3,10 +3,8 @@ namespace Hangman\Test\Event;
 
 use Hangman\Event\HangmanPlayerProposedInvalidAnswerEvent;
 use Hangman\Move\Answer;
-use Hangman\Test\Mock\HangmanMocker;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
-use MiniGame\Test\Mock\GameObjectMocker;
 
 class HangmanPlayerProposedInvalidAnswerEventTest extends \PHPUnit_Framework_TestCase
 {

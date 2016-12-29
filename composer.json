@@ -28,7 +28,11 @@
     },
     "autoload": {
         "psr-4": {
-            "Hangman\\": "src/",
+            "Hangman\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
             "Hangman\\Test\\" : "tests/unit/"
         }
     },
