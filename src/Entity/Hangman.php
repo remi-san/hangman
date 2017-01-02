@@ -179,7 +179,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      */
     public function canPlayerPlay(PlayerId $playerId)
     {
-        return $this->players->canPlayerPlay($playerId);
+        return $this->players->canPlay($playerId);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -502,7 +502,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     {
         $event = $player->lose($this->word);
 
-        if ($this->players->thereIsAtLeastOneActivePlayer() &&
+        if ($this->players->hasAtLeastOneActivePlayer() &&
             $this->players->isCurrentPlayer($player->getId())
         ) {
             $this->setNextPlayer($this->players->getNextPlayerId());

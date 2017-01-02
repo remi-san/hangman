@@ -60,7 +60,15 @@ class PlayersCollection extends ArrayCollection
     /**
      * @return bool
      */
-    public function thereIsAtLeastOneActivePlayer()
+    public function hasPlayers()
+    {
+        return $this->count() > 0;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasAtLeastOneActivePlayer()
     {
         foreach ($this->gameOrder as $gameOrder) {
             /** @var HangmanPlayer $player */
@@ -100,6 +108,26 @@ class PlayersCollection extends ArrayCollection
     }
 
     /**
+     * @param PlayerId $playerId
+     *
+     * @return bool
+     */
+    public function canPlay(PlayerId $playerId)
+    {
+        return $this->isCurrentPlayer($playerId);
+    }
+
+    /**
+     * @param PlayerId $playerId
+     *
+     * @return bool
+     */
+    public function isCurrentPlayer(PlayerId $playerId = null)
+    {
+        return $playerId !== null && $this->currentPlayer !== null && $this->currentPlayer->getId()->equals($playerId);
+    }
+
+    /**
      * @return HangmanPlayer
      */
     public function getCurrentPlayer()
@@ -113,30 +141,5 @@ class PlayersCollection extends ArrayCollection
     public function setCurrentPlayer(PlayerId $playerId = null)
     {
         $this->currentPlayer = ($playerId !== null) ? $this->get((string) $playerId) : null;
-    }
-
-    /**
-     * @param PlayerId $playerId
-     *
-     * @return bool
-     */
-    public function isCurrentPlayer(PlayerId $playerId = null)
-    {
-        return $this->currentPlayer !== null && $this->currentPlayer->getId()->equals($playerId);
-    }
-
-    /**
-     * @param PlayerId $playerId
-     *
-     * @return bool
-     */
-    public function canPlayerPlay(PlayerId $playerId)
-    {
-        return $this->isCurrentPlayer($playerId);
-    }
-
-    public function hasPlayers()
-    {
-        return $this->count() > 0;
     }
 }
