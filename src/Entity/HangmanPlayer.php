@@ -7,6 +7,7 @@ use Hangman\Event\HangmanBadLetterProposedEvent;
 use Hangman\Event\HangmanGoodLetterProposedEvent;
 use Hangman\Event\HangmanPlayerLostEvent;
 use Hangman\Event\HangmanPlayerWinEvent;
+use Hangman\Word;
 use MiniGame\Entity\MiniGame;
 use MiniGame\Entity\Player;
 use MiniGame\Entity\PlayerId;
@@ -261,18 +262,18 @@ class HangmanPlayer extends EventSourcedEntity implements Player
     }
 
     /**
-     * @param string $word
+     * @param Word $word
      *
      * @return HangmanPlayerWinEvent
      */
-    public function win($word)
+    public function win(Word $word)
     {
         $event = new HangmanPlayerWinEvent(
             $this->game->getId(),
             $this->getId(),
             $this->getPlayedLetters(),
             $this->getRemainingLives(),
-            $word
+            (string) $word
         );
         $this->apply($event);
 
@@ -280,11 +281,11 @@ class HangmanPlayer extends EventSourcedEntity implements Player
     }
 
     /**
-     * @param string $word
+     * @param Word $word
      *
      * @return HangmanPlayerLostEvent
      */
-    public function lose($word)
+    public function lose(Word $word)
     {
         $playedLetters = $this->getPlayedLetters();
 
@@ -294,7 +295,7 @@ class HangmanPlayer extends EventSourcedEntity implements Player
             $playedLetters,
             $this->getRemainingLives(),
             $this->game->buildWord($playedLetters),
-            $word
+            (string) $word
         );
         $this->apply($event);
 

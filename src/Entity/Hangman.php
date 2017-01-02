@@ -14,7 +14,6 @@ use Hangman\Event\HangmanPlayerProposedInvalidAnswerEvent;
 use Hangman\Event\HangmanPlayerTriedPlayingDuringAnotherPlayerTurnEvent;
 use Hangman\Event\HangmanPlayerTriedPlayingInactiveGameEvent;
 use Hangman\Event\HangmanPlayerTurnEvent;
-use Hangman\Event\HangmanPlayerWinEvent;
 use Hangman\Exception\HangmanException;
 use Hangman\Exception\HangmanPlayerOptionsException;
 use Hangman\Move\Answer;
@@ -24,6 +23,7 @@ use Hangman\Result\HangmanBadProposition;
 use Hangman\Result\HangmanGoodProposition;
 use Hangman\Result\HangmanLost;
 use Hangman\Result\HangmanWon;
+use Hangman\Word;
 use MiniGame\Entity\MiniGame;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\Player;
@@ -59,7 +59,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     private $id;
 
     /**
-     * @var string
+     * @var Word
      */
     private $word;
 
@@ -400,7 +400,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     private function currentPlayerProposeLetter($letter)
     {
         $capLetter = strtoupper($letter);
-        $letterPresent = $this->wordContains($capLetter);
+        $letterPresent = $this->word->contains($capLetter);
 
         $result =  (!$letterPresent)
                    ? $this->currentPlayerBadProposition($letter) // remove a life
@@ -420,7 +420,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     {
         $this->checkAnswerIsValid($answer);
 
-        if ($this->isTheAnswer(strtoupper($answer))) {
+        if ($this->word->equals($answer)) {
             return $this->playerWins($this->currentPlayer); // you win
         } else {
             return $this->playerLoses($this->currentPlayer); // you lose
@@ -480,19 +480,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      */
     private function playerWins(HangmanPlayer $player)
     {
-        $playerId = $player->getId();
-
-        $playedLetters = $this->getPlayedLettersForPlayer($playerId);
-        $remainingLives = $this->getRemainingLives($playerId);
-
-        $event = new HangmanPlayerWinEvent(
-            $this->id,
-            $playerId,
-            $playedLetters,
-            $remainingLives,
-            $this->word
-        );
-        $this->apply($event);
+        $event = $player->win($this->word);
 
         foreach ($this->players as $otherPlayer) {
             if ($otherPlayer->equals($player) || $otherPlayer->hasLost()) {
@@ -526,7 +514,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
         $event = new HangmanGameLostEvent(
             $this->id,
             $player->getId(),
-            $this->word
+            (string) $this->word
         );
         $this->apply($event);
 
@@ -576,52 +564,6 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     }
 
     /**
-     * Returns the list of played letters
-     *
-     * @param PlayerId $playerId
-     *
-     * @return array
-     */
-    private function getPlayedLettersForPlayer(PlayerId $playerId)
-    {
-        return $this->getPlayer($playerId)->getPlayedLetters();
-    }
-
-    /**
-     * Gets the remaining lives for the player
-     *
-     * @param PlayerId $playerId
-     *
-     * @return int
-     */
-    private function getRemainingLives(PlayerId $playerId)
-    {
-        return $this->getPlayer($playerId)->getRemainingLives();
-    }
-
-    /**
-     * Returns the indexes of the letter in the word
-     *
-     * @param string $letter
-     *
-     * @return boolean
-     */
-    private function wordContains($letter)
-    {
-        return strpos(strtoupper($this->word), strtoupper($letter)) !== false;
-    }
-
-    /**
-     * Get the letters of the word
-     *
-     * @return string[]
-     */
-    private function getLettersFromWord()
-    {
-        return array_unique(str_split(strtoupper($this->word)));
-    }
-
-    /**
      * Build the word from played letters
      *
      * @param string[] $playedLetters
@@ -630,17 +572,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      */
     public function buildWord($playedLetters)
     {
-        $wordLetters = $this->getLettersFromWord();
-
-        $goodLetters = array_intersect($wordLetters, $playedLetters);
-
-        $splitWord = str_split(strtoupper($this->word));
-        $word = '';
-        foreach ($splitWord as $letter) {
-            $word .= (in_array($letter, $goodLetters) ? $letter : '_') . ' ';
-        }
-
-        return trim($word);
+        return $this->word->buildWord($playedLetters);
     }
 
     /**
@@ -652,7 +584,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      */
     private function isAllLettersFoundForPlayer(HangmanPlayer $player)
     {
-        $wordLetters = $this->getLettersFromWord();
+        $wordLetters = $this->word->getLetters();
         $playerLetters = $player->getPlayedLetters();
         return count(array_intersect($wordLetters, $playerLetters)) == count($wordLetters);
     }
@@ -667,21 +599,9 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
      */
     private function checkAnswerIsValid($answer)
     {
-        if (strlen($answer) !== strlen($this->word)) {
+        if (! $this->word->isValid($answer)) {
             throw new HangmanException(sprintf('"%s" is not a valid answer!', $answer));
         }
-    }
-
-    /**
-     * Checks if the word is the same as the solution
-     *
-     * @param string $word
-     *
-     * @return bool
-     */
-    private function isTheAnswer($word)
-    {
-        return ($this->word === strtoupper($word));
     }
 
     /**
@@ -716,7 +636,7 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     protected function applyHangmanGameCreatedEvent(HangmanGameCreatedEvent $event)
     {
         $this->id = $event->getGameId();
-        $this->word = strtoupper($event->getWord());
+        $this->word = new Word($event->getWord());
         $this->players = [];
         $this->gameOrder = [];
         $this->state = self::STATE_READY;

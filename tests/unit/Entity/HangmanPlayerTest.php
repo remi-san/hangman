@@ -8,6 +8,7 @@ use Hangman\Event\HangmanGoodLetterProposedEvent;
 use Hangman\Event\HangmanPlayerLostEvent;
 use Hangman\Event\HangmanPlayerWinEvent;
 use Hangman\Test\Mock\TestableHangmanPlayer;
+use Hangman\Word;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
 use Rhumsaa\Uuid\Uuid;
@@ -157,7 +158,7 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldWin()
     {
-        $this->player->win('word');
+        $this->player->win(new Word('word'));
         $this->assertTrue($this->player->hasWon());
     }
 
@@ -166,7 +167,7 @@ class HangmanPlayerTest extends \PHPUnit_Framework_TestCase
      */
     public function itShouldLose()
     {
-        $this->player->lose('word');
+        $this->player->lose(new Word('word'));
         $this->assertTrue($this->player->hasLost());
     }
 
