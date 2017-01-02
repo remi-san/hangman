@@ -200,7 +200,7 @@ class HangmanPlayer extends EventSourcedEntity implements Player
      * @param  Player $player
      * @return bool
      */
-    public function equals(Player $player)
+    public function equals(Player $player = null)
     {
         return $player instanceof HangmanPlayer && $this->id->equals($player->id);
     }
