@@ -11,6 +11,7 @@ use Hangman\Event\HangmanPlayerLostEvent;
 use Hangman\Event\HangmanPlayerProposedInvalidAnswerEvent;
 use Hangman\Event\HangmanPlayerTriedPlayingDuringAnotherPlayerTurnEvent;
 use Hangman\Event\HangmanPlayerTriedPlayingInactiveGameEvent;
+use Hangman\Exception\HangmanException;
 use Hangman\Exception\HangmanPlayerOptionsException;
 use Hangman\Move\Answer;
 use Hangman\Move\Proposition;
@@ -19,6 +20,7 @@ use Hangman\Result\HangmanBadProposition;
 use Hangman\Result\HangmanGoodProposition;
 use Hangman\Result\HangmanLost;
 use Hangman\Result\HangmanWon;
+use League\Event\EventInterface;
 use MiniGame\Entity\MiniGameId;
 use MiniGame\Entity\PlayerId;
 use MiniGame\Exceptions\IllegalMoveException;
@@ -496,6 +498,16 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
     public function itShouldBePossibleToBuildTheGameForReconstitution()
     {
         $this->assertTrue(Hangman::instantiateForReconstitution() instanceof Hangman);
+    }
+
+    /**
+     * @test
+     */
+    public function itShouldNotBePossibleToApplyAnUnsupportedEvent()
+    {
+        $this->setExpectedException(HangmanException::class);
+
+        $this->hangman->apply(\Mockery::mock(EventInterface::class));
     }
 
     private function givenTheGameHasTwoPlayers()

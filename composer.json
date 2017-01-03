@@ -25,7 +25,8 @@
         "phpunit/phpunit": "~4.5",
         "Mockery/Mockery": "~0.9",
         "friendsofphp/php-cs-fixer": "^1.10",
-        "squizlabs/php_codesniffer": "~2.0"
+        "squizlabs/php_codesniffer": "~2.0",
+        "fzaninotto/faker": "^1.6"
     },
     "autoload": {
         "psr-4": {

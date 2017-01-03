@@ -23,7 +23,9 @@ class Word
      */
     public function getLetters()
     {
-        return array_unique(str_split(strtoupper($this->word)));
+        $letters = array_unique(str_split(strtoupper($this->word)));
+        sort($letters);
+        return $letters;
     }
 
     /**
@@ -36,6 +38,9 @@ class Word
     public function buildWord($playedLetters)
     {
         $wordLetters = $this->getLetters();
+        $playedLetters = array_map(function ($letter) {
+            return strtoupper($letter);
+        }, $playedLetters);
         $goodLetters = array_intersect($wordLetters, $playedLetters);
         $splitWord = str_split($this->word);
 
@@ -68,7 +73,7 @@ class Word
      */
     public function contains($letter)
     {
-        return strpos(strtoupper($this->word), strtoupper($letter)) !== false;
+        return strpos($this->word, strtoupper($letter)) !== false;
     }
 
     /**

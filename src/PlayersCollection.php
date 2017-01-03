@@ -24,9 +24,13 @@ class PlayersCollection extends ArrayCollection
      */
     public function __construct(array $elements = array())
     {
-        parent::__construct($elements);
+        parent::__construct();
 
         $this->gameOrder = [];
+
+        foreach ($elements as $element) {
+            $this->add($element);
+        }
     }
 
     /**
@@ -40,7 +44,13 @@ class PlayersCollection extends ArrayCollection
 
         parent::set($key, $value);
 
-        $this->gameOrder[] = $key;
+        if (! in_array($key, $this->gameOrder)) {
+            $this->gameOrder[] = $key;
+        }
+
+        if ($this->currentPlayer === null) {
+            $this->currentPlayer = $value;
+        }
     }
 
     /**

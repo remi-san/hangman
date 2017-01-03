@@ -727,11 +727,13 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
 
     /**
      * @param mixed $event
+     *
+     * @throws HangmanException
      */
     public function apply($event)
     {
         if (! $this->isSupportedEvent($event)) {
-            return;
+            throw new HangmanException('You cannot apply a non hangman event.');
         }
 
         parent::apply($event);
