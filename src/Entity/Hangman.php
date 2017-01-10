@@ -107,11 +107,11 @@ class Hangman extends EventSourcedAggregateRoot implements MiniGame
     /**
      * Returns the aggregate id
      *
-     * @return MiniGameId
+     * @return string
      */
     public function getAggregateRootId()
     {
-        return $this->id;
+        return (string) $this->id;
     }
 
     /**

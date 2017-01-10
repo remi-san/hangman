@@ -124,7 +124,7 @@ class HangmanTest extends \PHPUnit_Framework_TestCase
     public function itShouldBeBuildable()
     {
         $this->assertEquals('HANGMAN', $this->hangman->getName());
-        $this->assertEquals($this->hangmanId, $this->hangman->getAggregateRootId());
+        $this->assertEquals((string) $this->hangmanId, $this->hangman->getAggregateRootId());
         $this->assertEquals($this->hangmanId, $this->hangman->getId());
         $this->assertNull($this->hangman->getCurrentPlayer());
         $this->assertNull($this->hangman->getPlayer(null));
