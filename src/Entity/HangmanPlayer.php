@@ -2,7 +2,7 @@
 
 namespace Hangman\Entity;
 
-use Broadway\EventSourcing\EventSourcedEntity;
+use Broadway\EventSourcing\SimpleEventSourcedEntity;
 use Hangman\Event\HangmanBadLetterProposedEvent;
 use Hangman\Event\HangmanGoodLetterProposedEvent;
 use Hangman\Event\HangmanPlayerLostEvent;
@@ -14,7 +14,7 @@ use MiniGame\Entity\PlayerId;
 use MiniGame\GameResult;
 use Rhumsaa\Uuid\Uuid;
 
-class HangmanPlayer extends EventSourcedEntity implements Player
+class HangmanPlayer extends SimpleEventSourcedEntity implements Player
 {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
